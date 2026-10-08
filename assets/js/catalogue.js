@@ -2,13 +2,13 @@
    NYCE SOLUTIONS — central catalogue data
    -----------------------------------------------------------------------------
    One record per product. A product that belongs to several categories is NOT
-   duplicated: it lists every department and subcategory it is assigned to.
+   duplicated: it lists every category and subcategory it is assigned to.
 
    Field reference (see docs/implementation-guide.html for the full model):
    id                 unique internal ID (never shown as a supplier SKU)
    sku / model        verified supplier SKU or listed model; null when unknown
    brand              retailer-listed brand for sourced records; null otherwise
-   departments[]      parent category IDs           subcategories[]  child IDs
+   categories[]      parent category IDs           subcategories[]  child IDs
    applications[]     Home Backup Power | Farm & Irrigation | Construction & Workshop
    image / gallery    sprite tile references (assets/images/equipment.webp)
    price / priceType  number + "demo" | null + "quote"       currency  KES
@@ -321,7 +321,7 @@ window.NYCE_CATALOGUE = {
       "name": "Starter lithium solar kit",
       "brand": null,
       "brandStatus": "unverified",
-      "departments": [
+      "categories": [
         "solar"
       ],
       "subcategories": [
@@ -347,7 +347,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative solar & renewable energy equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "A starting point for lighting, connectivity and selected essential loads.",
       "description": "A starting point for lighting, connectivity and selected essential loads. Final components require a load schedule.",
       "specs": {
@@ -377,7 +377,7 @@ window.NYCE_CATALOGUE = {
       "name": "ALPS Essential 6 kW solar kit",
       "brand": "ALPS",
       "brandStatus": "retailer-listed",
-      "departments": [
+      "categories": [
         "solar"
       ],
       "subcategories": [
@@ -403,7 +403,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative solar & renewable energy equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "A reference solar-and-storage package for planning essential household circuits.",
       "description": "A reference solar-and-storage package for planning essential household circuits. Final battery selection and usable energy require confirmation.",
       "specs": {
@@ -435,7 +435,7 @@ window.NYCE_CATALOGUE = {
       "name": "SRNE 10 kW lithium solar system",
       "brand": "SRNE",
       "brandStatus": "retailer-listed",
-      "departments": [
+      "categories": [
         "solar"
       ],
       "subcategories": [
@@ -461,7 +461,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative solar & renewable energy equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "A larger reference package for a home or business energy assessment.",
       "description": "A larger reference package for a home or business energy assessment. Equipment scope and compatibility must be confirmed.",
       "specs": {
@@ -492,7 +492,7 @@ window.NYCE_CATALOGUE = {
       "name": "Commercial lithium solar package",
       "brand": null,
       "brandStatus": "unverified",
-      "departments": [
+      "categories": [
         "solar"
       ],
       "subcategories": [
@@ -518,7 +518,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative solar & renewable energy equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "Build a quotation around operating hours, peak demand and priority circuits.",
       "description": "Build a quotation around operating hours, peak demand and priority circuits. Capacity is defined after reviewing your requirements.",
       "specs": {
@@ -548,7 +548,7 @@ window.NYCE_CATALOGUE = {
       "name": "MUST 5.5 kW hybrid inverter",
       "brand": "MUST",
       "brandStatus": "retailer-listed",
-      "departments": [
+      "categories": [
         "solar"
       ],
       "subcategories": [
@@ -574,7 +574,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative solar & renewable energy equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "A reference hybrid inverter for solar and battery power planning.",
       "description": "A reference hybrid inverter for solar and battery power planning. Confirm the final model and compatible battery before purchase.",
       "specs": {
@@ -605,7 +605,7 @@ window.NYCE_CATALOGUE = {
       "name": "SRNE 2.56 kWh lithium battery",
       "brand": "SRNE",
       "brandStatus": "retailer-listed",
-      "departments": [
+      "categories": [
         "solar"
       ],
       "subcategories": [
@@ -631,7 +631,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative solar & renewable energy equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "Reference lithium storage for a compatible low-voltage solar system.",
       "description": "Reference lithium storage for a compatible low-voltage solar system. Check actual nominal voltage and charging limits with the supplier.",
       "specs": {
@@ -662,7 +662,7 @@ window.NYCE_CATALOGUE = {
       "name": "Doyin 1.5 HP solar borehole pump kit",
       "brand": "Doyin",
       "brandStatus": "retailer-listed",
-      "departments": [
+      "categories": [
         "solar",
         "water"
       ],
@@ -691,7 +691,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative solar & renewable energy equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "A sourced pump-system example for borehole and tank-filling enquiries.",
       "description": "A sourced pump-system example for borehole and tank-filling enquiries. Maximum flow and maximum head are separate operating points; request the pump curve.",
       "specs": {
@@ -723,7 +723,7 @@ window.NYCE_CATALOGUE = {
       "name": "Seven Stars 300 L solar water heater",
       "brand": "Seven Stars",
       "brandStatus": "retailer-listed",
-      "departments": [
+      "categories": [
         "solar"
       ],
       "subcategories": [
@@ -749,7 +749,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative solar & renewable energy equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "A reference solar hot-water system.",
       "description": "A reference solar hot-water system. Confirm water pressure, mounting space and the final equipment specification.",
       "specs": {
@@ -780,7 +780,7 @@ window.NYCE_CATALOGUE = {
       "name": "Solar cable connector pair",
       "brand": null,
       "brandStatus": "unverified",
-      "departments": [
+      "categories": [
         "solar"
       ],
       "subcategories": [
@@ -806,7 +806,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative solar & renewable energy equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "Illustrative connectors for a solar wiring quotation.",
       "description": "Illustrative connectors for a solar wiring quotation. Match the exact connector family and cable dimensions.",
       "specs": {
@@ -836,7 +836,7 @@ window.NYCE_CATALOGUE = {
       "name": "Solar pumping inverter",
       "brand": null,
       "brandStatus": "unverified",
-      "departments": [
+      "categories": [
         "solar"
       ],
       "subcategories": [
@@ -862,7 +862,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative solar & renewable energy equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "An illustrative controller for solar pumping projects.",
       "description": "An illustrative controller for solar pumping projects. Share the motor rating and water demand with your enquiry.",
       "specs": {
@@ -893,7 +893,7 @@ window.NYCE_CATALOGUE = {
       "name": "Drip irrigation starter kit",
       "brand": null,
       "brandStatus": "unverified",
-      "departments": [
+      "categories": [
         "agriculture",
         "water"
       ],
@@ -922,7 +922,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative agriculture & irrigation equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "Plan a drip-irrigation layout around your crop, plot dimensions and available water pressure.",
       "description": "Plan a drip-irrigation layout around your crop, plot dimensions and available water pressure. Kit contents require confirmation.",
       "specs": {
@@ -953,7 +953,7 @@ window.NYCE_CATALOGUE = {
       "name": "JIADI 10 HP walking diesel tractor",
       "brand": "JIADI",
       "brandStatus": "retailer-listed",
-      "departments": [
+      "categories": [
         "agriculture"
       ],
       "subcategories": [
@@ -979,7 +979,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative agriculture & irrigation equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "A sourced walking-tractor example for land-preparation enquiries.",
       "description": "A sourced walking-tractor example for land-preparation enquiries. Request confirmation of the included implements.",
       "specs": {
@@ -1010,7 +1010,7 @@ window.NYCE_CATALOGUE = {
       "name": "Timber beehive with frames",
       "brand": null,
       "brandStatus": "unverified",
-      "departments": [
+      "categories": [
         "agriculture"
       ],
       "subcategories": [
@@ -1036,7 +1036,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative agriculture & irrigation equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "An illustrative beekeeping equipment example.",
       "description": "An illustrative beekeeping equipment example. Specify your preferred hive configuration and number of units.",
       "specs": {
@@ -1066,7 +1066,7 @@ window.NYCE_CATALOGUE = {
       "name": "Automatic egg incubator",
       "brand": null,
       "brandStatus": "unverified",
-      "departments": [
+      "categories": [
         "agriculture"
       ],
       "subcategories": [
@@ -1092,7 +1092,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative agriculture & irrigation equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "Compare incubators around flock size and available power.",
       "description": "Compare incubators around flock size and available power. Capacity and control functions require product verification.",
       "specs": {
@@ -1123,7 +1123,7 @@ window.NYCE_CATALOGUE = {
       "name": "Maize milling machine",
       "brand": null,
       "brandStatus": "unverified",
-      "departments": [
+      "categories": [
         "agriculture"
       ],
       "subcategories": [
@@ -1149,7 +1149,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative agriculture & irrigation equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "An illustrative posho-mill enquiry item.",
       "description": "An illustrative posho-mill enquiry item. Share your target output and available power source.",
       "specs": {
@@ -1180,7 +1180,7 @@ window.NYCE_CATALOGUE = {
       "name": "Irrigation HDPE pipe coil",
       "brand": null,
       "brandStatus": "unverified",
-      "departments": [
+      "categories": [
         "agriculture"
       ],
       "subcategories": [
@@ -1206,7 +1206,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative agriculture & irrigation equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "Plan pipe lengths and fittings around your field layout.",
       "description": "Plan pipe lengths and fittings around your field layout. Diameter, pressure class and coil length need confirmation.",
       "specs": {
@@ -1237,7 +1237,7 @@ window.NYCE_CATALOGUE = {
       "name": "Agricultural diesel engine",
       "brand": null,
       "brandStatus": "unverified",
-      "departments": [
+      "categories": [
         "agriculture"
       ],
       "subcategories": [
@@ -1263,7 +1263,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative agriculture & irrigation equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "An illustrative engine for agricultural equipment selection.",
       "description": "An illustrative engine for agricultural equipment selection. Match shaft type, speed and power to the driven equipment.",
       "specs": {
@@ -1294,7 +1294,7 @@ window.NYCE_CATALOGUE = {
       "name": "Manual knapsack sprayer · 16 L example",
       "brand": null,
       "brandStatus": "unverified",
-      "departments": [
+      "categories": [
         "agriculture"
       ],
       "subcategories": [
@@ -1320,7 +1320,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative agriculture & irrigation equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "A training example of a backpack sprayer.",
       "description": "A training example of a backpack sprayer. Confirm application compatibility and follow the chosen product instructions.",
       "specs": {
@@ -1351,7 +1351,7 @@ window.NYCE_CATALOGUE = {
       "name": "Single-core cable · 2.5 mm² example",
       "brand": null,
       "brandStatus": "unverified",
-      "departments": [
+      "categories": [
         "electrical"
       ],
       "subcategories": [
@@ -1378,7 +1378,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative electricals & wiring equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "An illustrative single-core wiring cable.",
       "description": "An illustrative single-core wiring cable. Conductor, insulation and installation suitability need supplier confirmation.",
       "specs": {
@@ -1409,7 +1409,7 @@ window.NYCE_CATALOGUE = {
       "name": "Switched double wall socket",
       "brand": null,
       "brandStatus": "unverified",
-      "departments": [
+      "categories": [
         "electrical"
       ],
       "subcategories": [
@@ -1435,7 +1435,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative electricals & wiring equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "An illustrative switched socket for project planning.",
       "description": "An illustrative switched socket for project planning. Confirm the rating and mounting box before ordering.",
       "specs": {
@@ -1466,7 +1466,7 @@ window.NYCE_CATALOGUE = {
       "name": "Manual changeover switch",
       "brand": null,
       "brandStatus": "unverified",
-      "departments": [
+      "categories": [
         "electrical"
       ],
       "subcategories": [
@@ -1492,7 +1492,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative electricals & wiring equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "Compare changeover requirements for alternative power sources with your electrician.",
       "description": "Compare changeover requirements for alternative power sources with your electrician.",
       "specs": {
@@ -1523,7 +1523,7 @@ window.NYCE_CATALOGUE = {
       "name": "Tronic 4-way surge-protected extension",
       "brand": "Tronic",
       "brandStatus": "retailer-listed",
-      "departments": [
+      "categories": [
         "electrical"
       ],
       "subcategories": [
@@ -1550,7 +1550,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative electricals & wiring equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "A sourced extension-socket example for comparing outlet requirements.",
       "description": "A sourced extension-socket example for comparing outlet requirements. Confirm the cable length and full specification.",
       "specs": {
@@ -1581,7 +1581,7 @@ window.NYCE_CATALOGUE = {
       "name": "Automatic voltage stabilizer",
       "brand": null,
       "brandStatus": "unverified",
-      "departments": [
+      "categories": [
         "electrical"
       ],
       "subcategories": [
@@ -1607,7 +1607,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative electricals & wiring equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "An illustrative stabilizer for load-specific enquiries.",
       "description": "An illustrative stabilizer for load-specific enquiries. Share connected equipment and the required capacity.",
       "specs": {
@@ -1638,7 +1638,7 @@ window.NYCE_CATALOGUE = {
       "name": "Metal electrical panel enclosure",
       "brand": null,
       "brandStatus": "unverified",
-      "departments": [
+      "categories": [
         "electrical"
       ],
       "subcategories": [
@@ -1664,7 +1664,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative electricals & wiring equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "A planning example for housing electrical controls.",
       "description": "A planning example for housing electrical controls. Confirm dimensions, mounting and protection requirements.",
       "specs": {
@@ -1695,7 +1695,7 @@ window.NYCE_CATALOGUE = {
       "name": "Twin & earth cable",
       "brand": null,
       "brandStatus": "unverified",
-      "departments": [
+      "categories": [
         "electrical"
       ],
       "subcategories": [
@@ -1721,7 +1721,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative electricals & wiring equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "An illustrative wiring cable for a materials quotation.",
       "description": "An illustrative wiring cable for a materials quotation. Confirm conductor size and intended installation.",
       "specs": {
@@ -1752,7 +1752,7 @@ window.NYCE_CATALOGUE = {
       "name": "Distribution board · 8-way example",
       "brand": null,
       "brandStatus": "unverified",
-      "departments": [
+      "categories": [
         "electrical"
       ],
       "subcategories": [
@@ -1778,7 +1778,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative electricals & wiring equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "A training example of a distribution enclosure.",
       "description": "A training example of a distribution enclosure. Protective devices and ratings must be specified separately.",
       "specs": {
@@ -1809,7 +1809,7 @@ window.NYCE_CATALOGUE = {
       "name": "Electric submersible borehole pump",
       "brand": null,
       "brandStatus": "unverified",
-      "departments": [
+      "categories": [
         "water"
       ],
       "subcategories": [
@@ -1835,7 +1835,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative borehole & water solutions equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "An illustrative borehole pump.",
       "description": "An illustrative borehole pump. Send total dynamic head, water demand and borehole details for selection.",
       "specs": {
@@ -1866,7 +1866,7 @@ window.NYCE_CATALOGUE = {
       "name": "Doyin 1.5 kW AC/DC borehole pump",
       "brand": "Doyin",
       "brandStatus": "retailer-listed",
-      "departments": [
+      "categories": [
         "water"
       ],
       "subcategories": [
@@ -1892,7 +1892,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative borehole & water solutions equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "A sourced hybrid borehole pump example.",
       "description": "A sourced hybrid borehole pump example. Maximum head and flow are separate limits, not simultaneous performance; confirm the duty point.",
       "specs": {
@@ -1924,7 +1924,7 @@ window.NYCE_CATALOGUE = {
       "name": "Submersible pump cable",
       "brand": null,
       "brandStatus": "unverified",
-      "departments": [
+      "categories": [
         "water"
       ],
       "subcategories": [
@@ -1950,7 +1950,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative borehole & water solutions equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "An illustrative cable for a borehole project.",
       "description": "An illustrative cable for a borehole project. Confirm voltage drop, connection and underwater suitability.",
       "specs": {
@@ -1981,7 +1981,7 @@ window.NYCE_CATALOGUE = {
       "name": "Automatic pump control switch",
       "brand": null,
       "brandStatus": "unverified",
-      "departments": [
+      "categories": [
         "water"
       ],
       "subcategories": [
@@ -2007,7 +2007,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative borehole & water solutions equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "A planning example for pump automation.",
       "description": "A planning example for pump automation. Match the controller to the pump and water system.",
       "specs": {
@@ -2037,7 +2037,7 @@ window.NYCE_CATALOGUE = {
       "name": "Pedrollo 0.5 HP booster pump",
       "brand": "Pedrollo",
       "brandStatus": "retailer-listed",
-      "departments": [
+      "categories": [
         "water"
       ],
       "subcategories": [
@@ -2063,7 +2063,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative borehole & water solutions equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "A sourced booster-pump reference for tank-to-house supply enquiries.",
       "description": "A sourced booster-pump reference for tank-to-house supply enquiries. Confirm the pump curve and installation conditions.",
       "specs": {
@@ -2093,7 +2093,7 @@ window.NYCE_CATALOGUE = {
       "name": "Swimming pool circulation pump",
       "brand": null,
       "brandStatus": "unverified",
-      "departments": [
+      "categories": [
         "water"
       ],
       "subcategories": [
@@ -2119,7 +2119,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative borehole & water solutions equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "An illustrative pool pump.",
       "description": "An illustrative pool pump. Compare flow requirements with your filtration system.",
       "specs": {
@@ -2150,7 +2150,7 @@ window.NYCE_CATALOGUE = {
       "name": "Water filtration housing set",
       "brand": null,
       "brandStatus": "unverified",
-      "departments": [
+      "categories": [
         "water"
       ],
       "subcategories": [
@@ -2176,7 +2176,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative borehole & water solutions equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "A planning example for water treatment enquiries.",
       "description": "A planning example for water treatment enquiries. A water test is needed to define a suitable process; no potability claim is made.",
       "specs": {
@@ -2207,7 +2207,7 @@ window.NYCE_CATALOGUE = {
       "name": "Tolsen electric hoist · 0.5 tonne",
       "brand": "Tolsen",
       "brandStatus": "retailer-listed",
-      "departments": [
+      "categories": [
         "construction"
       ],
       "subcategories": [
@@ -2233,7 +2233,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative construction & tools equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "A sourced equipment reference for lifting enquiries.",
       "description": "A sourced equipment reference for lifting enquiries. Confirm the rated configuration, mounting and duty limits.",
       "specs": {
@@ -2263,7 +2263,7 @@ window.NYCE_CATALOGUE = {
       "name": "Site concrete mixer",
       "brand": null,
       "brandStatus": "unverified",
-      "departments": [
+      "categories": [
         "construction"
       ],
       "subcategories": [
@@ -2289,7 +2289,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative construction & tools equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "An illustrative concrete mixer for planning site work.",
       "description": "An illustrative concrete mixer for planning site work. Share batch size and available power.",
       "specs": {
@@ -2319,7 +2319,7 @@ window.NYCE_CATALOGUE = {
       "name": "Lenhard MM-300 inverter welder",
       "brand": "Lenhard",
       "brandStatus": "retailer-listed",
-      "departments": [
+      "categories": [
         "construction"
       ],
       "subcategories": [
@@ -2345,7 +2345,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative construction & tools equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "A sourced welding-machine example for fabrication and repair enquiries.",
       "description": "A sourced welding-machine example for fabrication and repair enquiries. The model name is not a verified output-current rating.",
       "specs": {
@@ -2376,7 +2376,7 @@ window.NYCE_CATALOGUE = {
       "name": "Workshop circular saw",
       "brand": null,
       "brandStatus": "unverified",
-      "departments": [
+      "categories": [
         "construction"
       ],
       "subcategories": [
@@ -2402,7 +2402,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative construction & tools equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "An illustrative saw for timber-work planning.",
       "description": "An illustrative saw for timber-work planning. Match cutting depth and blade to the material.",
       "specs": {
@@ -2433,7 +2433,7 @@ window.NYCE_CATALOGUE = {
       "name": "Cordless drill & driver kit",
       "brand": null,
       "brandStatus": "unverified",
-      "departments": [
+      "categories": [
         "construction"
       ],
       "subcategories": [
@@ -2459,7 +2459,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative construction & tools equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "An illustrative drill-driver kit for assembly and maintenance work.",
       "description": "An illustrative drill-driver kit for assembly and maintenance work. Compare chuck size, battery compatibility and included accessories.",
       "specs": {
@@ -2490,7 +2490,7 @@ window.NYCE_CATALOGUE = {
       "name": "Submersible drainage & sewage pump",
       "brand": null,
       "brandStatus": "unverified",
-      "departments": [
+      "categories": [
         "construction"
       ],
       "subcategories": [
@@ -2516,7 +2516,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative construction & tools equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "An illustrative drainage pump.",
       "description": "An illustrative drainage pump. Share the liquid type, solids size and pumping duty.",
       "specs": {
@@ -2547,7 +2547,7 @@ window.NYCE_CATALOGUE = {
       "name": "Outdoor security camera",
       "brand": null,
       "brandStatus": "unverified",
-      "departments": [
+      "categories": [
         "construction"
       ],
       "subcategories": [
@@ -2573,7 +2573,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative construction & tools equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "An illustrative security-equipment enquiry.",
       "description": "An illustrative security-equipment enquiry. Specify coverage, recording and network requirements.",
       "specs": {
@@ -2604,7 +2604,7 @@ window.NYCE_CATALOGUE = {
       "name": "Aluminium step ladder",
       "brand": null,
       "brandStatus": "unverified",
-      "departments": [
+      "categories": [
         "construction"
       ],
       "subcategories": [
@@ -2630,7 +2630,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative construction & tools equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "A planning example for access equipment.",
       "description": "A planning example for access equipment. Confirm the rated working height and intended use.",
       "specs": {
@@ -2661,7 +2661,7 @@ window.NYCE_CATALOGUE = {
       "name": "Portable fire extinguisher",
       "brand": null,
       "brandStatus": "unverified",
-      "departments": [
+      "categories": [
         "construction"
       ],
       "subcategories": [
@@ -2687,7 +2687,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative construction & tools equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "An illustrative fire-safety enquiry item.",
       "description": "An illustrative fire-safety enquiry item. Selection requires the applicable fire risks and verified product documentation.",
       "specs": {
@@ -2718,7 +2718,7 @@ window.NYCE_CATALOGUE = {
       "name": "Petrol walk-behind lawn mower",
       "brand": null,
       "brandStatus": "unverified",
-      "departments": [
+      "categories": [
         "construction"
       ],
       "subcategories": [
@@ -2744,7 +2744,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative construction & tools equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "An illustrative mower for grounds maintenance.",
       "description": "An illustrative mower for grounds maintenance. Share your lawn area and terrain.",
       "specs": {
@@ -2775,7 +2775,7 @@ window.NYCE_CATALOGUE = {
       "name": "Portable petrol generator",
       "brand": null,
       "brandStatus": "unverified",
-      "departments": [
+      "categories": [
         "generators"
       ],
       "subcategories": [
@@ -2801,7 +2801,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative petrol & diesel generators equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "An illustrative backup-power option.",
       "description": "An illustrative backup-power option. Share your continuous and starting loads for equipment selection.",
       "specs": {
@@ -2832,7 +2832,7 @@ window.NYCE_CATALOGUE = {
       "name": "Hisaki 8.75 kVA diesel generator",
       "brand": "Hisaki",
       "brandStatus": "retailer-listed",
-      "departments": [
+      "categories": [
         "generators"
       ],
       "subcategories": [
@@ -2861,7 +2861,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative petrol & diesel generators equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "A sourced model reference for backup-power planning.",
       "description": "A sourced model reference for backup-power planning. Confirm continuous rating and the scope of any changeover equipment.",
       "specs": {
@@ -2893,7 +2893,7 @@ window.NYCE_CATALOGUE = {
       "name": "Pulsar 41 kVA diesel generator",
       "brand": "Pulsar",
       "brandStatus": "retailer-listed",
-      "departments": [
+      "categories": [
         "generators"
       ],
       "subcategories": [
@@ -2920,7 +2920,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative petrol & diesel generators equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "A sourced industrial-generator example.",
       "description": "A sourced industrial-generator example. Final selection needs a load schedule and confirmation of the rated duty.",
       "specs": {
@@ -2952,7 +2952,7 @@ window.NYCE_CATALOGUE = {
       "name": "Generator alternator",
       "brand": null,
       "brandStatus": "unverified",
-      "departments": [
+      "categories": [
         "generators"
       ],
       "subcategories": [
@@ -2978,7 +2978,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative petrol & diesel generators equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "An illustrative alternator enquiry item.",
       "description": "An illustrative alternator enquiry item. Provide the engine speed, mounting and required output.",
       "specs": {
@@ -3009,7 +3009,7 @@ window.NYCE_CATALOGUE = {
       "name": "Gas-fuelled generator",
       "brand": null,
       "brandStatus": "unverified",
-      "departments": [
+      "categories": [
         "generators"
       ],
       "subcategories": [
@@ -3035,7 +3035,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative petrol & diesel generators equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "An illustrative gas-generator enquiry.",
       "description": "An illustrative gas-generator enquiry. LPG and biogas are different fuels; compatibility cannot be assumed.",
       "specs": {
@@ -3066,7 +3066,7 @@ window.NYCE_CATALOGUE = {
       "name": "TLAC 220 A diesel welding generator",
       "brand": "TLAC",
       "brandStatus": "retailer-listed",
-      "departments": [
+      "categories": [
         "generators",
         "construction"
       ],
@@ -3094,7 +3094,7 @@ window.NYCE_CATALOGUE = {
         }
       ],
       "alt": "Illustrative petrol & diesel generators equipment; not an exact model photograph",
-      "photoStatus": "Illustrative department visual; exact product photography pending",
+      "photoStatus": "Illustrative category visual; exact product photography pending",
       "shortDescription": "A sourced engine-driven welding reference for field-work enquiries.",
       "description": "A sourced engine-driven welding reference for field-work enquiries. Confirm the welding duty cycle and auxiliary power rating.",
       "specs": {
