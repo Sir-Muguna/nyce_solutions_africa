@@ -152,19 +152,20 @@ function recordTag(p) {
     : `<span class="tag illustrative record-tag">Illustrative product</span>`;
 }
 function card(p) {
-  const c = primaryCat(p), s = primarySub(p), spec = Object.entries(p.specs)[0];
-  const ident = p.model ? `Model ${p.model}` : p.sku ? `SKU ${p.sku}` : null;
+  const stock = Object.prototype.hasOwnProperty.call(p, 'stock') && p.stock !== undefined && p.stock !== null && p.stock !== '';
+  const whatsapp = validNumber()
+    ? `<a class="btn wa sm" href="https://wa.me/${WHATSAPP}?text=${encodeURIComponent(generalMessage())}" target="_blank" rel="noopener noreferrer">${icon('wa')} WhatsApp</a>`
+    : `<button type="button" class="btn wa sm" data-general-wa>${icon('wa')} WhatsApp</button>`;
   return `<article class="product-card" data-product-id="${p.id}">
-    <a href="#/product/${p.id}" class="product-media" aria-label="View ${esc(p.name)}">${photo(p.image.tile, p.alt, { label: false })}${recordTag(p)}</a>
+    <a href="#/product/${p.id}" class="product-media" aria-label="View ${esc(p.name)}">${photo(p.image.tile, p.alt, { label: false, mode: 'slice' })}${recordTag(p)}</a>
     <div class="product-content">
-      <span class="cat-name">${esc(c.name)}${s ? ` · ${esc(s.name)}` : ''}</span>
-      <h3><a href="#/product/${p.id}">${esc(p.name)}</a></h3>
-      ${ident ? `<p class="model-line">${esc(ident)}</p>` : ''}
-      ${spec ? `<p class="spec-line">${esc(spec[0])}: ${esc(spec[1])}</p>` : ''}
+      <h2><a href="#/product/${p.id}">${esc(p.name)}</a></h2>
+      ${p.sku ? `<p class="product-sku">SKU: ${esc(p.sku)}</p>` : ''}
+      ${stock ? `<p class="product-stock">Stock status: ${esc(p.stock)}</p>` : ''}
       ${priceBlock(p)}
       <div class="card-actions">
-        <a class="btn secondary sm" href="#/product/${p.id}">View details</a>
-        <button type="button" class="btn wa sm" data-wa="${p.id}">${icon('wa')} WhatsApp</button>
+        <a class="btn sm" href="#/product/${p.id}">View details</a>
+        ${whatsapp}
       </div>
     </div>
   </article>`;
@@ -178,47 +179,35 @@ const PENDING = (CONFIG.placeholders && CONFIG.placeholders.contactPending) || '
 /* ---------------------------------------------------------------- 4. Home */
 function home() {
   const featured = PRODUCTS.filter(p => p.featured).slice(0, 8);
-  return `
-  <section class="hero">
-    <div class="hero-copy">
-      <h1>Power your home.<br>Equip your business.</h1>
-      <p>One catalogue for electrical equipment, solar and backup power, borehole and water solutions, agricultural equipment and construction and workshop tools — for homes, farms, contractors and institutions in Kenya, with enquiries welcome from across Africa.</p>
-      <ul class="hero-list">
-        <li>${icon('bolt')} Electrical equipment</li><li>${icon('sun')} Solar &amp; backup power</li><li>${icon('drop')} Borehole &amp; water</li><li>${icon('leaf')} Agricultural equipment</li><li>${icon('tool')} Construction &amp; workshop</li>
-      </ul>
-      <div class="actions"><a class="btn" href="#/shop">Shop Products ${icon('arrow')}</a><a class="btn secondary" href="#/business">Request a Quote</a></div>
-    </div>
-    <div class="hero-visual">${photo(0, 'Solar panels, hybrid inverter and lithium battery', { label: !PROD, mode: 'slice' })}</div>
-  </section>
-  <div class="confidence">
-    <div>${icon('grid')}<div><strong>Six specialist departments</strong><span>${CATEGORIES.reduce((n, c) => n + c.subcategories.length, 0)} subcategories, one place to compare</span></div></div>
-    <div>${icon('wa')}<div><strong>Enquire on WhatsApp</strong><span>Every product prepares a ready-to-send enquiry</span></div></div>
-    <div>${icon('truck')}<div><strong>Delivery by enquiry</strong><span>Share your town or county for confirmation</span></div></div>
-  </div>
-  <section class="section" aria-labelledby="home-departments">
-    <div class="section-head"><div><h2 id="home-departments">Shop by department</h2><p>Open a department to see its products and subcategories in the Shop.</p></div><a href="#/shop" class="text-link">View Full Catalogue ${icon('arrow')}</a></div>
-    <div class="department-grid">${CATEGORIES.map(departmentCard).join('')}</div>
-  </section>
-  ${featured.length ? `<section class="section" aria-labelledby="home-featured">
-    <div class="section-head"><div><h2 id="home-featured">Featured equipment</h2><p>${PROD ? 'A selection from the catalogue.' : 'Demonstration products. Prices and availability require confirmation.'}</p></div><a class="text-link" href="#/shop">View Full Catalogue ${icon('arrow')}</a></div>
-    <div class="product-grid">${featured.map(card).join('')}</div>
-  </section>` : ''}
-  <section class="section" aria-labelledby="home-applications">
-    <div class="section-head"><div><h2 id="home-applications">Shop by application</h2><p>Start from the job you need done.</p></div></div>
-    <div class="application-grid">${APPLICATIONS.map(([n, d, i]) => `<a class="application" href="${makeUrl('shop', { application: n })}">${icon(i)}<h3>${n}</h3><p>${d}</p><span class="text-link">Explore equipment ${icon('arrow')}</span></a>`).join('')}</div>
-  </section>
-  <section class="band">
-    <div><h2>Business &amp; bulk orders</h2><p>Planning a farm, fit-out, workshop, school or institutional purchase? Send your equipment list, quantities and destination and we will prepare a quotation.</p></div>
-    <a class="btn light" href="#/business">Request a Quote ${icon('arrow')}</a>
-  </section>
-  <section class="support-grid">
-    <div class="support-card">${icon('truck')}<div><h3>Delivery</h3><p>${esc((CONFIG.placeholders && CONFIG.placeholders.deliveryStatement) || 'Delivery is confirmed per enquiry.')}</p><a class="text-link" href="#/contact?topic=Delivery%20enquiry">Ask about delivery ${icon('arrow')}</a></div></div>
-    <div class="support-card">${icon('message')}<div><h3>Customer support</h3><p>Have a model number, load list or site requirement? Include it in your enquiry so the first reply already covers the right specification.</p><a class="text-link" href="#/contact">Contact us ${icon('arrow')}</a></div></div>
-  </section>
-  <section class="band" style="background:var(--green)">
-    <div><h2>Ready to ask about a product?</h2><p>Open any product and tap the WhatsApp button. The message is prepared for you with the product name, quantity and a link.</p></div>
-    <button type="button" class="btn light" data-general-wa>${icon('wa')} Start a WhatsApp enquiry</button>
+  const arrivals = PRODUCTS.filter(p => p.dateAdded).sort((a, b) => String(b.dateAdded).localeCompare(String(a.dateAdded))).slice(0, 8);
+  const sellers = PRODUCTS.filter(p => p.bestSeller === true).slice(0, 8);
+  const productRow = (title, id, products, heading = 'h2') => `<section class="home-product-section" aria-labelledby="${id}">
+    <div class="home-section-head"><${heading} id="${id}">${title}</${heading}><a href="#/shop">Browse all products</a></div>
+    <div class="product-grid home-product-grid">${products.map(card).join('')}</div>
   </section>`;
+  return `
+  <section class="home-search-strip" aria-label="Search and browse products">
+    <!-- Search query signature: submit sends q=<URL-encoded-term> to #/shop; app.js matches product name and internal reference SKU. -->
+    <form class="search-form home-search-form" id="home-search" role="search">
+      <label class="sr-only" for="home-search-input">Search products by name or SKU</label>
+      <input type="search" id="home-search-input" placeholder="Search products by name or SKU" autocomplete="off">
+      <button type="submit" aria-label="Search products">${icon('search')}<span>Search</span></button>
+    </form>
+    <a class="btn secondary home-browse-link" href="#/shop">Browse all products</a>
+  </section>
+  ${productRow('Featured Products', 'home-featured', featured, 'h1')}
+  <nav class="category-quick-links" aria-label="Shop by category">
+    ${CATEGORIES.map(c => `<a href="${shopUrl(c.id)}">${esc(c.name)}</a>`).join('')}
+  </nav>
+  ${productRow('New Arrivals', 'home-arrivals', arrivals)}
+  ${productRow('Best Sellers', 'home-best-sellers', sellers)}
+  <section class="home-trust-strip" aria-label="Trust and service information">
+    <div>${icon('grid')}<span>Six specialist departments</span></div>
+    <div>${icon('wa')}<span>Enquire on WhatsApp</span></div>
+    <div>${icon('truck')}<span>Delivery by enquiry</span></div>
+    <div>${icon('message')}<span>Customer support</span></div>
+  </section>
+  <section class="home-cta-band"><a class="btn light" href="#/shop">Browse all products ${icon('arrow')}</a></section>`;
 }
 
 /* ---------------------------------------------------------------- 4b. Shop listing */
@@ -234,9 +223,9 @@ function selection(route) {
   if (category && !cat(category)) category = '';
   return { category, subcategory, q: g('q'), power: g('power'), phase: g('phase'), pricing: g('pricing'), source: g('source'), application: g('application'), sort: g('sort') || 'featured', page: Math.max(1, Math.floor(Number(g('page')) || 1)) };
 }
+// Search results must match only product name and internal SKU.
 function searchText(p) {
-  return [p.name, p.model, p.sku, p.brand, p.description, ...Object.values(p.specs), ...p.applications,
-    ...p.departments.map(d => cat(d) && cat(d).name), ...p.subcategories.map(s => subOf(s) && subOf(s).name)].join(' ').toLowerCase();
+  return [p.name, p.sku].join(' ').toLowerCase();
 }
 function filtered(sel) {
   const query = (sel.q || '').trim().toLowerCase();
@@ -262,23 +251,11 @@ function choice(name, value, label, count, checked, extra = '') {
 function selectField(label, id, options, value, hint = '') {
   return `<div class="field"><label for="${id}">${label}</label><select id="${id}" data-filter="${id.replace('filter-', '')}">${options.map(o => Array.isArray(o[1]) ? `<optgroup label="${esc(o[0])}">${o[1].map(([v, n]) => `<option value="${esc(v)}" ${String(value) === v ? 'selected' : ''}>${esc(n)}</option>`).join('')}</optgroup>` : `<option value="${esc(o[0])}" ${String(value) === o[0] ? 'selected' : ''}>${esc(o[1])}</option>`).join('')}</select>${hint ? `<small>${hint}</small>` : ''}</div>`;
 }
-function filterPanel(sel, base) {
-  const c = cat(sel.category);
-  const powers = [...new Set(base.map(p => p.power).filter(Boolean))].sort();
-  const phases = [...new Set(base.map(p => p.phase).filter(Boolean))].sort();
-  const subField = c
-    ? `<fieldset class="filter-group"><legend>Subcategory</legend><div class="choice-list" role="radiogroup">${choice('filter-subcategory', '', `All ${c.name}`, countDept(c.id), !sel.subcategory)}${c.subcategories.map(s => choice('filter-subcategory', s.id, s.name, countSub(s.id), sel.subcategory === s.id, 'sub')).join('')}</div></fieldset>`
-    : selectField('Subcategory', 'filter-subcategory', [['', 'All subcategories'], ...CATEGORIES.map(cc => [cc.name, cc.subcategories.map(s => [s.id, s.name])])], sel.subcategory, 'Choosing a subcategory also selects its department.');
+function filterPanel(sel) {
   return `<aside class="filter-panel" id="filters" aria-label="Product filters">
     <div class="drawer-head"><h2>Filter products</h2><button type="button" class="drawer-close" id="drawer-close" aria-label="Close filters">${icon('close')}</button></div>
     <form id="filter-form" novalidate>
-      <fieldset class="filter-group"><legend>Department</legend><div class="choice-list" role="radiogroup">${choice('filter-category', '', 'All departments', PRODUCTS.length, !sel.category)}${CATEGORIES.map(cc => choice('filter-category', cc.id, cc.name, countDept(cc.id), sel.category === cc.id)).join('')}</div></fieldset>
-      ${subField}
-      ${powers.length > 1 ? selectField('Power source', 'filter-power', [['', 'Any power source'], ...powers.map(p => [p, p])], sel.power) : ''}
-      ${phases.length ? selectField('Electrical phase', 'filter-phase', [['', 'Any phase'], ...phases.map(p => [p, p])], sel.phase) : ''}
-      ${selectField('Price type', 'filter-pricing', [['', 'All products'], ['demo', PROD ? 'Priced products' : 'Demonstration prices'], ['quote', 'Request Price']], sel.pricing)}
-      ${selectField('Application', 'filter-application', [['', 'Any application'], ...APPLICATIONS.map(a => [a[0], a[0]])], sel.application)}
-      ${PROD ? '' : selectField('Product evidence', 'filter-source', [['', 'All records'], ['sourced', 'Reference products'], ['illustrative', 'Illustrative products']], sel.source)}
+      <fieldset class="filter-group"><legend>Categories</legend><div class="choice-list" role="radiogroup">${choice('filter-category', '', 'All Categories', PRODUCTS.length, !sel.category)}${CATEGORIES.map(cc => choice('filter-category', cc.id, cc.name, countDept(cc.id), sel.category === cc.id)).join('')}</div></fieldset>
       <div class="filter-actions"><button type="button" class="btn secondary sm" data-clear-filters>Clear all filters</button></div>
     </form>
     <div class="filter-footer"><p>Not sure about the specification? <a href="#/business">Request a quote</a> and describe your requirement.</p></div>
@@ -300,10 +277,9 @@ function chips(sel) {
 }
 function listing(route) {
   const sel = selection(route), c = cat(sel.category), s = subOf(sel.subcategory);
-  const base = PRODUCTS.filter(p => inDept(p, sel.category));
   const rows = filtered(sel), pages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
   const page = Math.min(pages, sel.page), start = (page - 1) * PAGE_SIZE;
-  const title = s ? s.name : c ? c.name : sel.application ? sel.application : 'Shop';
+  const title = sel.q ? 'Search results' : s ? s.name : c ? c.name : sel.application ? sel.application : 'Shop';
   const breadcrumbs = [['Shop', (c || s || sel.q || sel.application) ? '#/shop' : null]];
   if (c) breadcrumbs.push([c.name, s ? shopUrl(c.id) : null]);
   if (s) breadcrumbs.push([s.name]);
@@ -313,19 +289,18 @@ function listing(route) {
   const summary = rows.length
     ? `<span class="result-count" role="status">${rows.length} ${rows.length === 1 ? 'product' : 'products'} <small>· showing ${start + 1}–${Math.min(start + PAGE_SIZE, rows.length)}</small></span>`
     : `<span class="result-count" role="status">0 products</span>`;
-  const querySummary = sel.q ? `<span class="small muted">Results for “${esc(sel.q)}”${c ? ` in ${esc(c.name)}` : ''}</span>` : '';
   const grid = rows.length ? rows.slice(start, start + PAGE_SIZE).map(card).join('')
-    : `<div class="empty"><h2>No products match these filters</h2><p>${sel.q ? 'Try a shorter search term or a different spelling, or ' : 'Try '}removing a filter or browse a department instead.</p><div class="actions"><button type="button" class="btn" data-clear-filters>Clear all filters</button>${c && (s || sel.q || sel.power || sel.phase || sel.pricing || sel.application || sel.source) ? `<a class="btn secondary" href="${shopUrl(c.id)}">All ${esc(c.name)}</a>` : ''}<a class="btn secondary" href="#/business">Request a quote instead</a></div></div>`;
+    : `<div class="empty"><p>${sel.q ? `No products match “${esc(sel.q)}”.` : 'No products match the selected filters.'}</p></div>`;
   const pagination = pages > 1 ? `<nav class="pagination" aria-label="Catalogue pages"><button type="button" data-page="${page - 1}" ${page === 1 ? 'disabled' : ''}>Previous</button>${Array.from({ length: pages }, (_, i) => `<button type="button" data-page="${i + 1}" ${page === i + 1 ? 'aria-current="page"' : ''} aria-label="Page ${i + 1}">${i + 1}</button>`).join('')}<button type="button" data-page="${page + 1}" ${page === pages ? 'disabled' : ''}>Next</button></nav>` : '';
   return crumb(breadcrumbs) + `
-  <section class="page-intro"><h1>${esc(title)}</h1><p>${esc(intro)}</p></section>
+  ${sel.q ? `<section class="search-results-summary" aria-labelledby="search-results-title"><h1 id="search-results-title">Search results for “${esc(sel.q)}”</h1>${summary}</section>` : `<section class="page-intro"><h1>${esc(title)}</h1><p>${esc(intro)}</p></section>`}
   ${PROD && !PRODUCTS.length ? notice('No products have been approved for publication yet. Add approved product IDs in <code>assets/js/config.js</code>.', 'warn') : ''}
   ${demoNotice('Demonstration catalogue: reference products come from cited retailer listings and illustrative products are unverified examples. Images are representative department visuals, not exact-model photographs.')}
   <div class="catalog-layout">
-    <div><button type="button" class="btn secondary filter-toggle" id="filter-toggle" aria-controls="filters" aria-expanded="false">${icon('filter')} Filters</button>${filterPanel(sel, base)}</div>
+    <div><button type="button" class="btn secondary filter-toggle" id="filter-toggle" aria-controls="filters" aria-expanded="false">${icon('filter')} Filters</button>${filterPanel(sel)}</div>
     <div class="catalog-main">
       <div class="toolbar">
-        <div class="toolbar-left">${summary}${querySummary}</div>
+        <div class="toolbar-left">${sel.q ? '' : summary}</div>
         <div class="toolbar-right">
           <label for="sort-products">Sort <select id="sort-products" data-filter="sort">${sortOptions.map(([v, n]) => `<option value="${v}" ${v === sel.sort ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
           <div class="view-toggle" role="group" aria-label="View"><button type="button" data-view="grid" aria-pressed="${viewMode === 'grid'}" aria-label="Grid view">${icon('grid')}</button><button type="button" data-view="list" aria-pressed="${viewMode === 'list'}" aria-label="List view">${icon('list')}</button></div>
@@ -470,9 +445,9 @@ function contact(params) {
     <div>
       <h2>How to reach us</h2>
       <ul class="info-list">
-        <li>${icon('wa')}<div><strong>WhatsApp</strong><small>${WHATSAPP ? `+${esc(WHATSAPP)}` : `<span class="muted">${esc(PENDING)}</span>`}</small></div></li>
+        <li>${icon('wa')}<div><strong>WhatsApp</strong><small>${WHATSAPP ? `<a href="https://wa.me/${WHATSAPP}">+${esc(WHATSAPP)}</a>` : `<span class="muted">${esc(PENDING)}</span>`}</small></div></li>
         <li>${icon('phone')}<div><strong>Phone</strong><small>${contactLine(CONFIG.phoneNumber, PENDING)}</small></div></li>
-        <li>${icon('mail')}<div><strong>Email</strong><small>${contactLine(CONFIG.emailAddress, PENDING)}</small></div></li>
+        <li>${icon('mail')}<div><strong>Email</strong><small>${CONFIG.emailAddress ? `<a href="mailto:${esc(CONFIG.emailAddress)}">${esc(CONFIG.emailAddress)}</a>` : contactLine(CONFIG.emailAddress, PENDING)}</small></div></li>
         <li>${icon('pin')}<div><strong>Address</strong><small>${contactLine(CONFIG.physicalAddress, PENDING)}</small></div></li>
         <li>${icon('clock')}<div><strong>Operating hours</strong><small>${contactLine(CONFIG.operatingHours, PENDING)}</small></div></li>
       </ul>
@@ -577,7 +552,6 @@ function render() {
   const main = document.getElementById('main');
   main.innerHTML = html;
   document.querySelectorAll('[data-nav]').forEach(a => { const on = a.dataset.nav === active; a.classList.toggle('active', on); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
-  closeMenu();
   document.getElementById('search-input').value = r.params.get('q') || '';
   const heading = main.querySelector('h1');
   document.title = `${(heading ? (heading.innerText || heading.textContent) : 'Catalogue').replace(/\s+/g, ' ').trim()} | ${BUSINESS}`;
@@ -610,10 +584,6 @@ function removeFilter(key) {
   const sel = selection(current());
   if (key === 'category') { sel.category = ''; sel.subcategory = ''; sel.power = ''; sel.phase = ''; } else sel[key] = '';
   sel.page = 1; navigate(makeUrl('shop', sel));
-}
-function closeMenu() {
-  document.getElementById('primary-nav').classList.remove('open');
-  const t = document.getElementById('menu-toggle'); t.setAttribute('aria-expanded', 'false'); t.setAttribute('aria-label', 'Open menu');
 }
 function openDrawer(moveFocus = true) {
   const panel = document.getElementById('filters'), backdrop = document.getElementById('drawer-backdrop'), toggle = document.getElementById('filter-toggle');
@@ -728,7 +698,6 @@ document.addEventListener('click', e => {
   const el = e.target.closest('button, a');
   if (!el) return;
   if (el.classList.contains('skip')) { e.preventDefault(); document.getElementById('main').focus(); return; }
-  if (el.id === 'menu-toggle') { const nav = document.getElementById('primary-nav'), open = nav.classList.toggle('open'); el.setAttribute('aria-expanded', String(open)); el.setAttribute('aria-label', open ? 'Close menu' : 'Open menu'); return; }
   if (el.id === 'filter-toggle') { drawerOpen ? closeDrawer() : openDrawer(); return; }
   if (el.id === 'drawer-close') { closeDrawer(); return; }
   if (el.dataset.focusField) { e.preventDefault(); const f = document.getElementById(el.dataset.focusField); if (f) f.focus(); return; }
@@ -773,10 +742,17 @@ document.addEventListener('keydown', e => {
     const names = ['description', 'specifications', 'delivery'], i = names.indexOf(e.target.dataset.tab);
     if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) { e.preventDefault(); const j = e.key === 'Home' ? 0 : e.key === 'End' ? 2 : (i + (e.key === 'ArrowRight' ? 1 : 2)) % 3; selectTab(names[j], true); }
   }
-  if (e.key === 'Escape') { closeMenu(); if (drawerOpen) closeDrawer(); }
+  if (e.key === 'Escape' && drawerOpen) closeDrawer();
 });
 document.addEventListener('submit', e => {
-  if (e.target.id === 'global-search') { e.preventDefault(); const q = document.getElementById('search-input').value.trim(); const sel = current().parts[0] === 'shop' ? selection(current()) : {}; navigate(makeUrl('shop', { ...sel, q, page: 1 })); return; }
+  if (e.target.id === 'global-search' || e.target.id === 'home-search') {
+    e.preventDefault();
+    const inputID = e.target.id === 'home-search' ? 'home-search-input' : 'search-input';
+    const q = document.getElementById(inputID).value.trim();
+    const route = current(), sel = route.parts[0] === 'shop' ? selection(route) : {};
+    navigate(makeUrl('shop', { ...sel, q, page: 1 }));
+    return;
+  }
   if (e.target.id !== 'enquiry-form') return;
   e.preventDefault();
   const form = e.target, errors = validateForm(form);
@@ -792,16 +768,18 @@ document.getElementById('modal').addEventListener('click', e => {
 document.getElementById('drawer-backdrop').addEventListener('click', () => closeDrawer());
 window.addEventListener('hashchange', () => { const m = document.getElementById('modal'); if (m.open) m.close(); render(); });
 window.addEventListener('resize', () => { if (innerWidth >= 1050 && drawerOpen) closeDrawer(false); });
+function updateHeaderOnScroll() {
+  document.querySelector('header').classList.toggle('is-compact', window.scrollY > 80);
+}
+window.addEventListener('scroll', updateHeaderOnScroll, { passive: true });
 
 /* ---------------------------------------------------------------- Boot */
 (function boot() {
   // Mode indicators and footer text driven by config.
-  const badge = document.getElementById('mode-badge'); if (badge) badge.hidden = PROD;
   const footerContact = document.getElementById('footer-contact');
-  if (footerContact) footerContact.innerHTML = `Phone: ${contactLine(CONFIG.phoneNumber, PENDING)}<br>WhatsApp: ${WHATSAPP ? `+${esc(WHATSAPP)}` : `<span class="muted">${esc(PENDING)}</span>`}<br>Email: ${contactLine(CONFIG.emailAddress, PENDING)}<br>Address &amp; hours: ${contactLine([CONFIG.physicalAddress, CONFIG.operatingHours].filter(Boolean).join(' · '), PENDING)}`;
+  if (footerContact) footerContact.innerHTML = `WhatsApp: ${WHATSAPP ? `<a href="https://wa.me/${WHATSAPP}">+${esc(WHATSAPP)}</a>` : `<span class="muted">${esc(PENDING)}</span>`}<br>Email: ${CONFIG.emailAddress ? `<a href="mailto:${esc(CONFIG.emailAddress)}">${esc(CONFIG.emailAddress)}</a>` : contactLine(CONFIG.emailAddress, PENDING)}<br>Facebook: <a href="${esc(CONFIG.facebookUrl)}" target="_blank" rel="noopener noreferrer">${esc(CONFIG.facebookName)}</a><br>Website: <a href="${esc(CONFIG.websiteUrl)}">${esc(CONFIG.websiteName)}</a><br>Phone: ${contactLine(CONFIG.phoneNumber, PENDING)}<br>Address &amp; hours: ${contactLine([CONFIG.physicalAddress, CONFIG.operatingHours].filter(Boolean).join(' · '), PENDING)}`;
   const year = document.getElementById('footer-year'); if (year) year.textContent = new Date().getFullYear();
   const note = document.getElementById('footer-note'); if (note) note.textContent = PROD ? 'Prices and availability are confirmed by quotation. No online payment.' : 'Demonstration catalogue · indicative prices · no live checkout or payment.';
-  const contactShort = document.getElementById('contact-short'); if (contactShort && CONFIG.phoneNumber) contactShort.querySelector('div').innerHTML = `<span>Call or WhatsApp</span>${esc(CONFIG.phoneNumber)}`;
 
   // Logo with wordmark fallback.
   for (const id of ['brand-logo', 'footer-logo']) {
@@ -818,6 +796,7 @@ window.addEventListener('resize', () => { if (innerWidth >= 1050 && drawerOpen) 
   document.querySelectorAll('[data-icon]').forEach(el => { el.innerHTML = icon(el.dataset.icon); });
   const sb = document.getElementById('search-button'); if (sb) sb.innerHTML = `${icon('search')}<span>Search</span>`;
   render();
+  updateHeaderOnScroll();
 })();
 
 // Read-only hooks for testing and training. Never a server API.

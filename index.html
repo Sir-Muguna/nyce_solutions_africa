@@ -13,29 +13,23 @@
 <body>
 <a href="#main" class="skip">Skip to main content</a>
 
-<div class="utility" id="utility-bar"><div class="wrap"><span>Equipment for Kenya. Enquiries across Africa.</span><span class="mode-badge" id="mode-badge" hidden>Demonstration catalogue · no live orders</span></div></div>
-
 <header>
   <div class="header-main wrap">
     <a href="#/" class="logo" aria-label="NYCE SOLUTIONS home"><img id="brand-logo" alt="NYCE SOLUTIONS" width="178" height="71"></a>
+    <!-- Search query signature: submit sends q=<URL-encoded term> to #/shop; app.js matches product name and internal reference SKU. -->
     <form class="search-form" id="global-search" role="search">
-      <label class="sr-only" for="search-input">Search products, models or categories</label>
+      <label class="sr-only" for="search-input">Search products by name or SKU</label>
       <input type="search" id="search-input" placeholder="Search solar, pumps, cables, tools…" autocomplete="off">
       <button type="submit" aria-label="Search products" id="search-button"></button>
     </form>
-    <a class="contact-short" href="#/contact" id="contact-short"><span data-icon="message"></span><div><span>Have a project in mind?</span>Talk to NYCE SOLUTIONS</div></a>
+    <nav class="navigation" id="primary-nav" aria-label="Main navigation">
+      <a href="#/" data-nav="home">Home</a>
+      <a href="#/shop" data-nav="shop">Shop</a>
+      <a href="#/shop" data-nav="categories">Categories</a>
+    </nav>
+    <button type="button" class="btn wa header-whatsapp" data-general-wa aria-label="Start a WhatsApp enquiry"><span data-icon="wa"></span><span>WhatsApp</span></button>
     <a class="cart-link" href="#/cart" aria-label="Cart, 0 items"><span data-icon="cart"></span><span class="cart-label">Cart</span><span class="cart-number" id="cart-count">0</span></a>
-    <button class="mobile-menu" aria-expanded="false" aria-controls="primary-nav" aria-label="Open menu" id="menu-toggle" data-icon="menu"></button>
   </div>
-  <div class="nav-band"><nav class="navigation wrap" id="primary-nav" aria-label="Main navigation">
-    <a href="#/" data-nav="home">Home</a>
-    <a href="#/shop" data-nav="shop">Shop</a>
-    <a href="#/business" data-nav="business">Business &amp; Bulk Orders</a>
-    <a href="#/about" data-nav="about">About Us</a>
-    <a href="#/contact" data-nav="contact">Contact</a>
-    <a href="#/cart" data-nav="cart">Cart</a>
-    <a href="#/business" class="nav-quote">Request a Quote <span data-icon="arrow"></span></a>
-  </nav></div>
 </header>
 
 <noscript><div class="noscript wrap">This catalogue needs JavaScript to display products, filters and enquiries. Enable JavaScript and reload the page.</div></noscript>
