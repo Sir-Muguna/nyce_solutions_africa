@@ -170,12 +170,6 @@ footer { background: #10284e; color: #dbe4f1; margin-top: 48px; }
 .footer-contact li { display: flex; flex-wrap: wrap; align-items: center; gap: 0 10px; padding: 2px 0; line-height: 1.6; }
 .footer-contact-label { min-width: 74px; color: #fff; font-weight: 600; }
 .footer-contact a { display: inline-flex; min-height: 44px; }
-.footer-help-list { list-style: none; margin: 0; padding: 0; }
-.footer-help-list li { padding: 7px 0; border-bottom: 1px solid #365078; font-size: 12px; line-height: 1.5; }
-.footer-help-list a { display: flex; flex-direction: column; align-items: flex-start; min-height: 0; text-decoration: none; }
-.footer-help-list strong, .footer-help-list li > strong { color: #fff; font-size: 12px; }
-.footer-help-list span { color: #c7d3e6; }
-.footer-subheading { margin: 12px 0 2px; color: #fff !important; font-weight: 700; }
 .link-note { font-size: 10px; line-height: 16px; letter-spacing: .05em; text-transform: uppercase; padding: 0 5px; border: 1px solid #6f87ad; border-radius: 3px; color: #c7d3e6; }
 .footer-bottom { padding-block: 16px; border-top: 1px solid #365078; display: flex; gap: 10px 20px; justify-content: space-between; flex-wrap: wrap; font-size: 12px; color: #b9c7dd; }
 

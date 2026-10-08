@@ -200,22 +200,6 @@ const PENDING = (CONFIG.placeholders && CONFIG.placeholders.contactPending) || '
 const NAV_LINKS = [['#/', 'Home', 'home'], ['#/about', 'About Us', 'about'], ['#/shop', 'Shop', 'shop'], ['#/business', 'Business & Bulk Order', 'business'], ['#/contact', 'Contact', 'contact']];
 const safeUrl = u => /^https:\/\/[^\s"'<>]+$/i.test(String(u || ''));
 const menuLink = (c, s, cls = '', label = '') => `<a href="${shopUrl(c.id, s ? s.id : '')}"${cls ? ` class="${cls}"` : ''} data-menu-category="${c.id}"${s ? ` data-menu-sub="${s.id}"` : ''}>${esc(label || (s ? s.name : c.name))}</a>`;
-function categoryHelp(id, description) {
-  const c = cat(id);
-  return c ? `<li><a href="${shopUrl(c.id)}"><strong>${esc(c.name)}</strong><span>${esc(description || c.advice)}</span></a></li>` : '';
-}
-function footerHelpHTML() {
-  return `<ul class="footer-help-list">
-    ${categoryHelp('solar', 'Plan around daily use, essential loads and available installation space.')}
-    ${categoryHelp('generators')}
-    ${categoryHelp('water')}
-    ${categoryHelp('agriculture')}
-    ${categoryHelp('construction')}
-    ${categoryHelp('electrical')}
-    <li><strong>Electronics &amp; appliances</strong><span>Ask about a specific item; availability is confirmed per enquiry.</span></li>
-    <li><strong>Bulk order terms</strong><span>Pricing, delivery, payment terms and service scope are confirmed in writing. No minimum order or discount is implied.</span></li>
-  </ul>`;
-}
 function departmentMenuHTML() {
   return `<div class="department-menu-head"><a href="#/shop" class="menu-all">Browse all products ${icon('arrow')}</a></div>
   <div class="department-columns">${CATEGORIES.map(c => `<div class="department-group">${menuLink(c, null, 'department-title')}<ul aria-label="${esc(c.name)} subcategories">${c.subcategories.map(sc => `<li>${menuLink(c, sc)}</li>`).join('')}</ul></div>`).join('')}</div>`;
@@ -232,8 +216,6 @@ function drawerHTML() {
   <div class="nav-drawer-foot"><button type="button" class="btn wa solid block" data-general-wa>${icon('wa')} Enquire on WhatsApp</button></div>`;
 }
 function buildFooter() {
-  const help = document.getElementById('footer-business-help');
-  if (help) help.innerHTML = footerHelpHTML();
   const list = document.getElementById('footer-contact');
   if (list) {
     const items = [];
