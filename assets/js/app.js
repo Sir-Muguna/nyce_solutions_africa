@@ -1,0 +1,825 @@
+/* =============================================================================
+   NYCE SOLUTIONS — catalogue application
+   -----------------------------------------------------------------------------
+   Vanilla JavaScript, hash-based routing, no build step.
+   Reads window.NYCE_CONFIG (config.js), window.NYCE_CATALOGUE (catalogue.js)
+   and window.NYCE_ASSETS (asset map in index.html or inlined in the standalone).
+
+   Sections
+     1. Bootstrap & helpers        5. Product detail
+     2. Cart state                 6. Business, Contact, About, Cart, Checkout, Policies
+     3. Shared components          7. Router & legacy redirects
+     4. Home & Shop (listing)      8. WhatsApp, modal, forms, events
+   ============================================================================ */
+(function () {
+'use strict';
+
+/* ---------------------------------------------------------------- 1. Bootstrap */
+const CONFIG = window.NYCE_CONFIG || {};
+const ASSETS = window.NYCE_ASSETS || {};
+const DATA = window.NYCE_CATALOGUE || { categories: [], products: [] };
+const PROD = CONFIG.siteMode === 'production';
+const PAGE_SIZE = Number(CONFIG.cataloguePageSize) > 0 ? Number(CONFIG.cataloguePageSize) : 12;
+const MAX_QTY = Number(CONFIG.maxQuantity) > 0 ? Number(CONFIG.maxQuantity) : 99;
+const CURRENCY = CONFIG.currency || 'KES';
+const LOCALE = CONFIG.locale || 'en-KE';
+const BUSINESS = CONFIG.businessName || 'NYCE SOLUTIONS';
+const WHATSAPP = String(CONFIG.whatsappNumber || '').replace(/\D/g, '');
+const APPROVED = new Set(Array.isArray(CONFIG.approvedProductIds) ? CONFIG.approvedProductIds : []);
+
+const CATEGORIES = DATA.categories;
+const ALL_PRODUCTS = DATA.products;
+// Production mode shows only owner-approved products. Demo mode shows every record.
+const PRODUCTS = PROD ? ALL_PRODUCTS.filter(p => APPROVED.has(p.id) || p.approved === true) : ALL_PRODUCTS;
+const HAS_DATES = PRODUCTS.some(p => p.dateAdded);
+
+const APPLICATIONS = [
+  ['Home Backup Power', 'Solar, storage, inverters and generators for essential household loads.', 'home'],
+  ['Farm & Irrigation', 'Pumps, pipes, tillers and processing equipment for growing and watering.', 'leaf'],
+  ['Construction & Workshop', 'Tools, site machinery, welding and electrical project supplies.', 'tool']
+];
+
+const ICONS = {
+  search: '<circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/>',
+  arrow: '<path d="M4 12h16m-6-6 6 6-6 6"/>',
+  cart: '<path d="M3 3h2l3 12h11l2-9H6"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/>',
+  menu: '<path d="M4 6h16M4 12h16M4 18h16"/>',
+  close: '<path d="M6 6l12 12M18 6 6 18"/>',
+  message: '<path d="M20 11a8 8 0 0 1-8 8H5l-3 3v-10a9 9 0 0 1 18-1Z"/><path d="M7 10h9M7 14h6"/>',
+  wa: '<path d="M21 11.5a9 9 0 0 1-13.5 8L3 21l1.5-4.5A9 9 0 1 1 21 11.5Z"/><path d="M8 7c-3 2 4 9 7 7l1-2-3-1-1 1-2-2 1-1-1-3Z"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.4 1.4m11.2 11.2L19 19M5 19l1.4-1.4M17.6 6.4 19 5"/>',
+  truck: '<path d="M2 5h12v12H2zm12 5h4l4 4v3h-8"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/>',
+  check: '<path d="m5 12 4 4L20 5"/>',
+  layers: '<path d="m12 3 10 5-10 5L2 8Zm-10 9 10 5 10-5M2 17l10 5 10-5"/>',
+  home: '<path d="m2 11 10-9 10 9M5 9v12h14V9M9 21v-8h6v8"/>',
+  leaf: '<path d="M21 3C8 1 1 8 5 15c7 8 17-1 16-12Z"/><path d="M3 22 16 9"/>',
+  tool: '<path d="M21 3a6 6 0 0 1-8 8L5 20a2 2 0 0 1-3-3l9-8a6 6 0 0 1 8-8l-4 4 4 2Z"/>',
+  grid: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+  list: '<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
+  filter: '<path d="M3 5h18M6 12h12M9 19h6"/>',
+  zoom: '<circle cx="10" cy="10" r="6"/><path d="m15 15 6 6M10 7v6M7 10h6"/>',
+  mail: '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 5 10 8L22 5"/>',
+  pin: '<path d="M19 9c0 5-7 12-7 12S5 14 5 9a7 7 0 0 1 14 0Z"/><circle cx="12" cy="9" r="2"/>',
+  phone: '<path d="M5 3h4l2 5-3 2a11 11 0 0 0 6 6l2-3 5 2v4a2 2 0 0 1-2 2A17 17 0 0 1 3 5a2 2 0 0 1 2-2Z"/>',
+  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  bolt: '<path d="M13 2 4 14h7l-1 8 9-12h-7Z"/>',
+  drop: '<path d="M12 3s7 7 7 12a7 7 0 0 1-14 0c0-5 7-12 7-12Z"/>',
+  info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v.2"/>'
+};
+const icon = n => `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n] || ICONS.layers}</svg>`;
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const money = n => `${CURRENCY} ${Number(n).toLocaleString(LOCALE, { maximumFractionDigits: 0 })}`;
+const cat = id => CATEGORIES.find(c => c.id === id);
+const subOf = id => { for (const c of CATEGORIES) { const s = c.subcategories.find(x => x.id === id); if (s) return { ...s, category: c }; } return null; };
+const product = id => PRODUCTS.find(p => p.id === id);
+const inDept = (p, c) => !c || p.departments.includes(c);
+const inSub = (p, s) => !s || p.subcategories.includes(s);
+const countDept = id => PRODUCTS.filter(p => inDept(p, id)).length;
+const countSub = id => PRODUCTS.filter(p => inSub(p, id)).length;
+const primaryCat = p => cat(p.departments[0]);
+const primarySub = p => subOf(p.subcategories[0]);
+const makeUrl = (path, params = {}) => {
+  const isDefault = (k, v) => (k === 'sort' && v === 'featured') || (k === 'page' && Number(v) === 1);
+  const q = new URLSearchParams(Object.entries(params).filter(([k, v]) => v !== '' && v !== null && v !== undefined && !isDefault(k, v)));
+  const s = q.toString();
+  return '#/' + path + (s ? '?' + s : '');
+};
+const shopUrl = (category, subcategory) => makeUrl('shop', { category, subcategory });
+const isDemoPrice = p => p.price !== null && p.priceType === 'demo' && !PROD;
+
+/* ---------------------------------------------------------------- Storage helpers */
+function store(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch { return false; } }
+function load(key, fallback) { try { const v = JSON.parse(localStorage.getItem(key)); return v === null || v === undefined ? fallback : v; } catch { return fallback; } }
+
+/* ---------------------------------------------------------------- 2. Cart state */
+const CART_KEY = 'nyce-demo-cart-v2';
+let cart = {}, canStore = true, toastTimer, previousHash = '', activeTab = 'description', galleryIndex = 0;
+let imageFailed = false, focusAfterRoute = null, drawerOpen = false, formPreview = '';
+let viewMode = load('nyce-view-mode', 'grid') === 'list' ? 'list' : 'grid';
+(function restoreCart() {
+  const data = load(CART_KEY, {});
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return;
+  Object.entries(data).forEach(([id, q]) => { const p = product(id); if (p && p.price !== null && Number.isInteger(q) && q > 0) cart[id] = Math.min(q, MAX_QTY); });
+  try { localStorage.getItem(CART_KEY); } catch { canStore = false; }
+})();
+function saveCart() { canStore = store(CART_KEY, cart) && canStore; updateCount(); }
+function cartCount() { return Object.values(cart).reduce((a, b) => a + b, 0); }
+function cartTotal() { return Object.entries(cart).reduce((sum, [id, q]) => sum + product(id).price * q, 0); }
+function updateCount() {
+  const n = cartCount();
+  document.getElementById('cart-count').textContent = n;
+  document.querySelector('.cart-link').setAttribute('aria-label', `Cart, ${n} ${n === 1 ? 'item' : 'items'}`);
+}
+function addCart(id, q) {
+  const p = product(id);
+  if (!p || p.price === null || !Number.isInteger(q) || q < 1 || q > MAX_QTY) return false;
+  const next = (cart[id] || 0) + q;
+  if (next > MAX_QTY) { notify(`Maximum ${MAX_QTY} units per product in this cart.`); return false; }
+  cart[id] = next; saveCart(); notify(`${q} × ${p.name} added to the cart.`, true); return true;
+}
+function notify(message, link = false) {
+  const el = document.getElementById('toast');
+  clearTimeout(toastTimer);
+  el.innerHTML = `<span>${esc(message)}</span>${link ? '<a href="#/cart">View cart</a>' : ''}`;
+  el.classList.add('visible');
+  toastTimer = setTimeout(() => el.classList.remove('visible'), 5000);
+}
+
+/* ---------------------------------------------------------------- 3. Shared components */
+function photo(tile, alt, opts = {}) {
+  const { label = !PROD, mode = 'meet' } = opts;
+  if (imageFailed || !ASSETS.equipment) {
+    return `<span class="photo"><img src="${esc(ASSETS.placeholder || '')}" alt="${esc(alt)}" loading="lazy"><span class="photo-fallback" aria-hidden="true">Image unavailable</span></span>`;
+  }
+  const x = (tile % 3) * 512, y = Math.floor(tile / 3) * 512;
+  return `<span class="photo"><svg viewBox="${x} ${y} 512 512" role="img" aria-label="${esc(alt)}" preserveAspectRatio="xMidYMid ${mode}"><image width="1536" height="1024" href="${esc(ASSETS.equipment)}"/></svg>${label ? '<span class="photo-label">Representative image</span>' : ''}</span>`;
+}
+const crumb = items => `<nav class="breadcrumb" aria-label="Breadcrumb"><a href="#/">Home</a>${items.map(([n, u]) => `<span aria-hidden="true">/</span>${u ? `<a href="${u}">${esc(n)}</a>` : `<span aria-current="page">${esc(n)}</span>`}`).join('')}</nav>`;
+const notice = (html, type = '') => `<div class="notice ${type}">${html}</div>`;
+const demoNotice = html => PROD ? '' : notice(html);
+
+function priceBlock(p, size = 'card') {
+  if (p.price === null) {
+    return `<div class="product-price">Request Price<span class="price-note">Quotation required · availability to confirm</span></div>`;
+  }
+  const note = isDemoPrice(p) ? 'Demonstration price · not a sales offer' : 'Taxes and delivery confirmed by quotation';
+  return `<div class="product-price">${money(p.price)}<span class="price-note">${note}</span></div>`;
+}
+function recordTag(p) {
+  if (PROD) return '';
+  return p.evidenceStatus === 'sourced'
+    ? `<span class="tag sourced record-tag">Reference product</span>`
+    : `<span class="tag illustrative record-tag">Illustrative product</span>`;
+}
+function card(p) {
+  const c = primaryCat(p), s = primarySub(p), spec = Object.entries(p.specs)[0];
+  const ident = p.model ? `Model ${p.model}` : p.sku ? `SKU ${p.sku}` : null;
+  return `<article class="product-card" data-product-id="${p.id}">
+    <a href="#/product/${p.id}" class="product-media" aria-label="View ${esc(p.name)}">${photo(p.image.tile, p.alt, { label: false })}${recordTag(p)}</a>
+    <div class="product-content">
+      <span class="cat-name">${esc(c.name)}${s ? ` · ${esc(s.name)}` : ''}</span>
+      <h3><a href="#/product/${p.id}">${esc(p.name)}</a></h3>
+      ${ident ? `<p class="model-line">${esc(ident)}</p>` : ''}
+      ${spec ? `<p class="spec-line">${esc(spec[0])}: ${esc(spec[1])}</p>` : ''}
+      ${priceBlock(p)}
+      <div class="card-actions">
+        <a class="btn secondary sm" href="#/product/${p.id}">View details</a>
+        <button type="button" class="btn wa sm" data-wa="${p.id}">${icon('wa')} WhatsApp</button>
+      </div>
+    </div>
+  </article>`;
+}
+function departmentCard(c) {
+  return `<a href="${shopUrl(c.id)}" class="department-card">${photo(c.imageTile, `${c.name} equipment`, { label: false, mode: 'slice' })}<div class="department-caption"><div><h3>${esc(c.name)}</h3><span>${c.subcategories.length} subcategories · ${countDept(c.id)} products</span></div><span class="round-arrow">${icon('arrow')}</span></div></a>`;
+}
+function contactLine(value, pending) { return value ? esc(value) : `<span class="muted">${esc(pending)}</span>`; }
+const PENDING = (CONFIG.placeholders && CONFIG.placeholders.contactPending) || 'To be supplied';
+
+/* ---------------------------------------------------------------- 4. Home */
+function home() {
+  const featured = PRODUCTS.filter(p => p.featured).slice(0, 8);
+  return `
+  <section class="hero">
+    <div class="hero-copy">
+      <h1>Power your home.<br>Equip your business.</h1>
+      <p>One catalogue for electrical equipment, solar and backup power, borehole and water solutions, agricultural equipment and construction and workshop tools — for homes, farms, contractors and institutions in Kenya, with enquiries welcome from across Africa.</p>
+      <ul class="hero-list">
+        <li>${icon('bolt')} Electrical equipment</li><li>${icon('sun')} Solar &amp; backup power</li><li>${icon('drop')} Borehole &amp; water</li><li>${icon('leaf')} Agricultural equipment</li><li>${icon('tool')} Construction &amp; workshop</li>
+      </ul>
+      <div class="actions"><a class="btn" href="#/shop">Shop Products ${icon('arrow')}</a><a class="btn secondary" href="#/business">Request a Quote</a></div>
+    </div>
+    <div class="hero-visual">${photo(0, 'Solar panels, hybrid inverter and lithium battery', { label: !PROD, mode: 'slice' })}</div>
+  </section>
+  <div class="confidence">
+    <div>${icon('grid')}<div><strong>Six specialist departments</strong><span>${CATEGORIES.reduce((n, c) => n + c.subcategories.length, 0)} subcategories, one place to compare</span></div></div>
+    <div>${icon('wa')}<div><strong>Enquire on WhatsApp</strong><span>Every product prepares a ready-to-send enquiry</span></div></div>
+    <div>${icon('truck')}<div><strong>Delivery by enquiry</strong><span>Share your town or county for confirmation</span></div></div>
+  </div>
+  <section class="section" aria-labelledby="home-departments">
+    <div class="section-head"><div><h2 id="home-departments">Shop by department</h2><p>Open a department to see its products and subcategories in the Shop.</p></div><a href="#/shop" class="text-link">View Full Catalogue ${icon('arrow')}</a></div>
+    <div class="department-grid">${CATEGORIES.map(departmentCard).join('')}</div>
+  </section>
+  ${featured.length ? `<section class="section" aria-labelledby="home-featured">
+    <div class="section-head"><div><h2 id="home-featured">Featured equipment</h2><p>${PROD ? 'A selection from the catalogue.' : 'Demonstration products. Prices and availability require confirmation.'}</p></div><a class="text-link" href="#/shop">View Full Catalogue ${icon('arrow')}</a></div>
+    <div class="product-grid">${featured.map(card).join('')}</div>
+  </section>` : ''}
+  <section class="section" aria-labelledby="home-applications">
+    <div class="section-head"><div><h2 id="home-applications">Shop by application</h2><p>Start from the job you need done.</p></div></div>
+    <div class="application-grid">${APPLICATIONS.map(([n, d, i]) => `<a class="application" href="${makeUrl('shop', { application: n })}">${icon(i)}<h3>${n}</h3><p>${d}</p><span class="text-link">Explore equipment ${icon('arrow')}</span></a>`).join('')}</div>
+  </section>
+  <section class="band">
+    <div><h2>Business &amp; bulk orders</h2><p>Planning a farm, fit-out, workshop, school or institutional purchase? Send your equipment list, quantities and destination and we will prepare a quotation.</p></div>
+    <a class="btn light" href="#/business">Request a Quote ${icon('arrow')}</a>
+  </section>
+  <section class="support-grid">
+    <div class="support-card">${icon('truck')}<div><h3>Delivery</h3><p>${esc((CONFIG.placeholders && CONFIG.placeholders.deliveryStatement) || 'Delivery is confirmed per enquiry.')}</p><a class="text-link" href="#/contact?topic=Delivery%20enquiry">Ask about delivery ${icon('arrow')}</a></div></div>
+    <div class="support-card">${icon('message')}<div><h3>Customer support</h3><p>Have a model number, load list or site requirement? Include it in your enquiry so the first reply already covers the right specification.</p><a class="text-link" href="#/contact">Contact us ${icon('arrow')}</a></div></div>
+  </section>
+  <section class="band" style="background:var(--green)">
+    <div><h2>Ready to ask about a product?</h2><p>Open any product and tap the WhatsApp button. The message is prepared for you with the product name, quantity and a link.</p></div>
+    <button type="button" class="btn light" data-general-wa>${icon('wa')} Start a WhatsApp enquiry</button>
+  </section>`;
+}
+
+/* ---------------------------------------------------------------- 4b. Shop listing */
+function current() {
+  const raw = location.hash.replace(/^#\/?/, '') || '';
+  const [path, query = ''] = raw.split('?');
+  return { parts: path.split('/').filter(Boolean), params: new URLSearchParams(query), path };
+}
+function selection(route) {
+  const g = k => route.params.get(k) || '';
+  let category = g('category'), subcategory = g('subcategory');
+  if (subcategory) { const s = subOf(subcategory); if (!s) subcategory = ''; else if (!category) category = s.category.id; }
+  if (category && !cat(category)) category = '';
+  return { category, subcategory, q: g('q'), power: g('power'), phase: g('phase'), pricing: g('pricing'), source: g('source'), application: g('application'), sort: g('sort') || 'featured', page: Math.max(1, Math.floor(Number(g('page')) || 1)) };
+}
+function searchText(p) {
+  return [p.name, p.model, p.sku, p.brand, p.description, ...Object.values(p.specs), ...p.applications,
+    ...p.departments.map(d => cat(d) && cat(d).name), ...p.subcategories.map(s => subOf(s) && subOf(s).name)].join(' ').toLowerCase();
+}
+function filtered(sel) {
+  const query = (sel.q || '').trim().toLowerCase();
+  const terms = query ? query.split(/\s+/) : [];
+  let rows = PRODUCTS.filter(p => inDept(p, sel.category) && inSub(p, sel.subcategory)
+    && (!terms.length || terms.every(t => searchText(p).includes(t)))
+    && (!sel.power || p.power === sel.power) && (!sel.phase || p.phase === sel.phase)
+    && (!sel.pricing || p.priceType === sel.pricing) && (!sel.source || p.evidenceStatus === sel.source)
+    && (!sel.application || p.applications.includes(sel.application)));
+  const byPrice = dir => (a, b) => a.price === null ? (b.price === null ? 0 : 1) : b.price === null ? -1 : dir * (a.price - b.price);
+  if (sel.sort === 'az') rows.sort((a, b) => a.name.localeCompare(b.name));
+  else if (sel.sort === 'za') rows.sort((a, b) => b.name.localeCompare(a.name));
+  else if (sel.sort === 'price-asc') rows.sort(byPrice(1));
+  else if (sel.sort === 'price-desc') rows.sort(byPrice(-1));
+  else if (sel.sort === 'newest' && HAS_DATES) rows.sort((a, b) => String(b.dateAdded || '').localeCompare(String(a.dateAdded || '')));
+  else rows.sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
+  return rows;
+}
+function choice(name, value, label, count, checked, extra = '') {
+  const id = `${name}-${value || 'all'}`;
+  return `<label class="choice ${extra}" for="${id}"><input type="radio" id="${id}" name="${name}" value="${esc(value)}" data-filter="${name.replace('filter-', '')}" ${checked ? 'checked' : ''}><span>${esc(label)}</span>${count !== null ? `<span class="count">${count}</span>` : ''}</label>`;
+}
+function selectField(label, id, options, value, hint = '') {
+  return `<div class="field"><label for="${id}">${label}</label><select id="${id}" data-filter="${id.replace('filter-', '')}">${options.map(o => Array.isArray(o[1]) ? `<optgroup label="${esc(o[0])}">${o[1].map(([v, n]) => `<option value="${esc(v)}" ${String(value) === v ? 'selected' : ''}>${esc(n)}</option>`).join('')}</optgroup>` : `<option value="${esc(o[0])}" ${String(value) === o[0] ? 'selected' : ''}>${esc(o[1])}</option>`).join('')}</select>${hint ? `<small>${hint}</small>` : ''}</div>`;
+}
+function filterPanel(sel, base) {
+  const c = cat(sel.category);
+  const powers = [...new Set(base.map(p => p.power).filter(Boolean))].sort();
+  const phases = [...new Set(base.map(p => p.phase).filter(Boolean))].sort();
+  const subField = c
+    ? `<fieldset class="filter-group"><legend>Subcategory</legend><div class="choice-list" role="radiogroup">${choice('filter-subcategory', '', `All ${c.name}`, countDept(c.id), !sel.subcategory)}${c.subcategories.map(s => choice('filter-subcategory', s.id, s.name, countSub(s.id), sel.subcategory === s.id, 'sub')).join('')}</div></fieldset>`
+    : selectField('Subcategory', 'filter-subcategory', [['', 'All subcategories'], ...CATEGORIES.map(cc => [cc.name, cc.subcategories.map(s => [s.id, s.name])])], sel.subcategory, 'Choosing a subcategory also selects its department.');
+  return `<aside class="filter-panel" id="filters" aria-label="Product filters">
+    <div class="drawer-head"><h2>Filter products</h2><button type="button" class="drawer-close" id="drawer-close" aria-label="Close filters">${icon('close')}</button></div>
+    <form id="filter-form" novalidate>
+      <fieldset class="filter-group"><legend>Department</legend><div class="choice-list" role="radiogroup">${choice('filter-category', '', 'All departments', PRODUCTS.length, !sel.category)}${CATEGORIES.map(cc => choice('filter-category', cc.id, cc.name, countDept(cc.id), sel.category === cc.id)).join('')}</div></fieldset>
+      ${subField}
+      ${powers.length > 1 ? selectField('Power source', 'filter-power', [['', 'Any power source'], ...powers.map(p => [p, p])], sel.power) : ''}
+      ${phases.length ? selectField('Electrical phase', 'filter-phase', [['', 'Any phase'], ...phases.map(p => [p, p])], sel.phase) : ''}
+      ${selectField('Price type', 'filter-pricing', [['', 'All products'], ['demo', PROD ? 'Priced products' : 'Demonstration prices'], ['quote', 'Request Price']], sel.pricing)}
+      ${selectField('Application', 'filter-application', [['', 'Any application'], ...APPLICATIONS.map(a => [a[0], a[0]])], sel.application)}
+      ${PROD ? '' : selectField('Product evidence', 'filter-source', [['', 'All records'], ['sourced', 'Reference products'], ['illustrative', 'Illustrative products']], sel.source)}
+      <div class="filter-actions"><button type="button" class="btn secondary sm" data-clear-filters>Clear all filters</button></div>
+    </form>
+    <div class="filter-footer"><p>Not sure about the specification? <a href="#/business">Request a quote</a> and describe your requirement.</p></div>
+  </aside>`;
+}
+function chips(sel) {
+  const list = [];
+  const c = cat(sel.category), s = subOf(sel.subcategory);
+  if (sel.q) list.push(['q', `Search: “${sel.q}”`]);
+  if (c) list.push(['category', c.name]);
+  if (s) list.push(['subcategory', s.name]);
+  if (sel.power) list.push(['power', sel.power]);
+  if (sel.phase) list.push(['phase', sel.phase]);
+  if (sel.pricing) list.push(['pricing', sel.pricing === 'demo' ? (PROD ? 'Priced products' : 'Demonstration prices') : 'Request Price']);
+  if (sel.application) list.push(['application', sel.application]);
+  if (sel.source) list.push(['source', sel.source === 'sourced' ? 'Reference products' : 'Illustrative products']);
+  if (!list.length) return '';
+  return `<div class="chips" aria-label="Active filters">${list.map(([k, n]) => `<button type="button" class="chip" data-remove-filter="${k}" aria-label="Remove filter ${esc(n)}"><span>${esc(n)}</span>${icon('close')}</button>`).join('')}<button type="button" class="clear-all" data-clear-filters>Clear all</button></div>`;
+}
+function listing(route) {
+  const sel = selection(route), c = cat(sel.category), s = subOf(sel.subcategory);
+  const base = PRODUCTS.filter(p => inDept(p, sel.category));
+  const rows = filtered(sel), pages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+  const page = Math.min(pages, sel.page), start = (page - 1) * PAGE_SIZE;
+  const title = s ? s.name : c ? c.name : sel.application ? sel.application : 'Shop';
+  const breadcrumbs = [['Shop', (c || s || sel.q || sel.application) ? '#/shop' : null]];
+  if (c) breadcrumbs.push([c.name, s ? shopUrl(c.id) : null]);
+  if (s) breadcrumbs.push([s.name]);
+  if (!c && sel.application) breadcrumbs.push([sel.application]);
+  const intro = s ? `Products in ${s.name}, part of ${c.name}.` : c ? `${c.intro} ${c.advice}` : 'Browse the full catalogue. Filter by department, subcategory, power source, phase and application, or search by name or model.';
+  const sortOptions = [['featured', 'Featured'], ...(HAS_DATES ? [['newest', 'Newest']] : []), ['az', 'Name: A–Z'], ['za', 'Name: Z–A'], ['price-asc', 'Price: low to high'], ['price-desc', 'Price: high to low']];
+  const summary = rows.length
+    ? `<span class="result-count" role="status">${rows.length} ${rows.length === 1 ? 'product' : 'products'} <small>· showing ${start + 1}–${Math.min(start + PAGE_SIZE, rows.length)}</small></span>`
+    : `<span class="result-count" role="status">0 products</span>`;
+  const querySummary = sel.q ? `<span class="small muted">Results for “${esc(sel.q)}”${c ? ` in ${esc(c.name)}` : ''}</span>` : '';
+  const grid = rows.length ? rows.slice(start, start + PAGE_SIZE).map(card).join('')
+    : `<div class="empty"><h2>No products match these filters</h2><p>${sel.q ? 'Try a shorter search term or a different spelling, or ' : 'Try '}removing a filter or browse a department instead.</p><div class="actions"><button type="button" class="btn" data-clear-filters>Clear all filters</button>${c && (s || sel.q || sel.power || sel.phase || sel.pricing || sel.application || sel.source) ? `<a class="btn secondary" href="${shopUrl(c.id)}">All ${esc(c.name)}</a>` : ''}<a class="btn secondary" href="#/business">Request a quote instead</a></div></div>`;
+  const pagination = pages > 1 ? `<nav class="pagination" aria-label="Catalogue pages"><button type="button" data-page="${page - 1}" ${page === 1 ? 'disabled' : ''}>Previous</button>${Array.from({ length: pages }, (_, i) => `<button type="button" data-page="${i + 1}" ${page === i + 1 ? 'aria-current="page"' : ''} aria-label="Page ${i + 1}">${i + 1}</button>`).join('')}<button type="button" data-page="${page + 1}" ${page === pages ? 'disabled' : ''}>Next</button></nav>` : '';
+  return crumb(breadcrumbs) + `
+  <section class="page-intro"><h1>${esc(title)}</h1><p>${esc(intro)}</p></section>
+  ${PROD && !PRODUCTS.length ? notice('No products have been approved for publication yet. Add approved product IDs in <code>assets/js/config.js</code>.', 'warn') : ''}
+  ${demoNotice('Demonstration catalogue: reference products come from cited retailer listings and illustrative products are unverified examples. Images are representative department visuals, not exact-model photographs.')}
+  <div class="catalog-layout">
+    <div><button type="button" class="btn secondary filter-toggle" id="filter-toggle" aria-controls="filters" aria-expanded="false">${icon('filter')} Filters</button>${filterPanel(sel, base)}</div>
+    <div class="catalog-main">
+      <div class="toolbar">
+        <div class="toolbar-left">${summary}${querySummary}</div>
+        <div class="toolbar-right">
+          <label for="sort-products">Sort <select id="sort-products" data-filter="sort">${sortOptions.map(([v, n]) => `<option value="${v}" ${v === sel.sort ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
+          <div class="view-toggle" role="group" aria-label="View"><button type="button" data-view="grid" aria-pressed="${viewMode === 'grid'}" aria-label="Grid view">${icon('grid')}</button><button type="button" data-view="list" aria-pressed="${viewMode === 'list'}" aria-label="List view">${icon('list')}</button></div>
+        </div>
+      </div>
+      ${chips(sel)}
+      <div class="product-grid ${viewMode === 'list' ? 'list' : ''}" id="results">${grid}</div>
+      ${pagination}
+      ${['price-asc', 'price-desc'].includes(sel.sort) && rows.some(p => p.price === null) ? '<p class="small muted">Request Price products are listed after priced products.</p>' : ''}
+    </div>
+  </div>`;
+}
+
+/* ---------------------------------------------------------------- 5. Product detail */
+function specTable(p) { return `<table class="spec-table"><tbody>${Object.entries(p.specs).map(([k, v]) => `<tr><th scope="row">${esc(k)}</th><td>${esc(v)}</td></tr>`).join('')}</tbody></table>`; }
+function technical(p) { return `<div class="technical-card">${icon('layers')}<h3>${esc(p.name)}</h3><p>${esc(Object.entries(p.specs).slice(0, 3).map(([k, v]) => `${k}: ${v}`).join(' · '))}</p><span class="tag">Specification overview · not a photograph</span></div>`; }
+function galleryItem(p, i) { const g = p.gallery[i] || p.gallery[0]; return g.type === 'spec' ? technical(p) : photo(g.tile, p.alt); }
+function relatedTo(p) {
+  const explicit = (p.related || []).map(product).filter(Boolean);
+  if (explicit.length) return explicit.slice(0, 4);
+  const sameSub = PRODUCTS.filter(x => x.id !== p.id && x.subcategories.some(s => p.subcategories.includes(s)));
+  const sameDept = PRODUCTS.filter(x => x.id !== p.id && !sameSub.includes(x) && x.departments.some(d => p.departments.includes(d)));
+  return [...sameSub, ...sameDept].slice(0, 4);
+}
+function detail(p) {
+  activeTab = 'description'; galleryIndex = 0;
+  const c = primaryCat(p), s = primarySub(p), related = relatedTo(p);
+  const otherAssignments = p.subcategories.slice(1).map(subOf).filter(Boolean);
+  const ident = [p.model ? `<strong>Model:</strong> ${esc(p.model)}` : '', p.sku ? `<strong>SKU:</strong> ${esc(p.sku)}` : '', p.brand ? `<strong>Brand:</strong> ${esc(p.brand)}${PROD ? '' : ' <span class="small">(retailer-listed)</span>'}` : ''].filter(Boolean);
+  return crumb([['Shop', '#/shop'], [c.name, shopUrl(c.id)], [s.name, shopUrl(c.id, s.id)], [p.name]]) + `
+  <div class="product-detail">
+    <div>
+      <button type="button" class="gallery-main" id="gallery-main" data-enlarge="${p.id}" aria-label="Enlarge image of ${esc(p.name)}"><span class="zoom-hint">${icon('zoom')}</span><span id="gallery-content">${galleryItem(p, 0)}</span></button>
+      <p class="gallery-caption">${PROD ? 'Tap or click the image to enlarge.' : 'Representative department image; exact product photography is pending. Tap or click to enlarge.'}</p>
+      <div class="thumbnails" role="group" aria-label="Product gallery">${p.gallery.map((g, i) => `<button type="button" class="thumb" data-gallery="${i}" data-id="${p.id}" aria-pressed="${i === 0}" aria-label="Show ${esc(g.label)}">${g.type === 'spec' ? '<span>Spec<br>overview</span>' : photo(g.tile, p.alt, { label: false })}</button>`).join('')}</div>
+    </div>
+    <div class="detail-copy">
+      <span class="cat-name"><a href="${shopUrl(c.id)}">${esc(c.name)}</a> · <a href="${shopUrl(c.id, s.id)}">${esc(s.name)}</a></span>
+      <h1>${esc(p.name)}</h1>
+      <p class="model">${ident.length ? ident.join(' · ') : (PROD ? 'Model confirmed on enquiry' : 'Supplier SKU: pending verification')}</p>
+      ${PROD ? '' : `<span class="tag ${p.evidenceStatus}">${p.evidenceStatus === 'sourced' ? 'Reference product · retailer-listed' : 'Illustrative product · not a verified offer'}</span>`}
+      ${priceBlock(p, 'detail')}
+      ${p.price !== null && !PROD ? notice('Demonstration price only. It is not a NYCE SOLUTIONS sales price; request a quotation for a confirmed amount.', 'warn') : ''}
+      <p>${esc(p.shortDescription)}</p>
+      <div class="spec-preview">${Object.entries(p.specs).slice(0, 4).map(([k, v]) => `<div><small>${esc(k)}</small><strong>${esc(v)}</strong></div>`).join('')}</div>
+      <h3 class="small" style="font-size:13px;margin:0">Intended applications</h3>
+      <ul class="applications-inline">${p.applications.map(a => `<li><a href="${makeUrl('shop', { application: a })}">${esc(a)}</a></li>`).join('')}</ul>
+      <div class="qty-line"><label for="detail-qty">Quantity</label>${quantity(1, 'detail-qty')}</div>
+      <div class="detail-actions">
+        ${p.price !== null ? `<button type="button" class="btn" data-add="${p.id}">${icon('cart')} Add to Cart</button>` : `<button type="button" class="btn" data-quote="${p.id}">Request a Quote ${icon('arrow')}</button>`}
+        <button type="button" class="btn wa solid" data-wa="${p.id}" data-detail="true">${icon('wa')} Enquire on WhatsApp</button>
+      </div>
+      <p class="small muted" style="margin-top:12px">Availability, taxes, transport and support scope are confirmed by quotation. An enquiry is not an order.</p>
+      ${otherAssignments.length ? `<p class="small muted">Also listed under: ${otherAssignments.map(o => `<a href="${shopUrl(o.category.id, o.id)}">${esc(o.name)}</a>`).join(', ')}</p>` : ''}
+    </div>
+  </div>
+  <div class="tabs" role="tablist" aria-label="Product information">
+    <button type="button" id="tab-description" role="tab" aria-selected="true" aria-controls="panel-description" data-tab="description">Description</button>
+    <button type="button" id="tab-specifications" role="tab" aria-selected="false" aria-controls="panel-specifications" tabindex="-1" data-tab="specifications">Specifications</button>
+    <button type="button" id="tab-delivery" role="tab" aria-selected="false" aria-controls="panel-delivery" tabindex="-1" data-tab="delivery">Delivery &amp; Support</button>
+  </div>
+  <section class="tab-panel" role="tabpanel" id="panel-description" aria-labelledby="tab-description" tabindex="0">
+    <h2>About this product</h2><p>${esc(p.description)}</p>
+    <h3>Intended applications</h3><ul>${p.applications.map(a => `<li>${esc(a)} — final suitability depends on your requirements and the selected specification.</li>`).join('')}</ul>
+    ${PROD ? '' : p.evidenceStatus === 'sourced'
+      ? `<p>Product identity and the listed fields were checked against a retailer listing${p.sourceChecked ? ` on ${esc(p.sourceChecked)}` : ''}. This is not manufacturer certification or evidence of NYCE SOLUTIONS stock. The source reference is recorded in the internal source register.</p>`
+      : '<p>This unbranded example illustrates the category. Specifications and pricing are illustrative and need owner approval before publication.</p>'}
+  </section>
+  <section class="tab-panel" role="tabpanel" id="panel-specifications" aria-labelledby="tab-specifications" tabindex="0" hidden>
+    <h2>Key specifications</h2>${specTable(p)}
+    ${PROD ? '' : notice(p.evidenceStatus === 'sourced' ? 'Retailer-listed fields only. Confirm against the manufacturer datasheet before purchase.' : 'Illustrative planning fields, not a verified model specification.')}
+  </section>
+  <section class="tab-panel" role="tabpanel" id="panel-delivery" aria-labelledby="tab-delivery" tabindex="0" hidden>
+    <h2>Delivery &amp; support</h2>
+    <p>${esc((CONFIG.placeholders && CONFIG.placeholders.deliveryStatement) || 'Delivery is confirmed per enquiry.')} Share your quantity, town or county and required timing in your enquiry.</p>
+    <p>Warranty terms, installation and after-sales support are confirmed in writing for the specific product. Request the applicable terms with your quotation.</p>
+    <button type="button" class="btn secondary" data-quote="${p.id}">Ask for a quotation</button>
+  </section>
+  ${related.length ? `<section class="section"><div class="section-head"><div><h2>Related equipment</h2><p>More from ${esc(c.name)}.</p></div><a class="text-link" href="${shopUrl(c.id)}">View department ${icon('arrow')}</a></div><div class="product-grid">${related.map(card).join('')}</div></section>` : ''}`;
+}
+function quantity(value, id, kind = 'detail') {
+  const label = kind.startsWith('cart:') ? ` for ${esc(product(kind.slice(5)).name)}` : '';
+  return `<div class="qty-control"><button type="button" data-qty-step="-1" data-for="${id}" aria-label="Decrease quantity${label}">−</button><input id="${id}" data-qty-kind="${kind}" type="number" inputmode="numeric" min="1" max="${MAX_QTY}" step="1" value="${value}" aria-label="Quantity${label}"><button type="button" data-qty-step="1" data-for="${id}" aria-label="Increase quantity${label}">+</button></div>`;
+}
+function validQty(input) {
+  const v = Number(input.value);
+  if (!Number.isInteger(v) || v < 1 || v > MAX_QTY) { input.setCustomValidity(`Enter a whole number from 1 to ${MAX_QTY}.`); input.reportValidity(); return null; }
+  input.setCustomValidity(''); return v;
+}
+
+/* ---------------------------------------------------------------- 6. Business, Contact, About, Cart, Checkout, Policies */
+const TOPICS = ['Product information', 'Quotation request', 'Home Backup Power', 'Farm & Irrigation', 'Construction & Workshop', 'Business / institutional purchase', 'Delivery enquiry', 'Support information'];
+function field(id, label, control, hint = '', full = false) {
+  return `<div class="field ${full ? 'full' : ''}" data-field="${id}"><label for="${id}">${label}</label>${control}${hint ? `<small>${hint}</small>` : ''}<span class="error" id="${id}-error" aria-live="polite"></span></div>`;
+}
+function enquiryForm(type, params) {
+  const p = product(params.get('product')), isBusiness = type === 'business';
+  let equipment = p ? `${p.name}${p.model ? ` · Model ${p.model}` : ''}${p.sku ? ` · SKU ${p.sku}` : ''}\nProduct link: ${productURL(p)}` : '';
+  if (params.get('from') === 'cart' && cartCount()) equipment = cartSummary();
+  let q = Number(params.get('qty') || 1); if (!Number.isInteger(q) || q < 1) q = 1;
+  const topic = params.get('topic') || (isBusiness ? 'Quotation request' : '');
+  return `<form id="enquiry-form" data-type="${type}" novalidate>
+    <div id="form-errors" role="alert" aria-live="assertive"></div>
+    <div class="form-grid">
+      ${field('enq-name', 'Full name *', '<input id="enq-name" name="name" required autocomplete="name" maxlength="100" aria-describedby="enq-name-error">')}
+      ${field('enq-email', 'Email address *', '<input id="enq-email" name="email" type="email" required autocomplete="email" maxlength="150" aria-describedby="enq-email-error">')}
+      ${field('enq-company', 'Business / organisation', '<input id="enq-company" name="company" autocomplete="organization" maxlength="150">', 'Optional')}
+      ${field('enq-phone', 'Phone / WhatsApp', '<input id="enq-phone" name="phone" type="tel" autocomplete="tel" maxlength="30">', 'Optional, include your country code')}
+      ${field('enq-location', 'Town / county and country *', '<input id="enq-location" name="location" required maxlength="150" placeholder="e.g. Nakuru, Kenya" aria-describedby="enq-location-error">', '', !isBusiness)}
+      ${isBusiness ? field('enq-qty', 'Quantity *', `<input id="enq-qty" name="quantity" type="number" inputmode="numeric" min="1" max="9999" step="1" required value="${q}" aria-describedby="enq-qty-error">`, 'For several items, list quantities in the equipment list below.') : ''}
+      ${field('enq-topic', `${isBusiness ? 'Project / application' : 'Enquiry topic'} *`, `<select id="enq-topic" name="topic" required aria-describedby="enq-topic-error"><option value="">Select a topic</option>${TOPICS.map(t => `<option ${t === topic ? 'selected' : ''}>${t}</option>`).join('')}</select>`, '', true)}
+      ${field('enq-message', `${isBusiness ? 'Equipment list and requirements' : 'Your message'} *`, `<textarea id="enq-message" name="message" required minlength="10" maxlength="4000" placeholder="Include equipment, quantities, specifications and your preferred timing." aria-describedby="enq-message-error">${esc(equipment)}</textarea>`, '', true)}
+    </div>
+    ${PROD ? '' : '<label class="check-label"><input type="checkbox" name="demo" required id="enq-demo"> <span>I understand this is a demonstration: the form prepares a preview and does not send a message.</span></label><span class="error" id="enq-demo-error" style="display:none;color:var(--danger);font-size:12px"></span>'}
+    <button class="btn" type="submit">${PROD ? 'Prepare enquiry' : `Preview ${isBusiness ? 'quotation request' : 'enquiry'}`} ${icon('arrow')}</button>
+    <p class="small muted" style="margin:12px 0 0">Required fields are marked *. Nothing is sent or saved to a server from this page — the prepared text can be copied or sent on WhatsApp.</p>
+    <div id="form-feedback" role="status" aria-live="polite"></div>
+  </form>`;
+}
+function business(params) {
+  return crumb([['Business & Bulk Orders']]) + `
+  <section class="page-intro"><h1>Business &amp; Bulk Orders</h1><p>Prepare a quotation request for a business, contractor, farm, school, hotel or institutional project. A clear brief gets a faster, more accurate quotation.</p></section>
+  <div class="two-col">
+    <div>
+      <h2>Tell us what the job needs</h2>
+      <p class="muted">A useful quotation starts with the equipment, quantities, specifications and destination. Include your preferred timing and any procurement requirements such as proforma invoices or tender documents.</p>
+      <ul class="info-list">
+        <li>${icon('layers')}<div><strong>Your equipment list</strong><small>Names, models, quantities and acceptable alternatives.</small></div></li>
+        <li>${icon('tool')}<div><strong>Your technical requirements</strong><small>Power, capacity, dimensions or a short description of the application.</small></div></li>
+        <li>${icon('pin')}<div><strong>Your destination</strong><small>Town, country and site access details where relevant.</small></div></li>
+      </ul>
+      ${notice('Pricing, delivery, payment terms and any service scope are confirmed in writing. No minimum order or bulk discount is implied.')}
+      <div class="actions"><a class="btn secondary" href="#/shop">Browse the catalogue first</a><button type="button" class="btn wa" data-general-wa>${icon('wa')} Ask on WhatsApp</button></div>
+    </div>
+    <div class="content-panel" id="quote"><h2>Request a quote</h2>${PROD ? '' : '<p class="muted small">Demonstration form · preview and copy only</p>'}${enquiryForm('business', params)}</div>
+  </div>`;
+}
+function contact(params) {
+  return crumb([['Contact']]) + `
+  <section class="page-intro"><h1>Contact NYCE SOLUTIONS</h1><p>Ask about a product, a delivery destination or the details needed for a quotation.</p></section>
+  <div class="two-col">
+    <div>
+      <h2>How to reach us</h2>
+      <ul class="info-list">
+        <li>${icon('wa')}<div><strong>WhatsApp</strong><small>${WHATSAPP ? `+${esc(WHATSAPP)}` : `<span class="muted">${esc(PENDING)}</span>`}</small></div></li>
+        <li>${icon('phone')}<div><strong>Phone</strong><small>${contactLine(CONFIG.phoneNumber, PENDING)}</small></div></li>
+        <li>${icon('mail')}<div><strong>Email</strong><small>${contactLine(CONFIG.emailAddress, PENDING)}</small></div></li>
+        <li>${icon('pin')}<div><strong>Address</strong><small>${contactLine(CONFIG.physicalAddress, PENDING)}</small></div></li>
+        <li>${icon('clock')}<div><strong>Operating hours</strong><small>${contactLine(CONFIG.operatingHours, PENDING)}</small></div></li>
+      </ul>
+      <button type="button" class="btn wa solid" data-general-wa>${icon('wa')} ${WHATSAPP ? 'Open a WhatsApp enquiry' : 'Preview a WhatsApp enquiry'}</button>
+      ${notice('Kenya delivery and enquiries from other African countries are confirmed per enquiry. Cross-border delivery remains an enquiry until coverage and terms are confirmed.')}
+    </div>
+    <div class="content-panel"><h2>Send an enquiry</h2>${PROD ? '' : '<p class="muted small">Demonstration form · nothing is transmitted</p>'}${enquiryForm('contact', params)}</div>
+  </div>`;
+}
+function about() {
+  return crumb([['About Us']]) + `
+  <section class="page-intro"><h1>Equipment for the way you live and work</h1><p>NYCE SOLUTIONS brings power, water and practical equipment into one catalogue for homes, farms, businesses and institutions.</p></section>
+  <section class="about-grid">${photo(4, 'Workshop tools on a workbench', { mode: 'slice' })}<div>
+    <h2>Start with the right questions</h2>
+    <p>Whether you are planning home backup power, improving water supply on a farm or equipping a workshop, the details matter: loads, flow and head, cable sizes, fuel and phase.</p>
+    <p>Browse six departments, compare the specifications that matter and send an enquiry built around your application. The catalogue serves individual consumers, businesses, electrical contractors, construction companies, farms, schools, hotels and government and institutional buyers in Kenya, with enquiries welcome from other African countries.</p>
+    <div class="actions"><a class="btn" href="#/shop">View Full Catalogue ${icon('arrow')}</a><a class="btn secondary" href="#/business">Business &amp; Bulk Orders</a></div>
+  </div></section>
+  <section class="section"><div class="application-grid">
+    <div class="application">${icon('search')}<h3>Find your starting point</h3><p>Browse six departments or search by name and model to find the right equipment.</p></div>
+    <div class="application">${icon('layers')}<h3>Compare the essentials</h3><p>Review power, capacity, phase and other relevant details before you ask for a quotation.</p></div>
+    <div class="application">${icon('wa')}<h3>Enquire on WhatsApp</h3><p>Every product prepares a message with the product, quantity and link so the conversation starts with the right details.</p></div>
+  </div></section>
+  ${demoNotice('Company history, legal details, team information and service capabilities have not been supplied. This page makes no claims about those details until the owner provides approved content.')}`;
+}
+function cartPage() {
+  const items = Object.entries(cart);
+  return crumb([['Cart']]) + `
+  <section class="page-intro"><h1>Cart</h1><p>Adjust quantities and review the subtotal, then send the list as an enquiry. ${PROD ? 'This cart does not reserve stock or place an order; a quotation confirms the final amount.' : 'This is a prototype cart: no order is submitted, no inventory is reserved and no payment is processed.'}</p></section>
+  ${items.length ? `<div class="cart-layout">
+    <div>${items.map(([id, q]) => { const p = product(id); return `<article class="cart-item" data-cart-id="${id}"><a href="#/product/${id}" aria-label="View ${esc(p.name)}">${photo(p.image.tile, p.alt, { label: false })}</a><div><h3><a href="#/product/${id}">${esc(p.name)}</a></h3><span class="price-note">${money(p.price)} each${isDemoPrice(p) ? ' · demonstration price' : ''}</span><div class="actions" style="gap:8px;align-items:center">${quantity(q, 'cart-qty-' + id, 'cart:' + id)}<button type="button" class="remove" data-remove="${id}">Remove</button></div></div><div class="cart-line-total" data-line-total="${id}">${money(p.price * q)}</div></article>`; }).join('')}
+      <div class="actions" style="margin-top:16px"><a class="btn secondary" href="#/shop">Continue shopping</a><button type="button" class="btn secondary" data-clear-cart>Clear cart</button></div>
+    </div>
+    <aside class="summary" aria-labelledby="summary-heading">
+      <h2 id="summary-heading">Summary</h2>
+      <p>Items: <strong id="summary-count">${cartCount()}</strong></p>
+      <div class="total"><span>Subtotal</span><span id="subtotal">${money(cartTotal())}</span></div>
+      <p>Taxes, delivery and other charges are not calculated. This is not a final amount payable.</p>
+      <a class="btn" href="#/checkout">Review enquiry summary ${icon('arrow')}</a>
+      <a class="btn secondary" href="#/business?from=cart">Request a quotation</a>
+      <p style="margin-top:14px">${canStore ? 'Cart items are stored in this browser only.' : 'Browser storage is unavailable; the cart lasts for this open page only.'} No order has been submitted, no inventory has been reserved and no payment has been processed.</p>
+    </aside>
+  </div>` : `<div class="empty">${icon('cart')}<h2 style="margin-top:12px">Your cart is empty</h2><p>Add a priced product to build an enquiry list, or request a quote for any product.</p><div class="actions"><a class="btn" href="${makeUrl('shop', { pricing: 'demo' })}">Browse priced products ${icon('arrow')}</a><a class="btn secondary" href="#/shop">View Full Catalogue</a></div></div>`}`;
+}
+function checkoutPage() {
+  const items = Object.entries(cart);
+  if (!items.length) return crumb([['Cart', '#/cart'], ['Enquiry summary']]) + `<section class="page-intro"><h1>Enquiry summary</h1></section><div class="empty"><h2>Nothing to summarise yet</h2><p>Your cart is empty. Add priced products first.</p><div class="actions"><a class="btn" href="#/shop">View Full Catalogue</a></div></div>`;
+  return crumb([['Cart', '#/cart'], ['Enquiry summary']]) + `
+  <section class="page-intro"><h1>Enquiry summary</h1><p>This is the prototype checkout step. It prepares an enquiry — it does not place an order, reserve stock or take payment.</p></section>
+  ${notice('<strong>No order has been submitted.</strong> No inventory has been reserved and no payment has been processed. Send the list as a WhatsApp enquiry or a quotation request to continue.', 'warn')}
+  <div class="data-table-wrap"><table class="data-table"><thead><tr><th scope="col">Item</th><th scope="col">Model / SKU</th><th scope="col">Quantity</th><th scope="col">Unit price</th><th scope="col">Line total</th></tr></thead><tbody>${items.map(([id, q]) => { const p = product(id); return `<tr><td><a href="#/product/${id}">${esc(p.name)}</a></td><td>${esc(p.model || p.sku || '—')}</td><td>${q}</td><td>${money(p.price)}</td><td>${money(p.price * q)}</td></tr>`; }).join('')}</tbody><tfoot><tr><th scope="row" colspan="4">Subtotal${PROD ? '' : ' (demonstration prices)'}</th><td><strong>${money(cartTotal())}</strong></td></tr></tfoot></table></div>
+  <p class="muted small">Taxes, delivery and other charges are not calculated. A written quotation confirms the final amount.</p>
+  <div class="actions"><button type="button" class="btn wa solid" data-cart-wa>${icon('wa')} Send list on WhatsApp</button><a class="btn" href="#/business?from=cart">Request a quotation</a><a class="btn secondary" href="#/cart">Back to cart</a></div>`;
+}
+const POLICIES = {
+  delivery: ['Delivery information', 'Delivery coverage, transport costs, collection options and lead times are confirmed per enquiry. Send your destination and equipment list to receive delivery details. Cross-border supply remains an enquiry until coverage and terms are confirmed.', 'Coverage areas, carrier arrangements, charges, order cut-offs, collection details, exclusions and cross-border responsibilities.'],
+  returns: ['Returns & warranty', 'Returns and warranty terms are confirmed in writing for the specific product. Request the applicable terms before purchase.', 'Eligibility, time limits, exclusions, inspection process, contact channel, refund method and manufacturer warranty documentation.'],
+  privacy: ['Privacy policy', 'This site does not submit forms to a server or use analytics or tracking scripts. The cart uses local browser storage where available. Enquiry text you prepare stays in your browser until you copy or send it.', 'Data-controller details, purposes, retention, contact channel, hosting, processors and cookie choices for the production site.'],
+  terms: ['Terms of sale', 'No transaction can be completed on this site. Prices shown are indicative; availability, taxes, payment terms and supply conditions are confirmed by written quotation.', 'Legal entity details, approved sales terms, price and tax treatment, payment methods, order acceptance rules and product conditions.']
+};
+function policyPage(key) {
+  const p = POLICIES[key]; if (!p) return notFound();
+  const pending = (CONFIG.placeholders && CONFIG.placeholders.policyPending) || 'Owner approval required';
+  return crumb([[p[0]]]) + `<section class="page-intro"><h1>${p[0]}</h1></section><div class="policy-card"><span class="tag illustrative">${esc(pending)}</span><p style="margin-top:14px">${p[1]}</p><h3>Still to be confirmed by the business</h3><p class="muted">${p[2]}</p><a class="btn secondary" href="#/contact">Send an enquiry</a></div>`;
+}
+function notFound(message = 'The address you opened does not exist in this catalogue.') {
+  return `<section class="route-error"><h1>Page not found</h1><p class="muted">${esc(message)}</p><div class="actions"><a class="btn" href="#/shop">View Full Catalogue ${icon('arrow')}</a><a class="btn secondary" href="#/">Go to the homepage</a></div></section>`;
+}
+
+/* ---------------------------------------------------------------- 7. Router */
+const LEGACY = {
+  // Old category-directory journey → filtered Shop routes (replaces history entry, so Back works).
+  resolve(parts) {
+    const [page, dept, sub] = parts;
+    if (page === 'categories') return '#/shop';
+    if (page === 'category') {
+      const c = cat(dept); if (!c) return null;
+      if (sub && !c.subcategories.some(s => s.id === sub)) return null;
+      return shopUrl(dept, sub || '');
+    }
+    return undefined;
+  }
+};
+function render() {
+  const r = current(), [page, id] = r.parts;
+  const legacy = LEGACY.resolve(r.parts);
+  if (legacy) { location.replace(legacy); return; }
+  let html = '', active = page || 'home';
+  if (!page) html = home();
+  else if (page === 'shop') html = listing(r);
+  else if (legacy === null) { html = notFound('That category does not exist. Browse the full catalogue instead.'); active = 'shop'; }
+  else if (page === 'product') { const p = product(id); html = p ? detail(p) : notFound(PROD && ALL_PRODUCTS.some(x => x.id === id) ? 'This product is not published yet.' : 'That product does not exist in the catalogue.'); active = 'shop'; }
+  else if (page === 'business') html = business(r.params);
+  else if (page === 'contact') html = contact(r.params);
+  else if (page === 'about') html = about();
+  else if (page === 'cart') html = cartPage();
+  else if (page === 'checkout') { html = checkoutPage(); active = 'cart'; }
+  else if (page === 'policy') html = policyPage(id);
+  else if (page === 'guide') html = notFound('The implementation guide has moved out of the customer-facing site. Open docs/implementation-guide.html from the repository.');
+  else html = notFound();
+
+  const main = document.getElementById('main');
+  main.innerHTML = html;
+  document.querySelectorAll('[data-nav]').forEach(a => { const on = a.dataset.nav === active; a.classList.toggle('active', on); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+  closeMenu();
+  document.getElementById('search-input').value = r.params.get('q') || '';
+  const heading = main.querySelector('h1');
+  document.title = `${(heading ? (heading.innerText || heading.textContent) : 'Catalogue').replace(/\s+/g, ' ').trim()} | ${BUSINESS}`;
+
+  const target = focusAfterRoute && document.getElementById(focusAfterRoute);
+  if (target) {
+    if (drawerOpen && innerWidth < 1050) openDrawer(false);
+    target.focus({ preventScroll: true });
+  } else if (previousHash !== '' && previousHash !== location.hash) {
+    // Route change: move focus to the new content and return to the top. On first load the
+    // browser's natural focus order is kept so the skip link is the first Tab stop.
+    main.focus({ preventScroll: true }); window.scrollTo(0, 0);
+  }
+  if (!target) { drawerOpen = false; document.body.classList.remove('drawer-open'); document.getElementById('drawer-backdrop').classList.remove('open'); document.getElementById('drawer-backdrop').hidden = true; }
+  focusAfterRoute = null; previousHash = location.hash || '#/'; updateCount();
+}
+function navigate(url) {
+  if (location.hash === url) { render(); document.getElementById('main').focus({ preventScroll: true }); window.scrollTo(0, 0); }
+  else location.hash = url;
+}
+function setFilter(key, value, focusID) {
+  const sel = selection(current());
+  sel[key] = value; sel.page = 1;
+  if (key === 'category') { sel.subcategory = ''; sel.power = ''; sel.phase = ''; }
+  if (key === 'subcategory' && value) { const s = subOf(value); sel.category = s ? s.category.id : sel.category; }
+  focusAfterRoute = focusID || null;
+  navigate(makeUrl('shop', sel));
+}
+function removeFilter(key) {
+  const sel = selection(current());
+  if (key === 'category') { sel.category = ''; sel.subcategory = ''; sel.power = ''; sel.phase = ''; } else sel[key] = '';
+  sel.page = 1; navigate(makeUrl('shop', sel));
+}
+function closeMenu() {
+  document.getElementById('primary-nav').classList.remove('open');
+  const t = document.getElementById('menu-toggle'); t.setAttribute('aria-expanded', 'false'); t.setAttribute('aria-label', 'Open menu');
+}
+function openDrawer(moveFocus = true) {
+  const panel = document.getElementById('filters'), backdrop = document.getElementById('drawer-backdrop'), toggle = document.getElementById('filter-toggle');
+  if (!panel) return;
+  drawerOpen = true; panel.classList.add('open'); backdrop.hidden = false; backdrop.classList.add('open'); document.body.classList.add('drawer-open');
+  if (toggle) toggle.setAttribute('aria-expanded', 'true');
+  if (moveFocus) { const close = document.getElementById('drawer-close'); if (close) close.focus(); }
+}
+function closeDrawer(returnFocus = true) {
+  const panel = document.getElementById('filters'), backdrop = document.getElementById('drawer-backdrop'), toggle = document.getElementById('filter-toggle');
+  drawerOpen = false; document.body.classList.remove('drawer-open'); backdrop.classList.remove('open'); backdrop.hidden = true;
+  if (panel) panel.classList.remove('open');
+  if (toggle) { toggle.setAttribute('aria-expanded', 'false'); if (returnFocus) toggle.focus(); }
+}
+function selectTab(name, focus = false) {
+  activeTab = name;
+  document.querySelectorAll('[role=tab]').forEach(t => { const on = t.dataset.tab === name; t.setAttribute('aria-selected', String(on)); t.tabIndex = on ? 0 : -1; if (on && focus) t.focus(); });
+  document.querySelectorAll('[role=tabpanel]').forEach(p => { p.hidden = p.id !== 'panel-' + name; });
+}
+
+/* ---------------------------------------------------------------- 8. WhatsApp, modal, forms */
+function productURL(p) {
+  const configured = String(CONFIG.publicBaseUrl || '').trim();
+  const base = configured || location.href.split('#')[0];
+  return base.replace(/#.*$/, '') + '#/product/' + p.id;
+}
+function priceLine(p) { return p.price === null ? 'Request Price' : `${money(p.price)}${isDemoPrice(p) ? ' (demonstration price shown on the website)' : ''}`; }
+function messageFor(p, q) {
+  const localNote = CONFIG.publicBaseUrl ? '' : (location.protocol === 'file:' ? ' (local file reference; configure publicBaseUrl for a public link)' : '');
+  return `Hello ${BUSINESS},
+I would like to enquire about the following item:
+Product: ${p.name}${p.model ? `\nModel: ${p.model}` : ''}${p.sku ? `\nSKU: ${p.sku}` : ''}
+Quantity: ${q}
+Displayed price: ${priceLine(p)}
+Product link${localNote}: ${productURL(p)}
+Please confirm:
+1. Current availability
+2. Delivery options and cost to my location: ________
+3. A final quotation including any applicable taxes
+This is an enquiry, not an order.`;
+}
+function cartSummary() {
+  return Object.entries(cart).map(([id, q]) => { const p = product(id); return `${p.name}${p.model ? ` · Model ${p.model}` : ''}${p.sku ? ` · SKU ${p.sku}` : ''}\nQuantity: ${q}\nDisplayed price: ${priceLine(p)}\nProduct link: ${productURL(p)}`; }).join('\n\n');
+}
+function cartMessage() {
+  return `Hello ${BUSINESS},
+I would like to enquire about the following items:
+
+${cartSummary()}
+
+Subtotal shown on the website: ${money(cartTotal())}${PROD ? '' : ' (demonstration prices)'}
+Please confirm:
+1. Current availability of each item
+2. Delivery options and cost to my location: ________
+3. A final quotation including any applicable taxes
+This is an enquiry, not an order.`;
+}
+function generalMessage() {
+  return `Hello ${BUSINESS},
+I would like to enquire about equipment for my project.
+Equipment / model: ________
+Quantity: ________
+Delivery location and country: ________
+Please confirm availability, delivery options and a final quotation.
+This is an enquiry, not an order.`;
+}
+const validNumber = () => /^\d{8,15}$/.test(WHATSAPP);
+function openModal(title, body, className = '') {
+  const m = document.getElementById('modal');
+  m.className = className;
+  document.getElementById('modal-content').innerHTML = `<h2 id="modal-title">${title}</h2>${body}`;
+  if (!m.open) m.showModal();
+  m.querySelector('.close').focus();
+}
+function messageModal(text, title = 'WhatsApp enquiry') {
+  const ok = validNumber();
+  openModal(title, `<p>${ok ? 'Review the message, then open WhatsApp to send it. Opening WhatsApp starts an enquiry; it does not place an order.' : `The ${esc(BUSINESS)} WhatsApp number has not been configured yet, so WhatsApp cannot be opened from here. You can copy the prepared message below; nothing has been sent.`}</p>
+    <label for="message-preview" class="sr-only">Enquiry message</label><textarea id="message-preview" readonly>${esc(text)}</textarea>
+    <div class="actions">${ok ? `<a class="btn wa solid" href="https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}" target="_blank" rel="noopener noreferrer">${icon('wa')} Open WhatsApp</a>` : ''}<button type="button" class="btn ${ok ? 'secondary' : ''}" data-copy-message>Copy message</button><button type="button" class="btn secondary" data-close-modal>Close</button></div>
+    <p class="copy-status" id="copy-status" role="status"></p>${ok ? '' : `<p class="small muted">Site owner: set <code>whatsappNumber</code> in <code>assets/js/config.js</code> (international digits only) to enable the WhatsApp button.</p>`}`);
+}
+async function copyMessage() {
+  const el = document.getElementById('message-preview'), text = el.value; let ok = false;
+  try { await navigator.clipboard.writeText(text); ok = true; } catch { el.focus(); el.select(); try { ok = document.execCommand('copy'); } catch { /* unsupported */ } }
+  document.getElementById('copy-status').textContent = ok ? 'Message copied. Nothing has been sent.' : 'Copy is unavailable in this browser. The message is selected — use your browser’s Copy command.';
+}
+function updateCartDisplay() {
+  updateCount();
+  const sub = document.getElementById('subtotal'); if (sub) sub.textContent = money(cartTotal());
+  const cnt = document.getElementById('summary-count'); if (cnt) cnt.textContent = cartCount();
+  Object.entries(cart).forEach(([id, q]) => { const el = document.querySelector(`[data-line-total="${id}"]`); if (el) el.textContent = money(product(id).price * q); });
+}
+function validateForm(form) {
+  const errors = [];
+  const setError = (id, msg) => { const wrap = form.querySelector(`[data-field="${id}"]`), err = document.getElementById(`${id}-error`), ctl = document.getElementById(id); if (wrap) wrap.classList.toggle('invalid', !!msg); if (err) err.textContent = msg || ''; if (ctl) ctl.setAttribute('aria-invalid', msg ? 'true' : 'false'); if (msg) errors.push({ id, msg }); };
+  const v = id => (document.getElementById(id) || { value: '' }).value.trim();
+  setError('enq-name', v('enq-name') ? '' : 'Enter your full name.');
+  setError('enq-email', !v('enq-email') ? 'Enter your email address.' : /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v('enq-email')) ? '' : 'Enter a valid email address, for example name@example.com.');
+  setError('enq-location', v('enq-location') ? '' : 'Enter your town or county and country.');
+  if (document.getElementById('enq-qty')) { const n = Number(v('enq-qty')); setError('enq-qty', Number.isInteger(n) && n >= 1 && n <= 9999 ? '' : 'Enter a whole number from 1 to 9999.'); }
+  setError('enq-topic', v('enq-topic') ? '' : 'Select a topic.');
+  setError('enq-message', !v('enq-message') ? 'Enter your message.' : v('enq-message').length < 10 ? 'Enter at least 10 characters.' : '');
+  const demo = document.getElementById('enq-demo');
+  if (demo) { const err = document.getElementById('enq-demo-error'); if (!demo.checked) { err.textContent = 'Tick the box to confirm you understand this is a demonstration.'; err.style.display = 'block'; demo.setAttribute('aria-invalid', 'true'); errors.push({ id: 'enq-demo', msg: err.textContent }); } else { err.textContent = ''; err.style.display = 'none'; demo.setAttribute('aria-invalid', 'false'); } }
+  const box = document.getElementById('form-errors');
+  box.innerHTML = errors.length ? `<div class="form-errors"><strong>Please correct ${errors.length} ${errors.length === 1 ? 'field' : 'fields'}:</strong><ul>${errors.map(e => `<li><a href="#${e.id}" data-focus-field="${e.id}">${esc(e.msg)}</a></li>`).join('')}</ul></div>` : '';
+  return errors;
+}
+
+/* ---------------------------------------------------------------- Events */
+document.addEventListener('click', e => {
+  const el = e.target.closest('button, a');
+  if (!el) return;
+  if (el.classList.contains('skip')) { e.preventDefault(); document.getElementById('main').focus(); return; }
+  if (el.id === 'menu-toggle') { const nav = document.getElementById('primary-nav'), open = nav.classList.toggle('open'); el.setAttribute('aria-expanded', String(open)); el.setAttribute('aria-label', open ? 'Close menu' : 'Open menu'); return; }
+  if (el.id === 'filter-toggle') { drawerOpen ? closeDrawer() : openDrawer(); return; }
+  if (el.id === 'drawer-close') { closeDrawer(); return; }
+  if (el.dataset.focusField) { e.preventDefault(); const f = document.getElementById(el.dataset.focusField); if (f) f.focus(); return; }
+  if (el.hasAttribute('data-clear-filters')) { focusAfterRoute = null; navigate('#/shop'); return; }
+  if (el.dataset.removeFilter) { removeFilter(el.dataset.removeFilter); return; }
+  if (el.dataset.view) { viewMode = el.dataset.view === 'list' ? 'list' : 'grid'; store('nyce-view-mode', viewMode); document.getElementById('results').classList.toggle('list', viewMode === 'list'); document.querySelectorAll('[data-view]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view === viewMode))); return; }
+  if (el.dataset.page) { const sel = selection(current()); sel.page = Number(el.dataset.page); navigate(makeUrl('shop', sel)); return; }
+  if (el.dataset.qtyStep) {
+    const input = document.getElementById(el.dataset.for); let q = Number(input.value) || 1;
+    q = Math.max(1, Math.min(MAX_QTY, Math.round(q) + Number(el.dataset.qtyStep))); input.value = q; input.setCustomValidity('');
+    if (input.dataset.qtyKind.startsWith('cart:')) { cart[input.dataset.qtyKind.slice(5)] = q; saveCart(); updateCartDisplay(); }
+    return;
+  }
+  if (el.dataset.add) { const q = validQty(document.getElementById('detail-qty')); if (q !== null) addCart(el.dataset.add, q); return; }
+  if (el.dataset.remove) { delete cart[el.dataset.remove]; saveCart(); render(); notify('Item removed from the cart.'); return; }
+  if (el.hasAttribute('data-clear-cart')) { cart = {}; saveCart(); render(); notify('Cart cleared.'); return; }
+  if (el.dataset.wa) { const p = product(el.dataset.wa); let q = 1; if (el.dataset.detail) { q = validQty(document.getElementById('detail-qty')); if (q === null) return; } messageModal(messageFor(p, q)); return; }
+  if (el.hasAttribute('data-general-wa')) { messageModal(generalMessage()); return; }
+  if (el.hasAttribute('data-cart-wa')) { if (!cartCount()) { notify('Your cart is empty.'); return; } messageModal(cartMessage(), 'WhatsApp enquiry · cart list'); return; }
+  if (el.dataset.quote) { let q = 1; const input = document.getElementById('detail-qty'); if (input) { q = validQty(input); if (q === null) return; } navigate(makeUrl('business', { product: el.dataset.quote, qty: q })); return; }
+  if (el.dataset.tab) { selectTab(el.dataset.tab); return; }
+  if (el.dataset.gallery !== undefined) {
+    const p = product(el.dataset.id); galleryIndex = Number(el.dataset.gallery) || 0;
+    document.getElementById('gallery-content').innerHTML = galleryItem(p, galleryIndex);
+    document.querySelectorAll('[data-gallery]').forEach(t => t.setAttribute('aria-pressed', String(Number(t.dataset.gallery) === galleryIndex)));
+    document.getElementById('gallery-main').setAttribute('aria-label', `Enlarge ${(p.gallery[galleryIndex] || {}).label || 'image'} for ${p.name}`);
+    return;
+  }
+  if (el.dataset.enlarge) { const p = product(el.dataset.enlarge); openModal(esc(p.name), galleryItem(p, galleryIndex) + (PROD ? '' : '<p style="margin-top:12px">Representative department image; exact product photography is pending.</p>'), 'lightbox'); return; }
+  if (el.hasAttribute('data-copy-message')) { copyMessage(); return; }
+  if (el.hasAttribute('data-form-preview')) { messageModal(formPreview, PROD ? 'Prepared enquiry' : 'Prepared enquiry · demonstration'); return; }
+  if (el.classList.contains('close') || el.hasAttribute('data-close-modal')) { document.getElementById('modal').close(); return; }
+});
+document.addEventListener('change', e => {
+  const el = e.target;
+  if (el.dataset.filter) { setFilter(el.dataset.filter, el.value, el.id || (el.name ? `${el.name}-${el.value}` : null)); return; }
+  if (el.dataset.qtyKind && el.dataset.qtyKind.startsWith('cart:')) { const q = validQty(el); if (q !== null) { cart[el.dataset.qtyKind.slice(5)] = q; saveCart(); updateCartDisplay(); } }
+});
+document.addEventListener('input', e => { if (e.target.setCustomValidity) e.target.setCustomValidity(''); });
+document.addEventListener('keydown', e => {
+  if (e.target.matches && e.target.matches('[role=tab]')) {
+    const names = ['description', 'specifications', 'delivery'], i = names.indexOf(e.target.dataset.tab);
+    if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) { e.preventDefault(); const j = e.key === 'Home' ? 0 : e.key === 'End' ? 2 : (i + (e.key === 'ArrowRight' ? 1 : 2)) % 3; selectTab(names[j], true); }
+  }
+  if (e.key === 'Escape') { closeMenu(); if (drawerOpen) closeDrawer(); }
+});
+document.addEventListener('submit', e => {
+  if (e.target.id === 'global-search') { e.preventDefault(); const q = document.getElementById('search-input').value.trim(); const sel = current().parts[0] === 'shop' ? selection(current()) : {}; navigate(makeUrl('shop', { ...sel, q, page: 1 })); return; }
+  if (e.target.id !== 'enquiry-form') return;
+  e.preventDefault();
+  const form = e.target, errors = validateForm(form);
+  if (errors.length) { const first = document.getElementById(errors[0].id); if (first) first.focus(); return; }
+  const d = Object.fromEntries(new FormData(form));
+  formPreview = `Enquiry for ${BUSINESS}\nName: ${d.name.trim()}\nEmail: ${d.email.trim()}${d.company ? `\nOrganisation: ${d.company.trim()}` : ''}${d.phone ? `\nPhone: ${d.phone.trim()}` : ''}\nDestination: ${d.location.trim()}\nTopic: ${d.topic}${d.quantity ? `\nQuantity: ${d.quantity}` : ''}\n\n${d.message.trim()}\n\nThis is an enquiry, not an order.`;
+  document.getElementById('form-feedback').innerHTML = `<div class="form-success"><h3>Your enquiry is prepared${PROD ? '' : ' (demonstration)'}.</h3><p>Nothing has been sent or saved to a server. Review the text, then copy it${validNumber() ? ' or open WhatsApp' : ''} to send it to ${esc(BUSINESS)}.</p><button type="button" class="btn secondary sm" data-form-preview>Review &amp; ${validNumber() ? 'send' : 'copy'} enquiry</button></div>`;
+  document.getElementById('form-feedback').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+});
+document.getElementById('modal').addEventListener('click', e => {
+  if (e.target.id === 'modal') { const r = e.target.getBoundingClientRect(); if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) e.target.close(); }
+});
+document.getElementById('drawer-backdrop').addEventListener('click', () => closeDrawer());
+window.addEventListener('hashchange', () => { const m = document.getElementById('modal'); if (m.open) m.close(); render(); });
+window.addEventListener('resize', () => { if (innerWidth >= 1050 && drawerOpen) closeDrawer(false); });
+
+/* ---------------------------------------------------------------- Boot */
+(function boot() {
+  // Mode indicators and footer text driven by config.
+  const badge = document.getElementById('mode-badge'); if (badge) badge.hidden = PROD;
+  const footerContact = document.getElementById('footer-contact');
+  if (footerContact) footerContact.innerHTML = `Phone: ${contactLine(CONFIG.phoneNumber, PENDING)}<br>WhatsApp: ${WHATSAPP ? `+${esc(WHATSAPP)}` : `<span class="muted">${esc(PENDING)}</span>`}<br>Email: ${contactLine(CONFIG.emailAddress, PENDING)}<br>Address &amp; hours: ${contactLine([CONFIG.physicalAddress, CONFIG.operatingHours].filter(Boolean).join(' · '), PENDING)}`;
+  const year = document.getElementById('footer-year'); if (year) year.textContent = new Date().getFullYear();
+  const note = document.getElementById('footer-note'); if (note) note.textContent = PROD ? 'Prices and availability are confirmed by quotation. No online payment.' : 'Demonstration catalogue · indicative prices · no live checkout or payment.';
+  const contactShort = document.getElementById('contact-short'); if (contactShort && CONFIG.phoneNumber) contactShort.querySelector('div').innerHTML = `<span>Call or WhatsApp</span>${esc(CONFIG.phoneNumber)}`;
+
+  // Logo with wordmark fallback.
+  for (const id of ['brand-logo', 'footer-logo']) {
+    const img = document.getElementById(id); if (!img) continue;
+    img.onerror = () => { const mark = document.createElement('strong'); mark.className = 'logo-text'; mark.textContent = BUSINESS; img.replaceWith(mark); };
+    img.src = ASSETS.logo || '';
+  }
+  // Equipment sprite with placeholder fallback.
+  const check = new Image();
+  check.onerror = () => { imageFailed = true; render(); };
+  check.src = ASSETS.equipment || '';
+  if (!ASSETS.equipment) imageFailed = true;
+
+  document.querySelectorAll('[data-icon]').forEach(el => { el.innerHTML = icon(el.dataset.icon); });
+  const sb = document.getElementById('search-button'); if (sb) sb.innerHTML = `${icon('search')}<span>Search</span>`;
+  render();
+})();
+
+// Read-only hooks for testing and training. Never a server API.
+window.NYCE = { config: CONFIG, categories: CATEGORIES, products: PRODUCTS, allProducts: ALL_PRODUCTS, filtered, selection, current, getCart: () => ({ ...cart }), getTotal: cartTotal, messageFor, productURL, mode: PROD ? 'production' : 'demo' };
+})();
