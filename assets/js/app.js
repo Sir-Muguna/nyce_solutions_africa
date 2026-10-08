@@ -73,11 +73,11 @@ const money = n => `${CURRENCY} ${Number(n).toLocaleString(LOCALE, { maximumFrac
 const cat = id => CATEGORIES.find(c => c.id === id);
 const subOf = id => { for (const c of CATEGORIES) { const s = c.subcategories.find(x => x.id === id); if (s) return { ...s, category: c }; } return null; };
 const product = id => PRODUCTS.find(p => p.id === id);
-const inDept = (p, c) => !c || (p.departments || []).includes(c);
+const inDept = (p, c) => !c || (p.categories || []).includes(c);
 const inSub = (p, s) => !s || (p.subcategories || []).includes(s);
 const countDept = id => PRODUCTS.filter(p => inDept(p, id)).length;
 const countSub = id => PRODUCTS.filter(p => inSub(p, id)).length;
-const primaryCat = p => cat(p.departments[0]);
+const primaryCat = p => cat(p.categories[0]);
 const primarySub = p => subOf(p.subcategories[0]);
 const makeUrl = (path, params = {}) => {
   const isDefault = (k, v) => k === 'page' && Number(v) === 1;
@@ -159,7 +159,7 @@ function recordTag(p) {
     ? `<span class="tag sourced record-tag">Reference product</span>`
     : `<span class="tag illustrative record-tag">Illustrative product</span>`;
 }
-// Real photographs (image.src) are used when a record has one; otherwise the department sprite tile; otherwise a placeholder.
+// Real photographs (image.src) are used when a record has one; otherwise the category sprite tile; otherwise a placeholder.
 const PHOTO_SRC = /^(assets\/|https:\/\/)[\w\-./%]+$/i;
 function productPhoto(p, alt, opts = {}) {
   const img = p.image || {};
@@ -189,20 +189,20 @@ function card(p, opts) {
     </div>
   </article>`;
 }
-function departmentCard(c) {
+function categoryCard(c) {
   const n = countDept(c.id), subs = c.subcategories.length;
-  return `<a href="${shopUrl(c.id)}" class="department-card">${photo(c.imageTile, `${c.name} equipment`, { label: false, mode: 'slice' })}<div class="department-caption"><div><h3>${esc(c.name)}</h3><span>${subs} ${subs === 1 ? 'subcategory' : 'subcategories'}${n ? ` · ${n} ${n === 1 ? 'product' : 'products'}` : ''}</span></div><span class="round-arrow">${icon('arrow')}</span></div></a>`;
+  return `<a href="${shopUrl(c.id)}" class="category-card">${photo(c.imageTile, `${c.name} equipment`, { label: false, mode: 'slice' })}<div class="category-caption"><div><h3>${esc(c.name)}</h3><span>${subs} ${subs === 1 ? 'subcategory' : 'subcategories'}${n ? ` · ${n} ${n === 1 ? 'product' : 'products'}` : ''}</span></div><span class="round-arrow">${icon('arrow')}</span></div></a>`;
 }
 function contactLine(value, pending) { return value ? esc(value) : `<span class="muted">${esc(pending)}</span>`; }
 const PENDING = (CONFIG.placeholders && CONFIG.placeholders.contactPending) || 'To be supplied';
 
-/* ---------------------------------------------------------------- 3b. Shell: department menu, mobile drawer, footer */
+/* ---------------------------------------------------------------- 3b. Shell: category menu, mobile drawer, footer */
 const NAV_LINKS = [['#/', 'Home', 'home'], ['#/about', 'About Us', 'about'], ['#/shop', 'Shop', 'shop'], ['#/business', 'Business & Bulk Order', 'business'], ['#/contact', 'Contact', 'contact']];
 const safeUrl = u => /^https:\/\/[^\s"'<>]+$/i.test(String(u || ''));
 const menuLink = (c, s, cls = '', label = '') => `<a href="${shopUrl(c.id, s ? s.id : '')}"${cls ? ` class="${cls}"` : ''} data-menu-category="${c.id}"${s ? ` data-menu-sub="${s.id}"` : ''}>${esc(label || (s ? s.name : c.name))}</a>`;
-function departmentMenuHTML() {
-  return `<div class="department-menu-head"><a href="#/shop" class="menu-all">Browse all products ${icon('arrow')}</a></div>
-  <div class="department-columns">${CATEGORIES.map(c => `<div class="department-group">${menuLink(c, null, 'department-title')}<ul aria-label="${esc(c.name)} subcategories">${c.subcategories.map(sc => `<li>${menuLink(c, sc)}</li>`).join('')}</ul></div>`).join('')}</div>`;
+function categoryMenuHTML() {
+  return `<div class="category-menu-head"><a href="#/shop" class="menu-all">Browse all products ${icon('arrow')}</a></div>
+  <div class="category-columns">${CATEGORIES.map(c => `<div class="category-group">${menuLink(c, null, 'category-title')}<ul aria-label="${esc(c.name)} subcategories">${c.subcategories.map(sc => `<li>${menuLink(c, sc)}</li>`).join('')}</ul></div>`).join('')}</div>`;
 }
 function drawerHTML() {
   return `<div class="nav-drawer-head"><span class="nav-drawer-title">Menu</span><button type="button" class="nav-drawer-close" aria-label="Close menu">${icon('close')}</button></div>
@@ -233,11 +233,11 @@ function buildFooter() {
   if ((CONFIG.placeholders || {}).policyPending) document.querySelectorAll('[data-policy-link]').forEach(a => a.insertAdjacentHTML('beforeend', ' <span class="link-note">Draft</span>'));
 }
 function buildShell() {
-  const menu = document.getElementById('department-menu'); if (menu) menu.innerHTML = departmentMenuHTML();
+  const menu = document.getElementById('category-menu'); if (menu) menu.innerHTML = categoryMenuHTML();
   const drawer = document.getElementById('nav-drawer'); if (drawer) drawer.innerHTML = drawerHTML();
   buildFooter();
 }
-const deptPanel = () => document.getElementById('department-menu');
+const deptPanel = () => document.getElementById('category-menu');
 const deptMenuOpen = () => { const p = deptPanel(); return !!p && !p.hidden; };
 // Keep the dropdown inside the viewport: it scrolls internally instead of running off the page.
 function fitDeptMenu() {
@@ -259,7 +259,7 @@ function openNav() {
   document.getElementById('menu-button').setAttribute('aria-expanded', 'true');
 }
 function closeNav() { const d = document.getElementById('nav-drawer'); if (d && d.open) d.close(); }
-// Mark the current page/department in both menus.
+// Mark the current page/category in both menus.
 function syncNav(route) {
   const sel = route.parts[0] === 'shop' ? selection(route) : { category: '', subcategory: '' };
   const drawerCategories = document.querySelector('#drawer-category-toggle')?.closest('details');
@@ -272,7 +272,7 @@ function syncNav(route) {
 }
 
 /* ---------------------------------------------------------------- 4. Home */
-// Product rows come only from real catalogue data: featured, best-seller and dated records when present, then department rows.
+// Product rows come only from real catalogue data: featured, best-seller and dated records when present, then category rows.
 // A product appears once on the page, a row needs at least two products, and there are never more than four rows.
 const HOME_MAX_ROWS = 4, HOME_ROW_SIZE = 4;
 function homeRows() {
@@ -296,7 +296,7 @@ function home() {
   const subCount = CATEGORIES.reduce((n, c) => n + c.subcategories.length, 0);
   // Every statement below is stated elsewhere in this site's own copy or computed from the catalogue; nothing is promised beyond that.
   const trust = [
-    ['grid', `${CATEGORIES.length} departments and ${subCount} subcategories in one catalogue`],
+    ['grid', `${CATEGORIES.length} categories and ${subCount} subcategories in one catalogue`],
     validNumber() ? ['wa', 'Send product enquiries on WhatsApp'] : null,
     ['message', 'Prices, availability and taxes are confirmed by quotation'],
     ['truck', 'Delivery details are confirmed per enquiry']
@@ -311,9 +311,9 @@ function home() {
     <p>Solar and backup power, water solutions, electricals, farm equipment, construction and workshop tools.</p>
     <div class="home-hero-actions"><a class="btn light" href="#/shop">Shop products</a><a class="btn outline-light" href="#/business">Request a quote</a></div>
   </section>
-  <section class="home-departments" aria-labelledby="home-departments-title">
-    <div class="home-section-head"><h2 id="home-departments-title">Shop by department</h2></div>
-    <div class="department-grid">${CATEGORIES.map(departmentCard).join('')}</div>
+  <section class="home-categories" aria-labelledby="home-categories-title">
+    <div class="home-section-head"><h2 id="home-categories-title">shop by category</h2></div>
+    <div class="category-grid">${CATEGORIES.map(categoryCard).join('')}</div>
   </section>
   ${rows.map(productRow).join('')}
   <section class="home-trust-strip" aria-label="Service information">
@@ -386,7 +386,7 @@ function filtered(sel) {
   else rows.sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
   return rows;
 }
-// Drop a filter value that would return nothing after the department or subcategory changed.
+// Drop a filter value that would return nothing after the category or subcategory changed.
 function dropEmptyFilters(sel) {
   FACETS.forEach(f => { if (sel[f.key] && !scoped(sel, f.key).some(p => f.values(p).includes(sel[f.key]))) sel[f.key] = ''; });
   if (sel.phase && !scoped(sel, 'phase-none').some(p => p.phase === sel.phase)) sel.phase = '';
@@ -429,7 +429,7 @@ function emptyState(sel) {
   const depts = CATEGORIES.filter(cc => PRODUCTS.some(p => inDept(p, cc.id)));
   return `<div class="empty"><h2>No matching products</h2><p>${msg}</p>${sel.q ? '<p class="small">Search looks at product names and SKUs. Check the spelling or try a shorter term.</p>' : ''}
     <div class="actions">${sel.q ? '<button type="button" class="btn secondary" data-remove-filter="q">Clear search</button>' : ''}${filtersOn ? '<button type="button" class="btn secondary" data-clear-filters-keep-search>Clear filters</button>' : ''}<a class="btn" href="#/shop">Browse all products</a></div>
-    <nav class="empty-links" aria-label="Browse by department"><span>Browse by department:</span>${depts.map(cc => `<a href="${shopUrl(cc.id)}">${esc(cc.name)}</a>`).join('')}</nav>
+    <nav class="empty-links" aria-label="Browse by category"><span>Browse by category:</span>${depts.map(cc => `<a href="${shopUrl(cc.id)}">${esc(cc.name)}</a>`).join('')}</nav>
     <p class="small">Cannot find what you need? <a href="#/business">Request a quote</a> or <button type="button" class="link-button" data-general-wa>ask on WhatsApp</button>.</p></div>`;
 }
 function listing(route) {
@@ -452,7 +452,7 @@ function listing(route) {
   const pagination = pages > 1 ? `<nav class="pagination" aria-label="Catalogue pages"><button type="button" data-page="${page - 1}" aria-label="Previous page" ${page === 1 ? 'disabled' : ''}>Previous</button>${pageList(page, pages).map(n => n === '…' ? '<span aria-hidden="true">…</span>' : `<button type="button" data-page="${n}" ${page === n ? 'aria-current="page"' : ''} aria-label="Page ${n}">${n}</button>`).join('')}<button type="button" data-page="${page + 1}" aria-label="Next page" ${page === pages ? 'disabled' : ''}>Next</button></nav>` : '';
   return crumb(breadcrumbs) + `
   ${sel.q ? `<section class="search-results-summary" aria-labelledby="search-results-title"><h1 id="search-results-title">Search results for “${esc(sel.q)}”</h1>${summary}</section>` : `<section class="page-intro"><h1>${esc(title)}</h1><p>${esc(intro)}</p></section>`}
-  ${demoNotice('Demonstration catalogue: reference products come from cited retailer listings and illustrative products are unverified examples. Images are representative department visuals, not exact-model photographs.')}
+  ${demoNotice('Demonstration catalogue: reference products come from cited retailer listings and illustrative products are unverified examples. Images are representative category visuals, not exact-model photographs.')}
   <div class="catalog-layout">
     <div class="catalog-main">
       <div class="toolbar">
@@ -478,7 +478,7 @@ function relatedTo(p) {
   const explicit = (p.related || []).map(product).filter(Boolean);
   if (explicit.length) return explicit.slice(0, 4);
   const sameSub = PRODUCTS.filter(x => x.id !== p.id && x.subcategories.some(s => p.subcategories.includes(s)));
-  const sameDept = PRODUCTS.filter(x => x.id !== p.id && !sameSub.includes(x) && x.departments.some(d => p.departments.includes(d)));
+  const sameDept = PRODUCTS.filter(x => x.id !== p.id && !sameSub.includes(x) && x.categories.some(d => p.categories.includes(d)));
   return [...sameSub, ...sameDept].slice(0, 4);
 }
 function detail(p) {
@@ -490,7 +490,7 @@ function detail(p) {
   <div class="product-detail">
     <div>
       <button type="button" class="gallery-main" id="gallery-main" data-enlarge="${p.id}" aria-label="Enlarge image of ${esc(p.name)}"><span class="zoom-hint">${icon('zoom')}</span><span id="gallery-content">${galleryItem(p, 0)}</span></button>
-      <p class="gallery-caption">${PROD ? 'Tap or click the image to enlarge.' : 'Representative department image; exact product photography is pending. Tap or click to enlarge.'}</p>
+      <p class="gallery-caption">${PROD ? 'Tap or click the image to enlarge.' : 'Representative category image; exact product photography is pending. Tap or click to enlarge.'}</p>
       <div class="thumbnails" role="group" aria-label="Product gallery">${p.gallery.map((g, i) => `<button type="button" class="thumb" data-gallery="${i}" data-id="${p.id}" aria-pressed="${i === 0}" aria-label="Show ${esc(g.label)}">${g.type === 'spec' ? '<span>Spec<br>overview</span>' : photo(g.tile, p.alt, { label: false })}</button>`).join('')}</div>
     </div>
     <div class="detail-copy">
@@ -535,7 +535,7 @@ function detail(p) {
     <p>Warranty terms, installation and after-sales support are confirmed in writing for the specific product. Request the applicable terms with your quotation.</p>
     <button type="button" class="btn secondary" data-quote="${p.id}">Ask for a quotation</button>
   </section>
-  ${related.length ? `<section class="section"><div class="section-head"><div><h2>Related equipment</h2><p>More from ${esc(c.name)}.</p></div><a class="text-link" href="${shopUrl(c.id)}">View department ${icon('arrow')}</a></div><div class="product-grid">${related.map(card).join('')}</div></section>` : ''}`;
+  ${related.length ? `<section class="section"><div class="section-head"><div><h2>Related equipment</h2><p>More from ${esc(c.name)}.</p></div><a class="text-link" href="${shopUrl(c.id)}">View category ${icon('arrow')}</a></div><div class="product-grid">${related.map(card).join('')}</div></section>` : ''}`;
 }
 function quantity(value, id, kind = 'detail') {
   const label = kind.startsWith('cart:') ? ` for ${esc(product(kind.slice(5)).name)}` : '';
@@ -619,11 +619,11 @@ function about() {
   <section class="about-grid">${photo(4, 'Workshop tools on a workbench', { mode: 'slice' })}<div>
     <h2>Start with the right questions</h2>
     <p>Whether you are planning home backup power, improving water supply on a farm or equipping a workshop, the details matter: loads, flow and head, cable sizes, fuel and phase.</p>
-    <p>Browse six departments, compare the specifications that matter and send an enquiry built around your application. The catalogue serves individual consumers, businesses, electrical contractors, construction companies, farms, schools, hotels and government and institutional buyers in Kenya, with enquiries welcome from other African countries.</p>
+    <p>Browse six categories, compare the specifications that matter and send an enquiry built around your application. The catalogue serves individual consumers, businesses, electrical contractors, construction companies, farms, schools, hotels and government and institutional buyers in Kenya, with enquiries welcome from other African countries.</p>
     <div class="actions"><a class="btn" href="#/shop">View Full Catalogue ${icon('arrow')}</a><a class="btn secondary" href="#/business">Business &amp; Bulk Orders</a></div>
   </div></section>
   <section class="section"><div class="application-grid">
-    <div class="application">${icon('search')}<h3>Find your starting point</h3><p>Browse six departments or search by name and model to find the right equipment.</p></div>
+    <div class="application">${icon('search')}<h3>Find your starting point</h3><p>Browse six categories or search by name and model to find the right equipment.</p></div>
     <div class="application">${icon('layers')}<h3>Compare the essentials</h3><p>Review power, capacity, phase and other relevant details before you ask for a quotation.</p></div>
     <div class="application">${icon('wa')}<h3>Enquire on WhatsApp</h3><p>Every product prepares a message with the product, quantity and link so the conversation starts with the right details.</p></div>
   </div></section>
@@ -848,7 +848,7 @@ document.addEventListener('click', e => {
   if (el.classList.contains('nav-drawer-close')) { closeNav(); return; }
   if (el.id === 'categories-toggle') { setDeptMenu(!deptMenuOpen()); return; }
   if (el.closest('#nav-drawer')) closeNav();
-  if (el.closest('#department-menu')) setDeptMenu(false);
+  if (el.closest('#category-menu')) setDeptMenu(false);
   if (el.dataset.focusField) { e.preventDefault(); const f = document.getElementById(el.dataset.focusField); if (f) f.focus(); return; }
   if (el.hasAttribute('data-clear-filters-keep-search')) { focusAfterRoute = null; navigate(makeUrl('shop', { q: selection(current()).q })); return; }
   if (el.hasAttribute('data-clear-filters')) { focusAfterRoute = null; navigate('#/shop'); return; }
@@ -876,7 +876,7 @@ document.addEventListener('click', e => {
     document.getElementById('gallery-main').setAttribute('aria-label', `Enlarge ${(p.gallery[galleryIndex] || {}).label || 'image'} for ${p.name}`);
     return;
   }
-  if (el.dataset.enlarge) { const p = product(el.dataset.enlarge); openModal(esc(p.name), galleryItem(p, galleryIndex) + (PROD ? '' : '<p style="margin-top:12px">Representative department image; exact product photography is pending.</p>'), 'lightbox'); return; }
+  if (el.dataset.enlarge) { const p = product(el.dataset.enlarge); openModal(esc(p.name), galleryItem(p, galleryIndex) + (PROD ? '' : '<p style="margin-top:12px">Representative category image; exact product photography is pending.</p>'), 'lightbox'); return; }
   if (el.hasAttribute('data-copy-message')) { copyMessage(); return; }
   if (el.hasAttribute('data-form-preview')) { messageModal(formPreview, PROD ? 'Prepared enquiry' : 'Prepared enquiry · demonstration'); return; }
   if (el.classList.contains('close') || el.hasAttribute('data-close-modal')) { document.getElementById('modal').close(); return; }
@@ -895,7 +895,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && deptMenuOpen()) { e.preventDefault(); setDeptMenu(false, true); return; }
 });
 document.addEventListener('click', e => { if (deptMenuOpen() && !e.target.closest('#nav-menu')) setDeptMenu(false); });
-// Tabbing out of the open department menu closes it without stealing focus.
+// Tabbing out of the open category menu closes it without stealing focus.
 document.getElementById('nav-menu').addEventListener('focusout', e => { if (deptMenuOpen() && e.relatedTarget && !e.currentTarget.contains(e.relatedTarget)) setDeptMenu(false); });
 (function bindDrawer() {
   const d = document.getElementById('nav-drawer');
