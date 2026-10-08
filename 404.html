@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Page not found | NYCE SOLUTIONS</title>
+<meta name="robots" content="noindex">
+<!-- This file is served by GitHub Pages for any unknown path, at any depth, so it
+     cannot rely on relative asset paths. Everything it needs is inline. -->
+<style>
+  body{margin:0;font-family:"Segoe UI",system-ui,Arial,sans-serif;color:#202938;background:#F3F6FA;display:grid;place-items:center;min-height:100vh;padding:20px;box-sizing:border-box}
+  .card{background:#fff;border:1px solid #dfe5ed;border-radius:12px;padding:32px 28px;max-width:520px;text-align:center}
+  h1{color:#1D3D73;font-size:28px;margin:0 0 10px;letter-spacing:-.02em}
+  p{color:#596777;line-height:1.6}
+  a.btn{display:inline-block;margin-top:10px;background:#1D3D73;color:#fff;padding:12px 20px;border-radius:6px;text-decoration:none;font-weight:600}
+  a.btn:focus-visible{outline:3px solid #db910b;outline-offset:3px}
+</style>
+</head>
+<body>
+<main class="card">
+  <h1>That page is not here.</h1>
+  <p>The address you opened does not exist on this site. The catalogue uses in-page routes that start with <code>#/</code>.</p>
+  <p><a class="btn" id="home-link" href="/">Open the catalogue</a></p>
+  <p style="font-size:12px">Hash routes such as <code>#/shop</code> are handled inside the catalogue page and never produce this error.</p>
+</main>
+<script>
+  // Compute the site root. GitHub project pages live under /<repository>/, user and
+  // custom-domain sites live at /. The first path segment is used as the project root
+  // when the host is a github.io domain; otherwise the origin root is used.
+  (function () {
+    var root = '/';
+    if (/github\.io$/i.test(location.hostname)) {
+      var seg = location.pathname.split('/').filter(Boolean)[0];
+      if (seg) root = '/' + seg + '/';
+    }
+    document.getElementById('home-link').href = root + '#/shop';
+  })();
+</script>
+</body>
+</html>
