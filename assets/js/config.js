@@ -28,7 +28,7 @@ window.NYCE_CONFIG = {
   siteMode: "demo",
 
   // Contact details
-  whatsappNumber: "254720388496", // international format, digits only
+  whatsappNumber: "254720384496", // international format, digits only
   phoneNumber: "",               // display format, e.g. "+254 7XX XXX XXX"
   emailAddress: "sales@nycesolutionsafrica.com",
   physicalAddress: "",           // e.g. "Street, Building, Town, Kenya"
