@@ -73,35 +73,33 @@ table { border-collapse: collapse; }
 .text-link { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; font-size: 14px; min-height: 40px; }
 .actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
-/* ---------- Utility bar ---------- */
-.utility { background: var(--navy); color: #fff; font-size: 12px; }
-.utility .wrap { min-height: 34px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-block: 5px; }
-.utility a { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
-.utility .mode-badge { background: #fff; color: var(--navy); border-radius: 3px; padding: 2px 7px; font-weight: 700; font-size: 11px; letter-spacing: .02em; }
-
 /* ---------- Header ---------- */
-header { background: #fff; border-bottom: 1px solid var(--line); position: relative; z-index: 20; }
-.header-main { display: grid; grid-template-columns: 1fr auto auto; gap: 10px 14px; align-items: center; padding-block: 12px; }
-.logo { display: inline-flex; align-items: center; }
-.logo img { width: 140px; height: 56px; object-fit: contain; }
-.logo-text { font-weight: 800; color: var(--navy); font-size: 18px; letter-spacing: -.01em; }
-.search-form { display: flex; align-items: center; border: 1px solid #c9d3e1; border-radius: var(--radius-sm); background: var(--light); overflow: hidden; min-width: 0; grid-column: 1 / -1; grid-row: 2; }
-.search-form input { padding: 11px 14px; border: 0; background: transparent; width: 100%; min-width: 0; color: var(--ink); font-size: 14px; }
+header { position: sticky; top: 0; z-index: 40; background: var(--light); border-bottom: 1px solid var(--line); }
+.header-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-areas: "logo whatsapp cart" "search search search" "nav nav nav";
+  gap: 6px 12px;
+  align-items: center;
+  padding-block: 8px;
+  transition: padding .18s ease;
+}
+.logo { grid-area: logo; display: inline-flex; align-items: center; min-height: 44px; }
+.logo img { width: 112px; height: 44px; object-fit: contain; }
+.logo-text { font-weight: 700; color: var(--ink); font-size: 16px; letter-spacing: -.01em; }
+.search-form { grid-area: search; display: flex; align-items: center; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--light); overflow: hidden; min-width: 0; width: 100%; }
+.search-form input { padding: 10px 12px; border: 0; background: transparent; width: 100%; min-width: 0; min-height: 44px; color: var(--ink); font-size: 14px; }
 .search-form input:focus-visible { outline-offset: -3px; }
-.search-form button { background: var(--blue); color: #fff; padding: 0 16px; min-height: 46px; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; }
+.search-form button { background: var(--blue); color: #fff; padding: 0 12px; min-width: 48px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-weight: 600; }
 .search-form button span { display: none; }
-.contact-short { display: none; }
-.cart-link { display: inline-flex; gap: 8px; align-items: center; font-weight: 600; min-height: 44px; padding: 0 6px; position: relative; }
+.header-whatsapp { grid-area: whatsapp; min-height: 44px; padding: 8px 10px; }
+.cart-link { grid-area: cart; display: inline-flex; gap: 6px; align-items: center; justify-content: center; font-weight: 600; min-width: 44px; min-height: 44px; padding: 0 4px; position: relative; }
 .cart-link .cart-label { display: none; }
 .cart-number { font-size: 11px; color: #fff; background: var(--blue); border-radius: 999px; display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 5px; font-weight: 700; }
-.mobile-menu { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; border: 1px solid var(--line); border-radius: var(--radius-sm); }
-.nav-band { border-top: 1px solid var(--line); }
-.navigation { display: none; flex-direction: column; gap: 2px; padding-block: 8px; }
-.navigation.open { display: flex; }
-.navigation > a { padding: 12px 10px; min-height: 46px; font-size: 14px; color: #364153; border-radius: var(--radius-sm); position: relative; display: flex; align-items: center; }
+.navigation { grid-area: nav; display: flex; align-items: center; gap: 4px; min-width: 0; }
+.navigation > a { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 8px 10px; border-radius: var(--radius-sm); color: var(--ink); white-space: nowrap; }
 .navigation > a:hover { text-decoration: none; background: var(--light); }
 .navigation > a.active { color: var(--navy); font-weight: 700; background: var(--light); }
-.nav-quote { color: var(--blue) !important; }
 
 /* ---------- Footer ---------- */
 footer { background: #10284e; color: #dbe4f1; margin-top: 48px; }
@@ -393,10 +391,9 @@ body:has(dialog[open]) { overflow: hidden; }
 @media (min-width: 600px) {
   body { font-size: 15px; }
   .wrap { padding-inline: 22px; }
-  .header-main { grid-template-columns: auto minmax(200px, 1fr) auto auto; gap: 16px; }
-  .search-form { grid-column: auto; grid-row: auto; }
+  .header-main { grid-template-columns: auto minmax(200px, 1fr) auto auto; grid-template-areas: "logo search whatsapp cart" "nav nav nav nav"; gap: 6px 16px; }
   .search-form button span { display: inline; }
-  .logo img { width: 160px; height: 64px; }
+  .search-form button { min-width: 82px; }
   .cart-link .cart-label { display: inline; }
   .department-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -415,15 +412,6 @@ body:has(dialog[open]) { overflow: hidden; }
 }
 @media (min-width: 800px) {
   .wrap { padding-inline: 28px; }
-  .mobile-menu { display: none; }
-  .navigation { display: flex; flex-direction: row; align-items: center; gap: 4px; min-height: 50px; padding: 0; }
-  .navigation > a { padding: 14px 14px; border-radius: 0; background: none; font-size: 14px; }
-  .navigation > a:first-child { padding-left: 0; }
-  .navigation > a:hover { background: none; }
-  .navigation > a.active { background: none; }
-  .navigation > a.active::after { content: ''; position: absolute; bottom: 0; left: 14px; right: 14px; height: 3px; background: var(--blue); }
-  .navigation > a:first-child.active::after { left: 0; }
-  .nav-quote { margin-left: auto; }
   .department-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
   .application-grid { grid-template-columns: repeat(3, 1fr); }
   .footer-grid { grid-template-columns: 1.3fr 1fr 1fr 1.2fr; gap: 28px; }
@@ -436,10 +424,6 @@ body:has(dialog[open]) { overflow: hidden; }
   .content-panel { padding: 26px; }
 }
 @media (min-width: 1050px) {
-  .header-main { grid-template-columns: 190px minmax(240px, 1fr) auto auto; gap: 26px; padding-block: 16px; }
-  .logo img { width: 178px; height: 71px; }
-  .contact-short { display: flex; align-items: center; gap: 10px; line-height: 1.35; font-size: 13px; }
-  .contact-short span { display: block; font-size: 11px; color: var(--muted); }
   .product-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; }
   .catalog-layout { grid-template-columns: 250px minmax(0, 1fr); gap: 28px; }
   .filter-toggle { display: none; }
@@ -450,7 +434,24 @@ body:has(dialog[open]) { overflow: hidden; }
   .hero { min-height: 420px; }
   .hero-copy { padding: 44px 40px; }
 }
+@media (min-width: 900px) {
+  .header-main { grid-template-columns: auto minmax(260px, 1fr) auto auto auto; grid-template-areas: "logo search nav whatsapp cart"; gap: 12px; }
+  .navigation { gap: 2px; }
+  .navigation > a { padding-inline: 8px; }
+}
 @media (min-width: 1500px) { .wrap { max-width: 1300px; } }
+
+header.is-compact .header-main {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas: "logo search cart";
+  gap: 8px 12px;
+  padding-block: 4px;
+}
+header.is-compact .logo img { width: 96px; height: 40px; }
+header.is-compact .navigation,
+header.is-compact .header-whatsapp { display: none; }
+header.is-compact .search-form button { min-width: 44px; padding-inline: 10px; }
+header.is-compact .search-form button span { display: none; }
 
 /* ---------- Motion & print ---------- */
 @media (prefers-reduced-motion: reduce) {

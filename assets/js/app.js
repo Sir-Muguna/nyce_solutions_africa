@@ -235,8 +235,7 @@ function selection(route) {
   return { category, subcategory, q: g('q'), power: g('power'), phase: g('phase'), pricing: g('pricing'), source: g('source'), application: g('application'), sort: g('sort') || 'featured', page: Math.max(1, Math.floor(Number(g('page')) || 1)) };
 }
 function searchText(p) {
-  return [p.name, p.model, p.sku, p.brand, p.description, ...Object.values(p.specs), ...p.applications,
-    ...p.departments.map(d => cat(d) && cat(d).name), ...p.subcategories.map(s => subOf(s) && subOf(s).name)].join(' ').toLowerCase();
+  return [p.name, p.sku].join(' ').toLowerCase();
 }
 function filtered(sel) {
   const query = (sel.q || '').trim().toLowerCase();
@@ -577,7 +576,6 @@ function render() {
   const main = document.getElementById('main');
   main.innerHTML = html;
   document.querySelectorAll('[data-nav]').forEach(a => { const on = a.dataset.nav === active; a.classList.toggle('active', on); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
-  closeMenu();
   document.getElementById('search-input').value = r.params.get('q') || '';
   const heading = main.querySelector('h1');
   document.title = `${(heading ? (heading.innerText || heading.textContent) : 'Catalogue').replace(/\s+/g, ' ').trim()} | ${BUSINESS}`;
@@ -610,10 +608,6 @@ function removeFilter(key) {
   const sel = selection(current());
   if (key === 'category') { sel.category = ''; sel.subcategory = ''; sel.power = ''; sel.phase = ''; } else sel[key] = '';
   sel.page = 1; navigate(makeUrl('shop', sel));
-}
-function closeMenu() {
-  document.getElementById('primary-nav').classList.remove('open');
-  const t = document.getElementById('menu-toggle'); t.setAttribute('aria-expanded', 'false'); t.setAttribute('aria-label', 'Open menu');
 }
 function openDrawer(moveFocus = true) {
   const panel = document.getElementById('filters'), backdrop = document.getElementById('drawer-backdrop'), toggle = document.getElementById('filter-toggle');
@@ -728,7 +722,6 @@ document.addEventListener('click', e => {
   const el = e.target.closest('button, a');
   if (!el) return;
   if (el.classList.contains('skip')) { e.preventDefault(); document.getElementById('main').focus(); return; }
-  if (el.id === 'menu-toggle') { const nav = document.getElementById('primary-nav'), open = nav.classList.toggle('open'); el.setAttribute('aria-expanded', String(open)); el.setAttribute('aria-label', open ? 'Close menu' : 'Open menu'); return; }
   if (el.id === 'filter-toggle') { drawerOpen ? closeDrawer() : openDrawer(); return; }
   if (el.id === 'drawer-close') { closeDrawer(); return; }
   if (el.dataset.focusField) { e.preventDefault(); const f = document.getElementById(el.dataset.focusField); if (f) f.focus(); return; }
@@ -773,7 +766,7 @@ document.addEventListener('keydown', e => {
     const names = ['description', 'specifications', 'delivery'], i = names.indexOf(e.target.dataset.tab);
     if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) { e.preventDefault(); const j = e.key === 'Home' ? 0 : e.key === 'End' ? 2 : (i + (e.key === 'ArrowRight' ? 1 : 2)) % 3; selectTab(names[j], true); }
   }
-  if (e.key === 'Escape') { closeMenu(); if (drawerOpen) closeDrawer(); }
+  if (e.key === 'Escape' && drawerOpen) closeDrawer();
 });
 document.addEventListener('submit', e => {
   if (e.target.id === 'global-search') { e.preventDefault(); const q = document.getElementById('search-input').value.trim(); const sel = current().parts[0] === 'shop' ? selection(current()) : {}; navigate(makeUrl('shop', { ...sel, q, page: 1 })); return; }
@@ -792,16 +785,18 @@ document.getElementById('modal').addEventListener('click', e => {
 document.getElementById('drawer-backdrop').addEventListener('click', () => closeDrawer());
 window.addEventListener('hashchange', () => { const m = document.getElementById('modal'); if (m.open) m.close(); render(); });
 window.addEventListener('resize', () => { if (innerWidth >= 1050 && drawerOpen) closeDrawer(false); });
+function updateHeaderOnScroll() {
+  document.querySelector('header').classList.toggle('is-compact', window.scrollY > 80);
+}
+window.addEventListener('scroll', updateHeaderOnScroll, { passive: true });
 
 /* ---------------------------------------------------------------- Boot */
 (function boot() {
   // Mode indicators and footer text driven by config.
-  const badge = document.getElementById('mode-badge'); if (badge) badge.hidden = PROD;
   const footerContact = document.getElementById('footer-contact');
   if (footerContact) footerContact.innerHTML = `Phone: ${contactLine(CONFIG.phoneNumber, PENDING)}<br>WhatsApp: ${WHATSAPP ? `+${esc(WHATSAPP)}` : `<span class="muted">${esc(PENDING)}</span>`}<br>Email: ${contactLine(CONFIG.emailAddress, PENDING)}<br>Address &amp; hours: ${contactLine([CONFIG.physicalAddress, CONFIG.operatingHours].filter(Boolean).join(' · '), PENDING)}`;
   const year = document.getElementById('footer-year'); if (year) year.textContent = new Date().getFullYear();
   const note = document.getElementById('footer-note'); if (note) note.textContent = PROD ? 'Prices and availability are confirmed by quotation. No online payment.' : 'Demonstration catalogue · indicative prices · no live checkout or payment.';
-  const contactShort = document.getElementById('contact-short'); if (contactShort && CONFIG.phoneNumber) contactShort.querySelector('div').innerHTML = `<span>Call or WhatsApp</span>${esc(CONFIG.phoneNumber)}`;
 
   // Logo with wordmark fallback.
   for (const id of ['brand-logo', 'footer-logo']) {
@@ -818,6 +813,7 @@ window.addEventListener('resize', () => { if (innerWidth >= 1050 && drawerOpen) 
   document.querySelectorAll('[data-icon]').forEach(el => { el.innerHTML = icon(el.dataset.icon); });
   const sb = document.getElementById('search-button'); if (sb) sb.innerHTML = `${icon('search')}<span>Search</span>`;
   render();
+  updateHeaderOnScroll();
 })();
 
 // Read-only hooks for testing and training. Never a server API.

@@ -33,7 +33,10 @@ with sync_playwright() as p:
     go(pg, '')
     nav_texts = pg.eval_on_selector_all('#primary-nav a', 'els => els.map(e => e.textContent.trim())')
     check('Nav: no "Shop by Category" tab', 'Shop by Category' not in ' '.join(nav_texts), nav_texts)
-    check('Nav: required items present', all(x in nav_texts for x in ['Home', 'Shop', 'Business & Bulk Orders', 'About Us', 'Contact', 'Cart']), nav_texts)
+    check('Nav: flat Home, Shop, Categories items', nav_texts == ['Home', 'Shop', 'Categories'], nav_texts)
+    check('Nav: Categories links to Shop', pg.get_attribute('#primary-nav a[data-nav="categories"]', 'href') == '#/shop')
+    check('Header: no promotional banner, carousel, or mega menu', pg.locator('header .utility, header .promo, header .carousel, header .mega-menu').count() == 0)
+    check('Header: visible named search input', pg.is_visible('#search-input') and pg.get_attribute('label[for="search-input"]', 'class') == 'sr-only')
     footer_links = pg.eval_on_selector_all('footer a', 'els => els.map(e => e.getAttribute("href"))')
     check('Footer: no category directory or guide links', not any(h and ('#/categories' in h or '#/category/' in h or 'guide' in h) for h in footer_links), footer_links)
     check('Footer: no "Shop by Category" text', 'Shop by Category' not in pg.inner_text('footer'))
@@ -44,10 +47,13 @@ with sync_playwright() as p:
     hero_h1 = pg.inner_text('.hero h1')
     check('Home: hero headline', 'Power your home.' in hero_h1 and 'Equip your business.' in hero_h1, hero_h1)
 
-    for href, nav in [('#/shop', 'shop'), ('#/business', 'business'), ('#/about', 'about'), ('#/contact', 'contact'), ('#/cart', 'cart'), ('#/', 'home')]:
+    for href, nav in [('#/shop', 'shop'), ('#/', 'home')]:
         go(pg, href)
         active = pg.get_attribute(f'#primary-nav a[data-nav="{nav}"]', 'aria-current')
         check(f'Nav link works + active state: {href}', pg.locator('main h1').count() >= 1 and active == 'page', f'aria-current={active}')
+    for href in ['#/business', '#/about', '#/contact', '#/cart']:
+        go(pg, href)
+        check(f'Existing route still resolves: {href}', pg.locator('main h1').count() == 1, pg.inner_text('main h1'))
 
     # legacy routes
     go(pg, '#/categories')
@@ -107,10 +113,12 @@ with sync_playwright() as p:
     check('Shop subcategory select lists all 59 (no department selected)', len(opts) == 59, len(opts))
 
     # ---------- Search ----------
-    for q, expect in [('hisaki', 'hisaki-generator'), ('HK7000SNA', 'hisaki-generator'), ('EC 7574-BS', 'tronic-extension'), ('Welding', 'lenhard-welder'), ('Incubators', 'incubator'), ('generators', 'pulsar-generator')]:
+    for q, expect in [('hisaki', 'hisaki-generator'), ('EC 7574-BS', 'tronic-extension'), ('Tronic 4-way surge-protected extension', 'tronic-extension')]:
         go(pg, '#/shop?q=' + urllib.parse.quote(q))
         ids = pg.eval_on_selector_all('.product-card', 'els => els.map(e => e.dataset.productId)')
         check(f'Search "{q}" finds {expect}', expect in ids, ids[:6])
+    go(pg, '#/shop?q=' + urllib.parse.quote('HK7000SNA'))
+    check('Search excludes model-only terms', pg.locator('.product-card').count() == 0)
     go(pg, '#/shop'); pg.fill('#search-input', 'borehole'); pg.press('#search-input', 'Enter'); pg.wait_for_timeout(250)
     check('Header search submits to #/shop?q=', 'q=borehole' in pg.evaluate('location.hash') and 'Results for' in pg.inner_text('.toolbar'))
 
@@ -265,7 +273,7 @@ with sync_playwright() as p:
         pg.keyboard.press('Tab')
     check('Keyboard: tabbing reaches catalogue controls', pg.evaluate("!!document.activeElement.closest('main')"))
 
-    for w, h in [(375, 740), (768, 1024), (1440, 900)]:
+    for w, h in [(375, 740), (768, 1024), (1280, 900)]:
         ctx2 = browser.new_context(viewport={'width': w, 'height': h}, device_scale_factor=1)
         p2 = ctx2.new_page()
         p2.on('console', lambda m: console_errors.append(m.text) if m.type == 'error' else None)
@@ -274,14 +282,28 @@ with sync_playwright() as p:
             p2.goto(URL + route); p2.wait_for_timeout(350)
             check(f'No horizontal overflow @{w}px {route}', no_overflow(p2), p2.evaluate('[document.documentElement.scrollWidth, window.innerWidth]'))
             p2.screenshot(path=f'{OUT}/{name}-{w}.png', full_page=(name != 'shop'))
-        # mobile nav + drawer
-        if w < 800:
-            p2.goto(URL + '#/'); p2.wait_for_timeout(300)
-            check(f'Mobile menu toggle visible @{w}', p2.is_visible('#menu-toggle') and not p2.is_visible('#primary-nav'))
-            p2.click('#menu-toggle'); p2.wait_for_timeout(100)
-            check(f'Mobile menu opens @{w}', p2.is_visible('#primary-nav') and p2.get_attribute('#menu-toggle', 'aria-expanded') == 'true')
-            p2.keyboard.press('Escape')
-            check(f'Mobile menu closes with Escape @{w}', not p2.is_visible('#primary-nav'))
+        p2.goto(URL + '#/'); p2.wait_for_timeout(300)
+        check(f'Header search visible without interaction @{w}', p2.is_visible('#search-input'))
+        tap_targets = p2.eval_on_selector_all('#primary-nav a, .header-whatsapp, .cart-link, #search-input, #search-button', 'els => els.map(e => { const r = e.getBoundingClientRect(); return [e.tagName, r.width, r.height] })')
+        check(f'Header tap targets at least 44px @{w}', all(width >= 44 and height >= 44 for _, width, height in tap_targets), tap_targets)
+        if w == 375:
+            logo_box = p2.locator('.logo').bounding_box()
+            search_box = p2.locator('.search-form').bounding_box()
+            check('Mobile search is a full-width row beneath logo', search_box['width'] >= 340 and search_box['y'] > logo_box['y'], [logo_box, search_box])
+        if w == 1280:
+            widths = p2.evaluate("Object.fromEntries(['.search-form', '.logo', '.navigation', '.header-whatsapp', '.cart-link'].map(s => [s, document.querySelector(s).getBoundingClientRect().width]))")
+            check('Desktop search is the widest header item', widths['.search-form'] > max(widths[s] for s in ['.logo', '.navigation', '.header-whatsapp', '.cart-link']), widths)
+        p2.evaluate('window.scrollTo(0, 500)'); p2.wait_for_timeout(150)
+        check(f'Scrolling compacts sticky header but keeps search and cart @{w}', 'is-compact' in p2.get_attribute('header', 'class') and p2.is_visible('#search-input') and p2.is_visible('.cart-link'), p2.get_attribute('header', 'class'))
+        check(f'Compact header hides nav and WhatsApp action @{w}', not p2.is_visible('#primary-nav') and not p2.is_visible('.header-whatsapp'))
+        p2.evaluate('window.scrollTo(0, 0)'); p2.wait_for_timeout(150)
+        check(f'Scrolling up restores flat navigation @{w}', p2.is_visible('#primary-nav'))
+        p2.click('.header-whatsapp')
+        whatsapp_number = p2.evaluate("window.NYCE.config.whatsappNumber.replace(/\\D/g, '')")
+        modal_href = p2.get_attribute('#modal a[href^="https://wa.me/"]', 'href')
+        wa_matches_config = f'wa.me/{whatsapp_number}?' in (modal_href or '') if whatsapp_number else 'number has not been configured yet' in p2.inner_text('#modal')
+        check(f'Header WhatsApp uses existing configured number @{w}', p2.is_visible('#modal[open]') and 'Hello NYCE SOLUTIONS' in p2.inner_text('#modal') and wa_matches_config)
+        p2.keyboard.press('Escape')
         if w < 1050:
             p2.goto(URL + '#/shop'); p2.wait_for_timeout(300)
             check(f'Filter drawer hidden by default @{w}', not p2.is_visible('#filters'))
