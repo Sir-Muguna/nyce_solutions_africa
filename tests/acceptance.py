@@ -52,6 +52,12 @@ with sync_playwright() as p:
     check('Nav: Categories links to Shop', pg.get_attribute('#primary-nav a[data-nav="categories"]', 'href') == '#/shop')
     check('Header: no promotional banner, carousel, or mega menu', pg.locator('header .utility, header .promo, header .carousel, header .mega-menu').count() == 0)
     check('Header: visible named search input', pg.is_visible('#search-input') and pg.get_attribute('label[for="search-input"]', 'class') == 'sr-only')
+    footer_channels = pg.eval_on_selector('#footer-contact', 'e => ({text:e.innerText, links:Array.from(e.querySelectorAll("a"), a => [a.textContent.trim(), a.getAttribute("href"), a.target, a.rel])})')
+    check('Footer shows all four configured contact channels', all(value in footer_channels['text'] for value in ['+254720388496', 'sales@nycesolutionsafrica.com', 'nycesolutionsafrica', 'www.nycesolutionsafrica.com']), footer_channels['text'])
+    check('Footer WhatsApp and email links use required destinations', any(link[:2] == ['+254720388496', 'https://wa.me/254720388496'] for link in footer_channels['links']) and any(link[:2] == ['sales@nycesolutionsafrica.com', 'mailto:sales@nycesolutionsafrica.com'] for link in footer_channels['links']), footer_channels['links'])
+    facebook_link = next((link for link in footer_channels['links'] if link[0] == 'nycesolutionsafrica'), None)
+    check('Footer Facebook link opens safely in a new tab', facebook_link == ['nycesolutionsafrica', 'https://www.facebook.com/nycesolutionsafrica', '_blank', 'noopener noreferrer'], facebook_link)
+    check('Footer website links to requested domain', any(link[:2] == ['www.nycesolutionsafrica.com', 'https://www.nycesolutionsafrica.com'] for link in footer_channels['links']), footer_channels['links'])
     footer_links = pg.eval_on_selector_all('footer a', 'els => els.map(e => e.getAttribute("href"))')
     check('Footer: no category directory or guide links', not any(h and ('#/categories' in h or '#/category/' in h or 'guide' in h) for h in footer_links), footer_links)
     check('Footer: no "Shop by Category" text', 'Shop by Category' not in pg.inner_text('footer'))
@@ -68,6 +74,9 @@ with sync_playwright() as p:
     for href in ['#/business', '#/about', '#/contact', '#/cart']:
         go(pg, href)
         check(f'Existing route still resolves: {href}', pg.locator('main h1').count() == 1, pg.inner_text('main h1'))
+    go(pg, '#/contact')
+    contact_links = pg.eval_on_selector_all('main .info-list a', 'els => els.map(a => [a.textContent.trim(), a.getAttribute("href")])')
+    check('Contact page uses configured WhatsApp and email links', ['+254720388496', 'https://wa.me/254720388496'] in contact_links and ['sales@nycesolutionsafrica.com', 'mailto:sales@nycesolutionsafrica.com'] in contact_links, contact_links)
 
     # legacy routes
     go(pg, '#/categories')
@@ -119,12 +128,19 @@ with sync_playwright() as p:
         if n < 1 or h1.strip() != sname:
             check(f'Subcategory listing {sid}', False, f'{n} cards, h1={h1}')
     check('All 59 subcategory routes list ≥1 product with correct heading', all(r['result'] == 'PASS' for r in results if r['check'].startswith('Subcategory listing')) and True)
-    # department discoverability via filter radios
+    # category discoverability via sidebar radios
     go(pg, '#/shop')
     radios = pg.eval_on_selector_all('input[name="filter-category"]', 'els => els.map(e => e.value)')
-    check('Shop filters expose all 6 departments', len([r for r in radios if r]) == 6, radios)
-    opts = pg.eval_on_selector_all('#filter-subcategory option', 'els => els.map(e => e.value).filter(Boolean)')
-    check('Shop subcategory select lists all 59 (no department selected)', len(opts) == 59, len(opts))
+    sidebar = pg.eval_on_selector('#filters', 'e => ({heading: e.querySelector(".drawer-head h2").textContent, legends: Array.from(e.querySelectorAll("legend"), x => x.textContent), labels: Array.from(e.querySelectorAll(".choice"), x => x.querySelector("span").textContent), values: Array.from(e.querySelectorAll(".choice"), x => x.querySelector(".count").textContent)})')
+    expected_categories = pg.evaluate('NYCE.categories.map(c => c.name)')
+    category_counts = pg.evaluate('NYCE.categories.map(c => NYCE.products.filter(p => p.departments.includes(c.id)).length)')
+    check('Sidebar retains filter heading and only Categories panel', sidebar['heading'] == 'Filter products' and sidebar['legends'] == ['Categories'], sidebar)
+    check('Category radios show All Categories and existing categories', sidebar['labels'] == ['All Categories', *expected_categories] and len([r for r in radios if r]) == len(expected_categories), sidebar['labels'])
+    check('Category counts are unchanged', [int(n) for n in sidebar['values'][1:]] == category_counts, sidebar['values'])
+    check('Removed sidebar filter panels are absent', not any(pg.locator(f'#filter-{key}').count() for key in ['subcategory', 'power', 'phase', 'pricing', 'application', 'source']))
+    check('Clear all filters and helper remain in sidebar', pg.locator('#filters [data-clear-filters]').count() == 1 and 'Not sure about the specification? Request a quote and describe your requirement.' in pg.inner_text('#filters'))
+    pg.click('label.choice:has(input[name="filter-category"][value="solar"])'); pg.wait_for_timeout(250)
+    check('Category radio filters the product grid', 'category=solar' in pg.evaluate('location.hash') and pg.locator('.product-card').count() > 0 and pg.locator('#filters legend').inner_text() == 'Categories')
 
     # ---------- Search ----------
     for q, expect in [('hisaki', 'hisaki-generator'), ('EC 7574-BS', 'tronic-extension'), ('Tronic 4-way surge-protected extension', 'tronic-extension')]:
@@ -142,10 +158,9 @@ with sync_playwright() as p:
     check('Header search submits to #/shop?q= and displays query/count', 'q=borehole' in pg.evaluate('location.hash') and 'borehole' in pg.inner_text('.search-results-summary') and 'products' in pg.inner_text('.search-results-summary'))
 
     # ---------- Filters ----------
-    go(pg, '#/shop?category=generators')
-    pg.select_option('#filter-phase', 'Three phase'); pg.wait_for_timeout(250)
+    go(pg, '#/shop?category=generators&phase=' + urllib.parse.quote('Three phase'))
     ids = pg.eval_on_selector_all('.product-card', 'els => els.map(e => e.dataset.productId)')
-    check('Combined filters (department + phase)', ids == ['pulsar-generator'], ids)
+    check('Existing category and phase filtering still applies from route state', ids == ['pulsar-generator'], ids)
     chips = pg.eval_on_selector_all('.chip', 'els => els.map(e => e.textContent.trim())')
     check('Active filter chips shown', len(chips) == 2, chips)
     pg.click('.chip[data-remove-filter="phase"]'); pg.wait_for_timeout(250)
@@ -350,6 +365,13 @@ with sync_playwright() as p:
             p2.screenshot(path=f'{OUT}/shop-drawer-open-{w}.png')
         # touch target sizes
         p2.goto(URL + '#/shop'); p2.wait_for_timeout(300)
+        if w in (375, 1280):
+            if w == 375:
+                p2.click('#filter-toggle'); p2.wait_for_timeout(150)
+            category_panel = p2.eval_on_selector('#filters', 'e => ({display:getComputedStyle(e).display, width:e.getBoundingClientRect().width, labels:Array.from(e.querySelectorAll(".choice span:first-of-type"), x => x.textContent)})')
+            check(f'Categories panel renders at @{w}px', category_panel['display'] != 'none' and category_panel['width'] > 0 and category_panel['labels'][0] == 'All Categories' and len(category_panel['labels']) == 7, category_panel)
+            if w == 375:
+                p2.keyboard.press('Escape'); p2.wait_for_timeout(150)
         small = p2.evaluate("Array.from(document.querySelectorAll('main button, main a.btn, header button, header a')).filter(e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && r.height < 32; }).map(e => e.textContent.trim().slice(0,20))")
         check(f'Touch targets ≥32px tall @{w}', len(small) == 0, small)
         # fixed widgets overlap: only toast/dialog/drawer are fixed

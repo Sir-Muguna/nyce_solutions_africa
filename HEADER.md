@@ -13,7 +13,7 @@
 
 The search form submits a client-side hash route of the form `#/shop?q=<URL-encoded-term>`. `q` is the sole search parameter; matching is case-insensitive against product `name` and internal reference `sku` fields. It does not call a server endpoint. The same signature and matching fields are documented in the comment immediately above the search form in `index.html`.
 
-The header WhatsApp button calls the existing enquiry-preview flow, which uses the shared `NYCE_CONFIG.whatsappNumber` value. It does not define a separate number. The current configured value is blank in `assets/js/config.js`.
+The header WhatsApp button calls the existing enquiry flow, which uses the shared `NYCE_CONFIG.whatsappNumber` value. It does not define a separate number. That value is configured as `254720388496` in `assets/js/config.js`.
 
 ## Breakpoint behavior
 

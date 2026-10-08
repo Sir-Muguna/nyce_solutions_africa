@@ -251,23 +251,11 @@ function choice(name, value, label, count, checked, extra = '') {
 function selectField(label, id, options, value, hint = '') {
   return `<div class="field"><label for="${id}">${label}</label><select id="${id}" data-filter="${id.replace('filter-', '')}">${options.map(o => Array.isArray(o[1]) ? `<optgroup label="${esc(o[0])}">${o[1].map(([v, n]) => `<option value="${esc(v)}" ${String(value) === v ? 'selected' : ''}>${esc(n)}</option>`).join('')}</optgroup>` : `<option value="${esc(o[0])}" ${String(value) === o[0] ? 'selected' : ''}>${esc(o[1])}</option>`).join('')}</select>${hint ? `<small>${hint}</small>` : ''}</div>`;
 }
-function filterPanel(sel, base) {
-  const c = cat(sel.category);
-  const powers = [...new Set(base.map(p => p.power).filter(Boolean))].sort();
-  const phases = [...new Set(base.map(p => p.phase).filter(Boolean))].sort();
-  const subField = c
-    ? `<fieldset class="filter-group"><legend>Subcategory</legend><div class="choice-list" role="radiogroup">${choice('filter-subcategory', '', `All ${c.name}`, countDept(c.id), !sel.subcategory)}${c.subcategories.map(s => choice('filter-subcategory', s.id, s.name, countSub(s.id), sel.subcategory === s.id, 'sub')).join('')}</div></fieldset>`
-    : selectField('Subcategory', 'filter-subcategory', [['', 'All subcategories'], ...CATEGORIES.map(cc => [cc.name, cc.subcategories.map(s => [s.id, s.name])])], sel.subcategory, 'Choosing a subcategory also selects its department.');
+function filterPanel(sel) {
   return `<aside class="filter-panel" id="filters" aria-label="Product filters">
     <div class="drawer-head"><h2>Filter products</h2><button type="button" class="drawer-close" id="drawer-close" aria-label="Close filters">${icon('close')}</button></div>
     <form id="filter-form" novalidate>
-      <fieldset class="filter-group"><legend>Department</legend><div class="choice-list" role="radiogroup">${choice('filter-category', '', 'All departments', PRODUCTS.length, !sel.category)}${CATEGORIES.map(cc => choice('filter-category', cc.id, cc.name, countDept(cc.id), sel.category === cc.id)).join('')}</div></fieldset>
-      ${subField}
-      ${powers.length > 1 ? selectField('Power source', 'filter-power', [['', 'Any power source'], ...powers.map(p => [p, p])], sel.power) : ''}
-      ${phases.length ? selectField('Electrical phase', 'filter-phase', [['', 'Any phase'], ...phases.map(p => [p, p])], sel.phase) : ''}
-      ${selectField('Price type', 'filter-pricing', [['', 'All products'], ['demo', PROD ? 'Priced products' : 'Demonstration prices'], ['quote', 'Request Price']], sel.pricing)}
-      ${selectField('Application', 'filter-application', [['', 'Any application'], ...APPLICATIONS.map(a => [a[0], a[0]])], sel.application)}
-      ${PROD ? '' : selectField('Product evidence', 'filter-source', [['', 'All records'], ['sourced', 'Reference products'], ['illustrative', 'Illustrative products']], sel.source)}
+      <fieldset class="filter-group"><legend>Categories</legend><div class="choice-list" role="radiogroup">${choice('filter-category', '', 'All Categories', PRODUCTS.length, !sel.category)}${CATEGORIES.map(cc => choice('filter-category', cc.id, cc.name, countDept(cc.id), sel.category === cc.id)).join('')}</div></fieldset>
       <div class="filter-actions"><button type="button" class="btn secondary sm" data-clear-filters>Clear all filters</button></div>
     </form>
     <div class="filter-footer"><p>Not sure about the specification? <a href="#/business">Request a quote</a> and describe your requirement.</p></div>
@@ -289,7 +277,6 @@ function chips(sel) {
 }
 function listing(route) {
   const sel = selection(route), c = cat(sel.category), s = subOf(sel.subcategory);
-  const base = PRODUCTS.filter(p => inDept(p, sel.category));
   const rows = filtered(sel), pages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
   const page = Math.min(pages, sel.page), start = (page - 1) * PAGE_SIZE;
   const title = sel.q ? 'Search results' : s ? s.name : c ? c.name : sel.application ? sel.application : 'Shop';
@@ -310,7 +297,7 @@ function listing(route) {
   ${PROD && !PRODUCTS.length ? notice('No products have been approved for publication yet. Add approved product IDs in <code>assets/js/config.js</code>.', 'warn') : ''}
   ${demoNotice('Demonstration catalogue: reference products come from cited retailer listings and illustrative products are unverified examples. Images are representative department visuals, not exact-model photographs.')}
   <div class="catalog-layout">
-    <div><button type="button" class="btn secondary filter-toggle" id="filter-toggle" aria-controls="filters" aria-expanded="false">${icon('filter')} Filters</button>${filterPanel(sel, base)}</div>
+    <div><button type="button" class="btn secondary filter-toggle" id="filter-toggle" aria-controls="filters" aria-expanded="false">${icon('filter')} Filters</button>${filterPanel(sel)}</div>
     <div class="catalog-main">
       <div class="toolbar">
         <div class="toolbar-left">${sel.q ? '' : summary}</div>
@@ -458,9 +445,9 @@ function contact(params) {
     <div>
       <h2>How to reach us</h2>
       <ul class="info-list">
-        <li>${icon('wa')}<div><strong>WhatsApp</strong><small>${WHATSAPP ? `+${esc(WHATSAPP)}` : `<span class="muted">${esc(PENDING)}</span>`}</small></div></li>
+        <li>${icon('wa')}<div><strong>WhatsApp</strong><small>${WHATSAPP ? `<a href="https://wa.me/${WHATSAPP}">+${esc(WHATSAPP)}</a>` : `<span class="muted">${esc(PENDING)}</span>`}</small></div></li>
         <li>${icon('phone')}<div><strong>Phone</strong><small>${contactLine(CONFIG.phoneNumber, PENDING)}</small></div></li>
-        <li>${icon('mail')}<div><strong>Email</strong><small>${contactLine(CONFIG.emailAddress, PENDING)}</small></div></li>
+        <li>${icon('mail')}<div><strong>Email</strong><small>${CONFIG.emailAddress ? `<a href="mailto:${esc(CONFIG.emailAddress)}">${esc(CONFIG.emailAddress)}</a>` : contactLine(CONFIG.emailAddress, PENDING)}</small></div></li>
         <li>${icon('pin')}<div><strong>Address</strong><small>${contactLine(CONFIG.physicalAddress, PENDING)}</small></div></li>
         <li>${icon('clock')}<div><strong>Operating hours</strong><small>${contactLine(CONFIG.operatingHours, PENDING)}</small></div></li>
       </ul>
@@ -790,7 +777,7 @@ window.addEventListener('scroll', updateHeaderOnScroll, { passive: true });
 (function boot() {
   // Mode indicators and footer text driven by config.
   const footerContact = document.getElementById('footer-contact');
-  if (footerContact) footerContact.innerHTML = `Phone: ${contactLine(CONFIG.phoneNumber, PENDING)}<br>WhatsApp: ${WHATSAPP ? `+${esc(WHATSAPP)}` : `<span class="muted">${esc(PENDING)}</span>`}<br>Email: ${contactLine(CONFIG.emailAddress, PENDING)}<br>Address &amp; hours: ${contactLine([CONFIG.physicalAddress, CONFIG.operatingHours].filter(Boolean).join(' · '), PENDING)}`;
+  if (footerContact) footerContact.innerHTML = `WhatsApp: ${WHATSAPP ? `<a href="https://wa.me/${WHATSAPP}">+${esc(WHATSAPP)}</a>` : `<span class="muted">${esc(PENDING)}</span>`}<br>Email: ${CONFIG.emailAddress ? `<a href="mailto:${esc(CONFIG.emailAddress)}">${esc(CONFIG.emailAddress)}</a>` : contactLine(CONFIG.emailAddress, PENDING)}<br>Facebook: <a href="${esc(CONFIG.facebookUrl)}" target="_blank" rel="noopener noreferrer">${esc(CONFIG.facebookName)}</a><br>Website: <a href="${esc(CONFIG.websiteUrl)}">${esc(CONFIG.websiteName)}</a><br>Phone: ${contactLine(CONFIG.phoneNumber, PENDING)}<br>Address &amp; hours: ${contactLine([CONFIG.physicalAddress, CONFIG.operatingHours].filter(Boolean).join(' · '), PENDING)}`;
   const year = document.getElementById('footer-year'); if (year) year.textContent = new Date().getFullYear();
   const note = document.getElementById('footer-note'); if (note) note.textContent = PROD ? 'Prices and availability are confirmed by quotation. No online payment.' : 'Demonstration catalogue · indicative prices · no live checkout or payment.';
 

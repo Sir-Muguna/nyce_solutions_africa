@@ -19,15 +19,18 @@
    ============================================================================ */
 window.NYCE_CONFIG = {
   businessName: "NYCE SOLUTIONS",
-  websiteName: "nycesolutionssafrica",
+  websiteName: "www.nycesolutionsafrica.com",
+  websiteUrl: "https://www.nycesolutionsafrica.com",
+  facebookName: "nycesolutionsafrica",
+  facebookUrl: "https://www.facebook.com/nycesolutionsafrica",
 
   // "demo" | "production"
   siteMode: "demo",
 
-  // Contact details — placeholders until the owner supplies verified values.
-  whatsappNumber: "",            // digits only, e.g. "2547XXXXXXXX"
+  // Contact details
+  whatsappNumber: "254720388496", // international format, digits only
   phoneNumber: "",               // display format, e.g. "+254 7XX XXX XXX"
-  emailAddress: "",              // e.g. "sales@example.com"
+  emailAddress: "sales@nycesolutionsafrica.com",
   physicalAddress: "",           // e.g. "Street, Building, Town, Kenya"
   operatingHours: "",            // e.g. "Mon–Fri 8:00–17:00, Sat 9:00–13:00"
 

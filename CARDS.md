@@ -19,7 +19,7 @@
 | View details destination | `id`, used in `#/product/:id` |
 | WhatsApp enquiry | `NYCE_CONFIG.whatsappNumber` and the existing generic `generalMessage()`; no product-specific details are inserted |
 
-The configured WhatsApp number is currently blank in `assets/js/config.js`. The card therefore opens the existing generic message preview/copy flow rather than generating a link to an unconfigured number. When a valid number is configured, the WhatsApp action links to that number with the generic prefilled message.
+The WhatsApp number configured in `assets/js/config.js` is `254720388496`. When configured, the WhatsApp action links to that number with the generic prefilled message; it does not insert product-specific details.
 
 The current catalogue has no `stock` field and only one non-null `sku` (`EC 7574-BS`, for `tronic-extension`). Cards consequently omit stock status and omit the SKU line for products without a supplied SKU. The catalogue has demonstration prices or quote-required values, but no tax-inclusion field; the existing price notes remain in place and do not assert tax-inclusive pricing.
 
