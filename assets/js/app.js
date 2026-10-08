@@ -152,19 +152,20 @@ function recordTag(p) {
     : `<span class="tag illustrative record-tag">Illustrative product</span>`;
 }
 function card(p) {
-  const c = primaryCat(p), s = primarySub(p), spec = Object.entries(p.specs)[0];
-  const ident = p.model ? `Model ${p.model}` : p.sku ? `SKU ${p.sku}` : null;
+  const stock = Object.prototype.hasOwnProperty.call(p, 'stock') && p.stock !== undefined && p.stock !== null && p.stock !== '';
+  const whatsapp = validNumber()
+    ? `<a class="btn wa sm" href="https://wa.me/${WHATSAPP}?text=${encodeURIComponent(generalMessage())}" target="_blank" rel="noopener noreferrer">${icon('wa')} WhatsApp</a>`
+    : `<button type="button" class="btn wa sm" data-general-wa>${icon('wa')} WhatsApp</button>`;
   return `<article class="product-card" data-product-id="${p.id}">
-    <a href="#/product/${p.id}" class="product-media" aria-label="View ${esc(p.name)}">${photo(p.image.tile, p.alt, { label: false })}${recordTag(p)}</a>
+    <a href="#/product/${p.id}" class="product-media" aria-label="View ${esc(p.name)}">${photo(p.image.tile, p.alt, { label: false, mode: 'slice' })}${recordTag(p)}</a>
     <div class="product-content">
-      <span class="cat-name">${esc(c.name)}${s ? ` · ${esc(s.name)}` : ''}</span>
-      <h3><a href="#/product/${p.id}">${esc(p.name)}</a></h3>
-      ${ident ? `<p class="model-line">${esc(ident)}</p>` : ''}
-      ${spec ? `<p class="spec-line">${esc(spec[0])}: ${esc(spec[1])}</p>` : ''}
+      <h2><a href="#/product/${p.id}">${esc(p.name)}</a></h2>
+      ${p.sku ? `<p class="product-sku">SKU: ${esc(p.sku)}</p>` : ''}
+      ${stock ? `<p class="product-stock">Stock status: ${esc(p.stock)}</p>` : ''}
       ${priceBlock(p)}
       <div class="card-actions">
-        <a class="btn secondary sm" href="#/product/${p.id}">View details</a>
-        <button type="button" class="btn wa sm" data-wa="${p.id}">${icon('wa')} WhatsApp</button>
+        <a class="btn sm" href="#/product/${p.id}">View details</a>
+        ${whatsapp}
       </div>
     </div>
   </article>`;
@@ -178,47 +179,35 @@ const PENDING = (CONFIG.placeholders && CONFIG.placeholders.contactPending) || '
 /* ---------------------------------------------------------------- 4. Home */
 function home() {
   const featured = PRODUCTS.filter(p => p.featured).slice(0, 8);
-  return `
-  <section class="hero">
-    <div class="hero-copy">
-      <h1>Power your home.<br>Equip your business.</h1>
-      <p>One catalogue for electrical equipment, solar and backup power, borehole and water solutions, agricultural equipment and construction and workshop tools — for homes, farms, contractors and institutions in Kenya, with enquiries welcome from across Africa.</p>
-      <ul class="hero-list">
-        <li>${icon('bolt')} Electrical equipment</li><li>${icon('sun')} Solar &amp; backup power</li><li>${icon('drop')} Borehole &amp; water</li><li>${icon('leaf')} Agricultural equipment</li><li>${icon('tool')} Construction &amp; workshop</li>
-      </ul>
-      <div class="actions"><a class="btn" href="#/shop">Shop Products ${icon('arrow')}</a><a class="btn secondary" href="#/business">Request a Quote</a></div>
-    </div>
-    <div class="hero-visual">${photo(0, 'Solar panels, hybrid inverter and lithium battery', { label: !PROD, mode: 'slice' })}</div>
-  </section>
-  <div class="confidence">
-    <div>${icon('grid')}<div><strong>Six specialist departments</strong><span>${CATEGORIES.reduce((n, c) => n + c.subcategories.length, 0)} subcategories, one place to compare</span></div></div>
-    <div>${icon('wa')}<div><strong>Enquire on WhatsApp</strong><span>Every product prepares a ready-to-send enquiry</span></div></div>
-    <div>${icon('truck')}<div><strong>Delivery by enquiry</strong><span>Share your town or county for confirmation</span></div></div>
-  </div>
-  <section class="section" aria-labelledby="home-departments">
-    <div class="section-head"><div><h2 id="home-departments">Shop by department</h2><p>Open a department to see its products and subcategories in the Shop.</p></div><a href="#/shop" class="text-link">View Full Catalogue ${icon('arrow')}</a></div>
-    <div class="department-grid">${CATEGORIES.map(departmentCard).join('')}</div>
-  </section>
-  ${featured.length ? `<section class="section" aria-labelledby="home-featured">
-    <div class="section-head"><div><h2 id="home-featured">Featured equipment</h2><p>${PROD ? 'A selection from the catalogue.' : 'Demonstration products. Prices and availability require confirmation.'}</p></div><a class="text-link" href="#/shop">View Full Catalogue ${icon('arrow')}</a></div>
-    <div class="product-grid">${featured.map(card).join('')}</div>
-  </section>` : ''}
-  <section class="section" aria-labelledby="home-applications">
-    <div class="section-head"><div><h2 id="home-applications">Shop by application</h2><p>Start from the job you need done.</p></div></div>
-    <div class="application-grid">${APPLICATIONS.map(([n, d, i]) => `<a class="application" href="${makeUrl('shop', { application: n })}">${icon(i)}<h3>${n}</h3><p>${d}</p><span class="text-link">Explore equipment ${icon('arrow')}</span></a>`).join('')}</div>
-  </section>
-  <section class="band">
-    <div><h2>Business &amp; bulk orders</h2><p>Planning a farm, fit-out, workshop, school or institutional purchase? Send your equipment list, quantities and destination and we will prepare a quotation.</p></div>
-    <a class="btn light" href="#/business">Request a Quote ${icon('arrow')}</a>
-  </section>
-  <section class="support-grid">
-    <div class="support-card">${icon('truck')}<div><h3>Delivery</h3><p>${esc((CONFIG.placeholders && CONFIG.placeholders.deliveryStatement) || 'Delivery is confirmed per enquiry.')}</p><a class="text-link" href="#/contact?topic=Delivery%20enquiry">Ask about delivery ${icon('arrow')}</a></div></div>
-    <div class="support-card">${icon('message')}<div><h3>Customer support</h3><p>Have a model number, load list or site requirement? Include it in your enquiry so the first reply already covers the right specification.</p><a class="text-link" href="#/contact">Contact us ${icon('arrow')}</a></div></div>
-  </section>
-  <section class="band" style="background:var(--green)">
-    <div><h2>Ready to ask about a product?</h2><p>Open any product and tap the WhatsApp button. The message is prepared for you with the product name, quantity and a link.</p></div>
-    <button type="button" class="btn light" data-general-wa>${icon('wa')} Start a WhatsApp enquiry</button>
+  const arrivals = PRODUCTS.filter(p => p.dateAdded).sort((a, b) => String(b.dateAdded).localeCompare(String(a.dateAdded))).slice(0, 8);
+  const sellers = PRODUCTS.filter(p => p.bestSeller === true).slice(0, 8);
+  const productRow = (title, id, products, heading = 'h2') => `<section class="home-product-section" aria-labelledby="${id}">
+    <div class="home-section-head"><${heading} id="${id}">${title}</${heading}><a href="#/shop">Browse all products</a></div>
+    <div class="product-grid home-product-grid">${products.map(card).join('')}</div>
   </section>`;
+  return `
+  <section class="home-search-strip" aria-label="Search and browse products">
+    <!-- Search query signature: submit sends q=<URL-encoded-term> to #/shop; app.js matches product name and internal reference SKU. -->
+    <form class="search-form home-search-form" id="home-search" role="search">
+      <label class="sr-only" for="home-search-input">Search products by name or SKU</label>
+      <input type="search" id="home-search-input" placeholder="Search products by name or SKU" autocomplete="off">
+      <button type="submit" aria-label="Search products">${icon('search')}<span>Search</span></button>
+    </form>
+    <a class="btn secondary home-browse-link" href="#/shop">Browse all products</a>
+  </section>
+  ${productRow('Featured Products', 'home-featured', featured, 'h1')}
+  <nav class="category-quick-links" aria-label="Shop by category">
+    ${CATEGORIES.map(c => `<a href="${shopUrl(c.id)}">${esc(c.name)}</a>`).join('')}
+  </nav>
+  ${productRow('New Arrivals', 'home-arrivals', arrivals)}
+  ${productRow('Best Sellers', 'home-best-sellers', sellers)}
+  <section class="home-trust-strip" aria-label="Trust and service information">
+    <div>${icon('grid')}<span>Six specialist departments</span></div>
+    <div>${icon('wa')}<span>Enquire on WhatsApp</span></div>
+    <div>${icon('truck')}<span>Delivery by enquiry</span></div>
+    <div>${icon('message')}<span>Customer support</span></div>
+  </section>
+  <section class="home-cta-band"><a class="btn light" href="#/shop">Browse all products ${icon('arrow')}</a></section>`;
 }
 
 /* ---------------------------------------------------------------- 4b. Shop listing */
@@ -234,6 +223,7 @@ function selection(route) {
   if (category && !cat(category)) category = '';
   return { category, subcategory, q: g('q'), power: g('power'), phase: g('phase'), pricing: g('pricing'), source: g('source'), application: g('application'), sort: g('sort') || 'featured', page: Math.max(1, Math.floor(Number(g('page')) || 1)) };
 }
+// Search results must match only product name and internal SKU.
 function searchText(p) {
   return [p.name, p.sku].join(' ').toLowerCase();
 }
@@ -302,7 +292,7 @@ function listing(route) {
   const base = PRODUCTS.filter(p => inDept(p, sel.category));
   const rows = filtered(sel), pages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
   const page = Math.min(pages, sel.page), start = (page - 1) * PAGE_SIZE;
-  const title = s ? s.name : c ? c.name : sel.application ? sel.application : 'Shop';
+  const title = sel.q ? 'Search results' : s ? s.name : c ? c.name : sel.application ? sel.application : 'Shop';
   const breadcrumbs = [['Shop', (c || s || sel.q || sel.application) ? '#/shop' : null]];
   if (c) breadcrumbs.push([c.name, s ? shopUrl(c.id) : null]);
   if (s) breadcrumbs.push([s.name]);
@@ -312,19 +302,18 @@ function listing(route) {
   const summary = rows.length
     ? `<span class="result-count" role="status">${rows.length} ${rows.length === 1 ? 'product' : 'products'} <small>· showing ${start + 1}–${Math.min(start + PAGE_SIZE, rows.length)}</small></span>`
     : `<span class="result-count" role="status">0 products</span>`;
-  const querySummary = sel.q ? `<span class="small muted">Results for “${esc(sel.q)}”${c ? ` in ${esc(c.name)}` : ''}</span>` : '';
   const grid = rows.length ? rows.slice(start, start + PAGE_SIZE).map(card).join('')
-    : `<div class="empty"><h2>No products match these filters</h2><p>${sel.q ? 'Try a shorter search term or a different spelling, or ' : 'Try '}removing a filter or browse a department instead.</p><div class="actions"><button type="button" class="btn" data-clear-filters>Clear all filters</button>${c && (s || sel.q || sel.power || sel.phase || sel.pricing || sel.application || sel.source) ? `<a class="btn secondary" href="${shopUrl(c.id)}">All ${esc(c.name)}</a>` : ''}<a class="btn secondary" href="#/business">Request a quote instead</a></div></div>`;
+    : `<div class="empty"><p>${sel.q ? `No products match “${esc(sel.q)}”.` : 'No products match the selected filters.'}</p></div>`;
   const pagination = pages > 1 ? `<nav class="pagination" aria-label="Catalogue pages"><button type="button" data-page="${page - 1}" ${page === 1 ? 'disabled' : ''}>Previous</button>${Array.from({ length: pages }, (_, i) => `<button type="button" data-page="${i + 1}" ${page === i + 1 ? 'aria-current="page"' : ''} aria-label="Page ${i + 1}">${i + 1}</button>`).join('')}<button type="button" data-page="${page + 1}" ${page === pages ? 'disabled' : ''}>Next</button></nav>` : '';
   return crumb(breadcrumbs) + `
-  <section class="page-intro"><h1>${esc(title)}</h1><p>${esc(intro)}</p></section>
+  ${sel.q ? `<section class="search-results-summary" aria-labelledby="search-results-title"><h1 id="search-results-title">Search results for “${esc(sel.q)}”</h1>${summary}</section>` : `<section class="page-intro"><h1>${esc(title)}</h1><p>${esc(intro)}</p></section>`}
   ${PROD && !PRODUCTS.length ? notice('No products have been approved for publication yet. Add approved product IDs in <code>assets/js/config.js</code>.', 'warn') : ''}
   ${demoNotice('Demonstration catalogue: reference products come from cited retailer listings and illustrative products are unverified examples. Images are representative department visuals, not exact-model photographs.')}
   <div class="catalog-layout">
     <div><button type="button" class="btn secondary filter-toggle" id="filter-toggle" aria-controls="filters" aria-expanded="false">${icon('filter')} Filters</button>${filterPanel(sel, base)}</div>
     <div class="catalog-main">
       <div class="toolbar">
-        <div class="toolbar-left">${summary}${querySummary}</div>
+        <div class="toolbar-left">${sel.q ? '' : summary}</div>
         <div class="toolbar-right">
           <label for="sort-products">Sort <select id="sort-products" data-filter="sort">${sortOptions.map(([v, n]) => `<option value="${v}" ${v === sel.sort ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
           <div class="view-toggle" role="group" aria-label="View"><button type="button" data-view="grid" aria-pressed="${viewMode === 'grid'}" aria-label="Grid view">${icon('grid')}</button><button type="button" data-view="list" aria-pressed="${viewMode === 'list'}" aria-label="List view">${icon('list')}</button></div>
@@ -769,7 +758,14 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && drawerOpen) closeDrawer();
 });
 document.addEventListener('submit', e => {
-  if (e.target.id === 'global-search') { e.preventDefault(); const q = document.getElementById('search-input').value.trim(); const sel = current().parts[0] === 'shop' ? selection(current()) : {}; navigate(makeUrl('shop', { ...sel, q, page: 1 })); return; }
+  if (e.target.id === 'global-search' || e.target.id === 'home-search') {
+    e.preventDefault();
+    const inputID = e.target.id === 'home-search' ? 'home-search-input' : 'search-input';
+    const q = document.getElementById(inputID).value.trim();
+    const route = current(), sel = route.parts[0] === 'shop' ? selection(route) : {};
+    navigate(makeUrl('shop', { ...sel, q, page: 1 }));
+    return;
+  }
   if (e.target.id !== 'enquiry-form') return;
   e.preventDefault();
   const form = e.target, errors = validateForm(form);

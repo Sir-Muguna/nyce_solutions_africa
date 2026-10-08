@@ -1,2 +1,6 @@
 .venv
 AUDIT.md
+HEADER.md
+LICENSE
+README.md
+__pycache__/
