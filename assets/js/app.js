@@ -8,7 +8,7 @@
    Sections
      1. Bootstrap & helpers        5. Product detail
      2. Cart state                 6. Business, Contact, About, Cart, Checkout, Policies
-     3. Shared components          7. Router & legacy redirects
+     3. Shared components (3b: shell) 7. Router & legacy redirects
      4. Home & Shop (listing)      8. WhatsApp, modal, forms, events
    ============================================================================ */
 (function () {
@@ -44,6 +44,7 @@ const ICONS = {
   arrow: '<path d="M4 12h16m-6-6 6 6-6 6"/>',
   cart: '<path d="M3 3h2l3 12h11l2-9H6"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/>',
   menu: '<path d="M4 6h16M4 12h16M4 18h16"/>',
+  chevron: '<path d="m6 9 6 6 6-6"/>',
   close: '<path d="M6 6l12 12M18 6 6 18"/>',
   message: '<path d="M20 11a8 8 0 0 1-8 8H5l-3 3v-10a9 9 0 0 1 18-1Z"/><path d="M7 10h9M7 14h6"/>',
   wa: '<path d="M21 11.5a9 9 0 0 1-13.5 8L3 21l1.5-4.5A9 9 0 1 1 21 11.5Z"/><path d="M8 7c-3 2 4 9 7 7l1-2-3-1-1 1-2-2 1-1-1-3Z"/>',
@@ -72,20 +73,23 @@ const money = n => `${CURRENCY} ${Number(n).toLocaleString(LOCALE, { maximumFrac
 const cat = id => CATEGORIES.find(c => c.id === id);
 const subOf = id => { for (const c of CATEGORIES) { const s = c.subcategories.find(x => x.id === id); if (s) return { ...s, category: c }; } return null; };
 const product = id => PRODUCTS.find(p => p.id === id);
-const inDept = (p, c) => !c || p.departments.includes(c);
-const inSub = (p, s) => !s || p.subcategories.includes(s);
+const inDept = (p, c) => !c || (p.departments || []).includes(c);
+const inSub = (p, s) => !s || (p.subcategories || []).includes(s);
 const countDept = id => PRODUCTS.filter(p => inDept(p, id)).length;
 const countSub = id => PRODUCTS.filter(p => inSub(p, id)).length;
 const primaryCat = p => cat(p.departments[0]);
 const primarySub = p => subOf(p.subcategories[0]);
 const makeUrl = (path, params = {}) => {
-  const isDefault = (k, v) => (k === 'sort' && v === 'featured') || (k === 'page' && Number(v) === 1);
+  const isDefault = (k, v) => k === 'page' && Number(v) === 1;
   const q = new URLSearchParams(Object.entries(params).filter(([k, v]) => v !== '' && v !== null && v !== undefined && !isDefault(k, v)));
   const s = q.toString();
   return '#/' + path + (s ? '?' + s : '');
 };
 const shopUrl = (category, subcategory) => makeUrl('shop', { category, subcategory });
-const isDemoPrice = p => p.price !== null && p.priceType === 'demo' && !PROD;
+// Price states: priced (a usable number), quote (quotation only) and unavailable (the record has no usable price data).
+const hasPrice = p => typeof p.price === 'number' && Number.isFinite(p.price) && p.price >= 0 && p.priceType !== 'quote';
+const priceState = p => hasPrice(p) ? 'priced' : (p.price === null || p.priceType === 'quote') ? 'quote' : 'unavailable';
+const isDemoPrice = p => hasPrice(p) && p.priceType === 'demo' && !PROD;
 
 /* ---------------------------------------------------------------- Storage helpers */
 function store(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch { return false; } }
@@ -94,12 +98,12 @@ function load(key, fallback) { try { const v = JSON.parse(localStorage.getItem(k
 /* ---------------------------------------------------------------- 2. Cart state */
 const CART_KEY = 'nyce-demo-cart-v2';
 let cart = {}, canStore = true, toastTimer, previousHash = '', activeTab = 'description', galleryIndex = 0;
-let imageFailed = false, focusAfterRoute = null, drawerOpen = false, formPreview = '';
+let imageFailed = false, focusAfterRoute = null, formPreview = '';
 let viewMode = load('nyce-view-mode', 'grid') === 'list' ? 'list' : 'grid';
 (function restoreCart() {
   const data = load(CART_KEY, {});
   if (!data || typeof data !== 'object' || Array.isArray(data)) return;
-  Object.entries(data).forEach(([id, q]) => { const p = product(id); if (p && p.price !== null && Number.isInteger(q) && q > 0) cart[id] = Math.min(q, MAX_QTY); });
+  Object.entries(data).forEach(([id, q]) => { const p = product(id); if (p && hasPrice(p) && Number.isInteger(q) && q > 0) cart[id] = Math.min(q, MAX_QTY); });
   try { localStorage.getItem(CART_KEY); } catch { canStore = false; }
 })();
 function saveCart() { canStore = store(CART_KEY, cart) && canStore; updateCount(); }
@@ -112,7 +116,7 @@ function updateCount() {
 }
 function addCart(id, q) {
   const p = product(id);
-  if (!p || p.price === null || !Number.isInteger(q) || q < 1 || q > MAX_QTY) return false;
+  if (!p || !hasPrice(p) || !Number.isInteger(q) || q < 1 || q > MAX_QTY) return false;
   const next = (cart[id] || 0) + q;
   if (next > MAX_QTY) { notify(`Maximum ${MAX_QTY} units per product in this cart.`); return false; }
   cart[id] = next; saveCart(); notify(`${q} × ${p.name} added to the cart.`, true); return true;
@@ -126,11 +130,11 @@ function notify(message, link = false) {
 }
 
 /* ---------------------------------------------------------------- 3. Shared components */
+const photoPlaceholder = alt => `<span class="photo"><img src="${esc(ASSETS.placeholder || '')}" alt="${esc(alt)}" loading="lazy"><span class="photo-fallback" aria-hidden="true">Image unavailable</span></span>`;
 function photo(tile, alt, opts = {}) {
   const { label = !PROD, mode = 'meet' } = opts;
-  if (imageFailed || !ASSETS.equipment) {
-    return `<span class="photo"><img src="${esc(ASSETS.placeholder || '')}" alt="${esc(alt)}" loading="lazy"><span class="photo-fallback" aria-hidden="true">Image unavailable</span></span>`;
-  }
+  // A missing sprite, a failed sprite load or a record without a usable tile shows the placeholder instead of a broken image.
+  if (imageFailed || !ASSETS.equipment || !Number.isInteger(tile) || tile < 0 || tile > 5) return photoPlaceholder(alt);
   const x = (tile % 3) * 512, y = Math.floor(tile / 3) * 512;
   return `<span class="photo"><svg viewBox="${x} ${y} 512 512" role="img" aria-label="${esc(alt)}" preserveAspectRatio="xMidYMid ${mode}"><image width="1536" height="1024" href="${esc(ASSETS.equipment)}"/></svg>${label ? '<span class="photo-label">Representative image</span>' : ''}</span>`;
 }
@@ -139,11 +143,15 @@ const notice = (html, type = '') => `<div class="notice ${type}">${html}</div>`;
 const demoNotice = html => PROD ? '' : notice(html);
 
 function priceBlock(p, size = 'card') {
-  if (p.price === null) {
-    return `<div class="product-price">Request Price<span class="price-note">Quotation required · availability to confirm</span></div>`;
+  const state = priceState(p);
+  if (state === 'quote') {
+    return `<div class="product-price" data-price-state="quote">Request Price<span class="price-note">Quotation required · availability to confirm</span></div>`;
+  }
+  if (state === 'unavailable') {
+    return `<div class="product-price" data-price-state="unavailable">Price not available<span class="price-note">Contact us to confirm price and availability</span></div>`;
   }
   const note = isDemoPrice(p) ? 'Demonstration price · not a sales offer' : 'Taxes and delivery confirmed by quotation';
-  return `<div class="product-price">${money(p.price)}<span class="price-note">${note}</span></div>`;
+  return `<div class="product-price" data-price-state="priced">${money(p.price)}<span class="price-note">${note}</span></div>`;
 }
 function recordTag(p) {
   if (PROD) return '';
@@ -151,15 +159,26 @@ function recordTag(p) {
     ? `<span class="tag sourced record-tag">Reference product</span>`
     : `<span class="tag illustrative record-tag">Illustrative product</span>`;
 }
-function card(p) {
+// Real photographs (image.src) are used when a record has one; otherwise the department sprite tile; otherwise a placeholder.
+const PHOTO_SRC = /^(assets\/|https:\/\/)[\w\-./%]+$/i;
+function productPhoto(p, alt, opts = {}) {
+  const img = p.image || {};
+  if (typeof img.src === 'string' && PHOTO_SRC.test(img.src)) {
+    return `<span class="photo"><img src="${esc(img.src)}" alt="${esc(alt)}" width="600" height="600" decoding="async" ${opts.eager ? '' : 'loading="lazy"'} data-photo-src></span>`;
+  }
+  return photo(img.tile, alt, { label: false, mode: 'slice' });
+}
+function card(p, opts) {
+  const { heading = 'h2', eager = false } = opts && typeof opts === 'object' ? opts : {};
+  const h = heading === 'h3' ? 'h3' : 'h2', name = p.name || 'Product';
   const stock = Object.prototype.hasOwnProperty.call(p, 'stock') && p.stock !== undefined && p.stock !== null && p.stock !== '';
   const whatsapp = validNumber()
     ? `<a class="btn wa sm" href="https://wa.me/${WHATSAPP}?text=${encodeURIComponent(generalMessage())}" target="_blank" rel="noopener noreferrer">${icon('wa')} WhatsApp</a>`
     : `<button type="button" class="btn wa sm" data-general-wa>${icon('wa')} WhatsApp</button>`;
   return `<article class="product-card" data-product-id="${p.id}">
-    <a href="#/product/${p.id}" class="product-media" aria-label="View ${esc(p.name)}">${photo(p.image.tile, p.alt, { label: false, mode: 'slice' })}${recordTag(p)}</a>
+    <a href="#/product/${p.id}" class="product-media" aria-label="View ${esc(name)}">${productPhoto(p, p.alt || name, { eager })}${recordTag(p)}</a>
     <div class="product-content">
-      <h2><a href="#/product/${p.id}">${esc(p.name)}</a></h2>
+      <${h}><a href="#/product/${p.id}">${esc(name)}</a></${h}>
       ${p.sku ? `<p class="product-sku">SKU: ${esc(p.sku)}</p>` : ''}
       ${stock ? `<p class="product-stock">Stock status: ${esc(p.stock)}</p>` : ''}
       ${priceBlock(p)}
@@ -171,43 +190,157 @@ function card(p) {
   </article>`;
 }
 function departmentCard(c) {
-  return `<a href="${shopUrl(c.id)}" class="department-card">${photo(c.imageTile, `${c.name} equipment`, { label: false, mode: 'slice' })}<div class="department-caption"><div><h3>${esc(c.name)}</h3><span>${c.subcategories.length} subcategories · ${countDept(c.id)} products</span></div><span class="round-arrow">${icon('arrow')}</span></div></a>`;
+  const n = countDept(c.id), subs = c.subcategories.length;
+  return `<a href="${shopUrl(c.id)}" class="department-card">${photo(c.imageTile, `${c.name} equipment`, { label: false, mode: 'slice' })}<div class="department-caption"><div><h3>${esc(c.name)}</h3><span>${subs} ${subs === 1 ? 'subcategory' : 'subcategories'}${n ? ` · ${n} ${n === 1 ? 'product' : 'products'}` : ''}</span></div><span class="round-arrow">${icon('arrow')}</span></div></a>`;
 }
 function contactLine(value, pending) { return value ? esc(value) : `<span class="muted">${esc(pending)}</span>`; }
 const PENDING = (CONFIG.placeholders && CONFIG.placeholders.contactPending) || 'To be supplied';
 
+/* ---------------------------------------------------------------- 3b. Shell: department menu, mobile drawer, footer */
+const NAV_LINKS = [['#/', 'Home', 'home'], ['#/about', 'About Us', 'about'], ['#/shop', 'Shop', 'shop'], ['#/business', 'Business & Bulk Order', 'business'], ['#/contact', 'Contact', 'contact']];
+const safeUrl = u => /^https:\/\/[^\s"'<>]+$/i.test(String(u || ''));
+const menuLink = (c, s, cls = '', label = '') => `<a href="${shopUrl(c.id, s ? s.id : '')}"${cls ? ` class="${cls}"` : ''} data-menu-category="${c.id}"${s ? ` data-menu-sub="${s.id}"` : ''}>${esc(label || (s ? s.name : c.name))}</a>`;
+function categoryHelp(id, description) {
+  const c = cat(id);
+  return c ? `<li><a href="${shopUrl(c.id)}"><strong>${esc(c.name)}</strong><span>${esc(description || c.advice)}</span></a></li>` : '';
+}
+function footerHelpHTML() {
+  return `<ul class="footer-help-list">
+    ${categoryHelp('solar', 'Plan around daily use, essential loads and available installation space.')}
+    ${categoryHelp('generators')}
+    ${categoryHelp('water')}
+    ${categoryHelp('agriculture')}
+    ${categoryHelp('construction')}
+    ${categoryHelp('electrical')}
+    <li><strong>Electronics &amp; appliances</strong><span>Ask about a specific item; availability is confirmed per enquiry.</span></li>
+    <li><strong>Bulk order terms</strong><span>Pricing, delivery, payment terms and service scope are confirmed in writing. No minimum order or discount is implied.</span></li>
+  </ul>`;
+}
+function departmentMenuHTML() {
+  return `<div class="department-menu-head"><a href="#/shop" class="menu-all">Browse all products ${icon('arrow')}</a></div>
+  <div class="department-columns">${CATEGORIES.map(c => `<div class="department-group">${menuLink(c, null, 'department-title')}<ul aria-label="${esc(c.name)} subcategories">${c.subcategories.map(sc => `<li>${menuLink(c, sc)}</li>`).join('')}</ul></div>`).join('')}</div>`;
+}
+function drawerHTML() {
+  return `<div class="nav-drawer-head"><span class="nav-drawer-title">Menu</span><button type="button" class="nav-drawer-close" aria-label="Close menu">${icon('close')}</button></div>
+  <div class="nav-drawer-body"><nav aria-label="Mobile navigation">
+    <ul class="drawer-links">
+      ${NAV_LINKS.slice(0, 2).map(([href, name, key]) => `<li><a href="${href}" data-nav-drawer="${key}">${name}</a></li>`).join('')}
+      <li><details class="drawer-category-nav"><summary id="drawer-category-toggle" data-nav-drawer="categories">Categories</summary><div class="drawer-accordion" role="group" aria-label="Product categories">${CATEGORIES.map(c => `<details data-menu-category="${c.id}"><summary>${esc(c.name)}</summary><ul><li>${menuLink(c, null, 'drawer-all', `All ${c.name}`)}</li>${c.subcategories.map(sc => `<li>${menuLink(c, sc)}</li>`).join('')}</ul></details>`).join('')}</div></details></li>
+      ${NAV_LINKS.slice(2).map(([href, name, key]) => `<li><a href="${href}" data-nav-drawer="${key}">${name}</a></li>`).join('')}
+    </ul>
+  </nav></div>
+  <div class="nav-drawer-foot"><button type="button" class="btn wa solid block" data-general-wa>${icon('wa')} Enquire on WhatsApp</button></div>`;
+}
+function buildFooter() {
+  const help = document.getElementById('footer-business-help');
+  if (help) help.innerHTML = footerHelpHTML();
+  const list = document.getElementById('footer-contact');
+  if (list) {
+    const items = [];
+    if (validNumber()) items.push(['WhatsApp', `<a href="https://wa.me/${WHATSAPP}">+${esc(WHATSAPP)}</a>`]);
+    if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(CONFIG.emailAddress || '')) items.push(['Email', `<a href="mailto:${esc(CONFIG.emailAddress)}">${esc(CONFIG.emailAddress)}</a>`]);
+    if (CONFIG.phoneNumber) items.push(['Phone', esc(CONFIG.phoneNumber)]);
+    if (safeUrl(CONFIG.facebookUrl)) items.push(['Facebook', `<a href="${esc(CONFIG.facebookUrl)}" target="_blank" rel="noopener noreferrer">${esc(CONFIG.facebookName || CONFIG.facebookUrl)}</a>`]);
+    if (safeUrl(CONFIG.websiteUrl)) items.push(['Website', `<a href="${esc(CONFIG.websiteUrl)}">${esc(CONFIG.websiteName || CONFIG.websiteUrl)}</a>`]);
+    if (CONFIG.physicalAddress) items.push(['Address', esc(CONFIG.physicalAddress)]);
+    if (CONFIG.operatingHours) items.push(['Hours', esc(CONFIG.operatingHours)]);
+    list.innerHTML = items.map(([label, value]) => `<li><span class="footer-contact-label">${label}</span>${value}</li>`).join('');
+    list.hidden = !items.length;
+  }
+  // Policy pages still carry the owner-approval placeholder, so say so wherever they are linked.
+  if ((CONFIG.placeholders || {}).policyPending) document.querySelectorAll('[data-policy-link]').forEach(a => a.insertAdjacentHTML('beforeend', ' <span class="link-note">Draft</span>'));
+}
+function buildShell() {
+  const menu = document.getElementById('department-menu'); if (menu) menu.innerHTML = departmentMenuHTML();
+  const drawer = document.getElementById('nav-drawer'); if (drawer) drawer.innerHTML = drawerHTML();
+  buildFooter();
+}
+const deptPanel = () => document.getElementById('department-menu');
+const deptMenuOpen = () => { const p = deptPanel(); return !!p && !p.hidden; };
+// Keep the dropdown inside the viewport: it scrolls internally instead of running off the page.
+function fitDeptMenu() {
+  const p = deptPanel(); if (!p || p.hidden) return;
+  p.style.maxHeight = '';
+  p.style.maxHeight = Math.max(160, innerHeight - p.getBoundingClientRect().top - 16) + 'px';
+}
+function setDeptMenu(open, returnFocus = false) {
+  const p = deptPanel(), toggle = document.getElementById('categories-toggle');
+  if (!p || !toggle) return;
+  p.hidden = !open; toggle.setAttribute('aria-expanded', String(open));
+  if (open) fitDeptMenu(); else p.style.maxHeight = '';
+  if (!open && returnFocus) toggle.focus();
+}
+function openNav() {
+  const d = document.getElementById('nav-drawer'); if (!d || d.open) return;
+  setDeptMenu(false);
+  d.showModal();
+  document.getElementById('menu-button').setAttribute('aria-expanded', 'true');
+}
+function closeNav() { const d = document.getElementById('nav-drawer'); if (d && d.open) d.close(); }
+// Mark the current page/department in both menus.
+function syncNav(route) {
+  const sel = route.parts[0] === 'shop' ? selection(route) : { category: '', subcategory: '' };
+  const drawerCategories = document.querySelector('#drawer-category-toggle')?.closest('details');
+  if (drawerCategories) drawerCategories.open = !!sel.category;
+  document.querySelectorAll('[data-menu-category]').forEach(el => {
+    if (el.tagName === 'DETAILS') { el.open = !!sel.category && el.dataset.menuCategory === sel.category; return; }
+    const on = !!sel.category && el.dataset.menuCategory === sel.category && (el.dataset.menuSub || '') === (sel.subcategory || '');
+    if (on) el.setAttribute('aria-current', 'page'); else el.removeAttribute('aria-current');
+  });
+}
+
 /* ---------------------------------------------------------------- 4. Home */
+// Product rows come only from real catalogue data: featured, best-seller and dated records when present, then department rows.
+// A product appears once on the page, a row needs at least two products, and there are never more than four rows.
+const HOME_MAX_ROWS = 4, HOME_ROW_SIZE = 4;
+function homeRows() {
+  const shown = new Set(), rows = [];
+  const usable = PRODUCTS.filter(p => p && p.id && p.name);
+  const add = (id, title, list, href, more) => {
+    if (rows.length >= HOME_MAX_ROWS) return;
+    const items = list.filter(p => !shown.has(p.id)).slice(0, HOME_ROW_SIZE);
+    if (items.length < 2) return;
+    items.forEach(p => shown.add(p.id));
+    rows.push({ id, title, items, href, more });
+  };
+  add('home-featured', 'Featured Products', usable.filter(p => p.featured), '#/shop', 'Browse all products');
+  add('home-best-sellers', 'Best Sellers', usable.filter(p => p.bestSeller === true), '#/shop', 'Browse all products');
+  add('home-arrivals', 'New Arrivals', usable.filter(p => p.dateAdded).sort((a, b) => String(b.dateAdded).localeCompare(String(a.dateAdded))), '#/shop', 'Browse all products');
+  CATEGORIES.forEach(c => add(`home-dept-${c.id}`, c.name, usable.filter(p => inDept(p, c.id)), shopUrl(c.id), 'View all'));
+  return rows;
+}
 function home() {
-  const featured = PRODUCTS.filter(p => p.featured).slice(0, 8);
-  const arrivals = PRODUCTS.filter(p => p.dateAdded).sort((a, b) => String(b.dateAdded).localeCompare(String(a.dateAdded))).slice(0, 8);
-  const sellers = PRODUCTS.filter(p => p.bestSeller === true).slice(0, 8);
-  const productRow = (title, id, products, heading = 'h2') => `<section class="home-product-section" aria-labelledby="${id}">
-    <div class="home-section-head"><${heading} id="${id}">${title}</${heading}><a href="#/shop">Browse all products</a></div>
-    <div class="product-grid home-product-grid">${products.map(card).join('')}</div>
+  const rows = homeRows();
+  const subCount = CATEGORIES.reduce((n, c) => n + c.subcategories.length, 0);
+  // Every statement below is stated elsewhere in this site's own copy or computed from the catalogue; nothing is promised beyond that.
+  const trust = [
+    ['grid', `${CATEGORIES.length} departments and ${subCount} subcategories in one catalogue`],
+    validNumber() ? ['wa', 'Send product enquiries on WhatsApp'] : null,
+    ['message', 'Prices, availability and taxes are confirmed by quotation'],
+    ['truck', 'Delivery details are confirmed per enquiry']
+  ].filter(Boolean);
+  const productRow = (row, index) => `<section class="home-product-section" aria-labelledby="${row.id}">
+    <div class="home-section-head"><h2 id="${row.id}">${esc(row.title)}</h2><a href="${row.href}">${row.more}${row.more === 'View all' ? `<span class="sr-only"> ${esc(row.title)}</span>` : ''}</a></div>
+    <div class="product-grid home-product-grid">${row.items.map(p => card(p, { heading: 'h3', eager: index === 0 })).join('')}</div>
   </section>`;
   return `
-  <section class="home-search-strip" aria-label="Search and browse products">
-    <!-- Search query signature: submit sends q=<URL-encoded-term> to #/shop; app.js matches product name and internal reference SKU. -->
-    <form class="search-form home-search-form" id="home-search" role="search">
-      <label class="sr-only" for="home-search-input">Search products by name or SKU</label>
-      <input type="search" id="home-search-input" placeholder="Search products by name or SKU" autocomplete="off">
-      <button type="submit" aria-label="Search products">${icon('search')}<span>Search</span></button>
-    </form>
-    <a class="btn secondary home-browse-link" href="#/shop">Browse all products</a>
+  <section class="home-hero" aria-labelledby="home-title">
+    <h1 id="home-title">Power your home. Equip your business.</h1>
+    <p>Solar and backup power, water solutions, electricals, farm equipment, construction and workshop tools.</p>
+    <div class="home-hero-actions"><a class="btn light" href="#/shop">Shop products</a><a class="btn outline-light" href="#/business">Request a quote</a></div>
   </section>
-  ${productRow('Featured Products', 'home-featured', featured, 'h1')}
-  <nav class="category-quick-links" aria-label="Shop by category">
-    ${CATEGORIES.map(c => `<a href="${shopUrl(c.id)}">${esc(c.name)}</a>`).join('')}
-  </nav>
-  ${productRow('New Arrivals', 'home-arrivals', arrivals)}
-  ${productRow('Best Sellers', 'home-best-sellers', sellers)}
-  <section class="home-trust-strip" aria-label="Trust and service information">
-    <div>${icon('grid')}<span>Six specialist departments</span></div>
-    <div>${icon('wa')}<span>Enquire on WhatsApp</span></div>
-    <div>${icon('truck')}<span>Delivery by enquiry</span></div>
-    <div>${icon('message')}<span>Customer support</span></div>
+  <section class="home-departments" aria-labelledby="home-departments-title">
+    <div class="home-section-head"><h2 id="home-departments-title">Shop by department</h2></div>
+    <div class="department-grid">${CATEGORIES.map(departmentCard).join('')}</div>
   </section>
-  <section class="home-cta-band"><a class="btn light" href="#/shop">Browse all products ${icon('arrow')}</a></section>`;
+  ${rows.map(productRow).join('')}
+  <section class="home-trust-strip" aria-label="Service information">
+    ${trust.map(([ic, text]) => `<div>${icon(ic)}<span>${esc(text)}</span></div>`).join('')}
+  </section>
+  <section class="home-cta-band band" aria-labelledby="home-cta-title">
+    <div><h2 id="home-cta-title">Need a quotation or a bulk order?</h2><p>Send your equipment list, quantities and destination. Pricing, delivery and payment terms are confirmed in writing; an enquiry is not an order.</p></div>
+    <div class="band-actions"><a class="btn light" href="#/business">Request a quote ${icon('arrow')}</a><button type="button" class="btn wa solid" data-general-wa>${icon('wa')} ${validNumber() ? 'Enquire on WhatsApp' : 'Prepare a WhatsApp enquiry'}</button><a class="btn outline-light" href="#/contact">Contact us</a></div>
+  </section>`;
 }
 
 /* ---------------------------------------------------------------- 4b. Shop listing */
@@ -216,50 +349,82 @@ function current() {
   const [path, query = ''] = raw.split('?');
   return { parts: path.split('/').filter(Boolean), params: new URLSearchParams(query), path };
 }
+const SORTS = ['relevance', 'featured', 'newest', 'az', 'za', 'price-asc', 'price-desc'];
+const validSort = (s, q) => SORTS.includes(s) && !(s === 'relevance' && !q) && !(s === 'newest' && !HAS_DATES);
+const defaultSort = sel => sel.q ? 'relevance' : 'featured';
+const sortOf = sel => sel.sort || defaultSort(sel);
+// Filters come only from fields present in the catalogue records. A filter is offered only when it can separate the current results.
+const FACETS = [
+  { key: 'pricing', legend: 'Pricing', values: p => { const s = priceState(p); return s === 'priced' ? ['priced'] : s === 'quote' ? ['quote'] : []; }, label: v => v === 'priced' ? (PROD ? 'Priced products' : 'Priced (demonstration prices)') : 'Request Price' },
+  { key: 'application', legend: 'Application', values: p => Array.isArray(p.applications) ? p.applications.filter(Boolean) : [], label: v => v },
+  { key: 'power', legend: 'Power source', values: p => p.power ? [p.power] : [], label: v => v }
+];
 function selection(route) {
   const g = k => route.params.get(k) || '';
   let category = g('category'), subcategory = g('subcategory');
-  if (subcategory) { const s = subOf(subcategory); if (!s) subcategory = ''; else if (!category) category = s.category.id; }
+  if (subcategory) { const s = subOf(subcategory); if (s) category = s.category.id; else subcategory = ''; }
   if (category && !cat(category)) category = '';
-  return { category, subcategory, q: g('q'), power: g('power'), phase: g('phase'), pricing: g('pricing'), source: g('source'), application: g('application'), sort: g('sort') || 'featured', page: Math.max(1, Math.floor(Number(g('page')) || 1)) };
+  const q = g('q'), pricing = g('pricing') === 'demo' ? 'priced' : g('pricing');
+  return { category, subcategory, q, power: g('power'), phase: g('phase'), pricing, source: PROD ? '' : g('source'), application: g('application'), sort: validSort(g('sort'), q) ? g('sort') : '', page: Math.max(1, Math.floor(Number(g('page')) || 1)) };
 }
 // Search results must match only product name and internal SKU.
 function searchText(p) {
   return [p.name, p.sku].join(' ').toLowerCase();
 }
-function filtered(sel) {
-  const query = (sel.q || '').trim().toLowerCase();
-  const terms = query ? query.split(/\s+/) : [];
-  let rows = PRODUCTS.filter(p => inDept(p, sel.category) && inSub(p, sel.subcategory)
+const queryTerms = q => { const s = String(q || '').trim().toLowerCase(); return s ? s.split(/\s+/) : []; };
+// Products matching the selection. `skip` ignores one control ('category', 'subcategory' or a filter key) so that
+// option counts show what choosing that option would return.
+function scoped(sel, skip = '') {
+  const terms = queryTerms(sel.q);
+  return PRODUCTS.filter(p => (skip === 'category' || inDept(p, sel.category)) && (skip === 'category' || skip === 'subcategory' || inSub(p, sel.subcategory))
     && (!terms.length || terms.every(t => searchText(p).includes(t)))
-    && (!sel.power || p.power === sel.power) && (!sel.phase || p.phase === sel.phase)
-    && (!sel.pricing || p.priceType === sel.pricing) && (!sel.source || p.evidenceStatus === sel.source)
-    && (!sel.application || p.applications.includes(sel.application)));
-  const byPrice = dir => (a, b) => a.price === null ? (b.price === null ? 0 : 1) : b.price === null ? -1 : dir * (a.price - b.price);
-  if (sel.sort === 'az') rows.sort((a, b) => a.name.localeCompare(b.name));
-  else if (sel.sort === 'za') rows.sort((a, b) => b.name.localeCompare(a.name));
-  else if (sel.sort === 'price-asc') rows.sort(byPrice(1));
-  else if (sel.sort === 'price-desc') rows.sort(byPrice(-1));
-  else if (sel.sort === 'newest' && HAS_DATES) rows.sort((a, b) => String(b.dateAdded || '').localeCompare(String(a.dateAdded || '')));
+    && FACETS.every(f => skip === f.key || !sel[f.key] || f.values(p).includes(sel[f.key]))
+    && (!sel.phase || p.phase === sel.phase) && (!sel.source || p.evidenceStatus === sel.source));
+}
+function relevance(p, query, terms) {
+  const name = String(p.name || '').toLowerCase(), sku = String(p.sku || '').toLowerCase();
+  let score = 0;
+  if (sku && sku === query) score += 100;
+  if (name === query) score += 90;
+  if (name.startsWith(query)) score += 60; else if (name.includes(query)) score += 40;
+  if (sku && sku.includes(query)) score += 30;
+  terms.forEach(t => { if (new RegExp(`(^|[^a-z0-9])${t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`).test(name)) score += 5; });
+  return score + (p.featured ? 1 : 0);
+}
+function filtered(sel) {
+  const rows = scoped(sel), sort = sortOf(sel), name = p => String(p.name || '');
+  const byName = (a, b) => name(a).localeCompare(name(b));
+  const byPrice = dir => (a, b) => { const x = hasPrice(a), y = hasPrice(b); return x ? (y ? dir * (a.price - b.price) || byName(a, b) : -1) : (y ? 1 : byName(a, b)); };
+  if (sort === 'az') rows.sort(byName);
+  else if (sort === 'za') rows.sort((a, b) => byName(b, a));
+  else if (sort === 'price-asc') rows.sort(byPrice(1));
+  else if (sort === 'price-desc') rows.sort(byPrice(-1));
+  else if (sort === 'newest' && HAS_DATES) rows.sort((a, b) => String(b.dateAdded || '').localeCompare(String(a.dateAdded || '')) || byName(a, b));
+  else if (sort === 'relevance' && sel.q) { const query = String(sel.q).trim().toLowerCase(), terms = queryTerms(sel.q); rows.sort((a, b) => relevance(b, query, terms) - relevance(a, query, terms) || byName(a, b)); }
   else rows.sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
   return rows;
 }
-function choice(name, value, label, count, checked, extra = '') {
-  const id = `${name}-${value || 'all'}`;
-  return `<label class="choice ${extra}" for="${id}"><input type="radio" id="${id}" name="${name}" value="${esc(value)}" data-filter="${name.replace('filter-', '')}" ${checked ? 'checked' : ''}><span>${esc(label)}</span>${count !== null ? `<span class="count">${count}</span>` : ''}</label>`;
+// Drop a filter value that would return nothing after the department or subcategory changed.
+function dropEmptyFilters(sel) {
+  FACETS.forEach(f => { if (sel[f.key] && !scoped(sel, f.key).some(p => f.values(p).includes(sel[f.key]))) sel[f.key] = ''; });
+  if (sel.phase && !scoped(sel, 'phase-none').some(p => p.phase === sel.phase)) sel.phase = '';
 }
-function selectField(label, id, options, value, hint = '') {
-  return `<div class="field"><label for="${id}">${label}</label><select id="${id}" data-filter="${id.replace('filter-', '')}">${options.map(o => Array.isArray(o[1]) ? `<optgroup label="${esc(o[0])}">${o[1].map(([v, n]) => `<option value="${esc(v)}" ${String(value) === v ? 'selected' : ''}>${esc(n)}</option>`).join('')}</optgroup>` : `<option value="${esc(o[0])}" ${String(value) === o[0] ? 'selected' : ''}>${esc(o[1])}</option>`).join('')}</select>${hint ? `<small>${hint}</small>` : ''}</div>`;
+const activeFilterCount = sel => ['category', 'subcategory', 'power', 'phase', 'pricing', 'application', 'source'].filter(k => sel[k]).length - (sel.category && sel.subcategory ? 1 : 0);
+function pageList(page, pages) {
+  if (pages <= 7) return Array.from({ length: pages }, (_, i) => i + 1);
+  const keep = new Set([1, pages, page - 1, page, page + 1]);
+  if (page <= 3) [2, 3, 4].forEach(n => keep.add(n));
+  if (page >= pages - 2) [pages - 1, pages - 2, pages - 3].forEach(n => keep.add(n));
+  const list = [...keep].filter(n => n >= 1 && n <= pages).sort((a, b) => a - b), out = [];
+  list.forEach((n, i) => { if (i && n - list[i - 1] > 1) out.push('…'); out.push(n); });
+  return out;
 }
-function filterPanel(sel) {
-  return `<aside class="filter-panel" id="filters" aria-label="Product filters">
-    <div class="drawer-head"><h2>Filter products</h2><button type="button" class="drawer-close" id="drawer-close" aria-label="Close filters">${icon('close')}</button></div>
-    <form id="filter-form" novalidate>
-      <fieldset class="filter-group"><legend>Categories</legend><div class="choice-list" role="radiogroup">${choice('filter-category', '', 'All Categories', PRODUCTS.length, !sel.category)}${CATEGORIES.map(cc => choice('filter-category', cc.id, cc.name, countDept(cc.id), sel.category === cc.id)).join('')}</div></fieldset>
-      <div class="filter-actions"><button type="button" class="btn secondary sm" data-clear-filters>Clear all filters</button></div>
-    </form>
-    <div class="filter-footer"><p>Not sure about the specification? <a href="#/business">Request a quote</a> and describe your requirement.</p></div>
-  </aside>`;
+// The URL a shop route should have: invalid, mismatched or out-of-range values are corrected so the page and its URL agree.
+function canonicalShop(route) {
+  const sel = selection(route), pages = Math.max(1, Math.ceil(filtered(sel).length / PAGE_SIZE));
+  sel.page = Math.min(pages, sel.page);
+  const url = makeUrl('shop', sel), want = new URLSearchParams(url.split('?')[1] || '');
+  return ['category', 'subcategory', 'q', 'power', 'phase', 'pricing', 'source', 'application', 'sort', 'page'].some(k => (route.params.get(k) || '') !== (want.get(k) || '')) ? url : '';
 }
 function chips(sel) {
   const list = [];
@@ -269,47 +434,56 @@ function chips(sel) {
   if (s) list.push(['subcategory', s.name]);
   if (sel.power) list.push(['power', sel.power]);
   if (sel.phase) list.push(['phase', sel.phase]);
-  if (sel.pricing) list.push(['pricing', sel.pricing === 'demo' ? (PROD ? 'Priced products' : 'Demonstration prices') : 'Request Price']);
+  if (sel.pricing) list.push(['pricing', sel.pricing === 'priced' ? (PROD ? 'Priced products' : 'Demonstration prices') : 'Request Price']);
   if (sel.application) list.push(['application', sel.application]);
   if (sel.source) list.push(['source', sel.source === 'sourced' ? 'Reference products' : 'Illustrative products']);
   if (!list.length) return '';
   return `<div class="chips" aria-label="Active filters">${list.map(([k, n]) => `<button type="button" class="chip" data-remove-filter="${k}" aria-label="Remove filter ${esc(n)}"><span>${esc(n)}</span>${icon('close')}</button>`).join('')}<button type="button" class="clear-all" data-clear-filters>Clear all</button></div>`;
 }
+function emptyState(sel) {
+  if (!PRODUCTS.length) return `<div class="empty"><h2>The catalogue is being prepared</h2><p>No products are published yet. Send an enquiry and describe the equipment you need.</p><div class="actions"><a class="btn" href="#/business">Request a quote</a><a class="btn secondary" href="#/contact">Contact us</a></div></div>`;
+  const filtersOn = activeFilterCount(sel) > 0;
+  const msg = sel.q ? `No products match “${esc(sel.q)}”${filtersOn ? ' with the selected filters' : ''}.` : 'No products match the selected filters.';
+  const depts = CATEGORIES.filter(cc => PRODUCTS.some(p => inDept(p, cc.id)));
+  return `<div class="empty"><h2>No matching products</h2><p>${msg}</p>${sel.q ? '<p class="small">Search looks at product names and SKUs. Check the spelling or try a shorter term.</p>' : ''}
+    <div class="actions">${sel.q ? '<button type="button" class="btn secondary" data-remove-filter="q">Clear search</button>' : ''}${filtersOn ? '<button type="button" class="btn secondary" data-clear-filters-keep-search>Clear filters</button>' : ''}<a class="btn" href="#/shop">Browse all products</a></div>
+    <nav class="empty-links" aria-label="Browse by department"><span>Browse by department:</span>${depts.map(cc => `<a href="${shopUrl(cc.id)}">${esc(cc.name)}</a>`).join('')}</nav>
+    <p class="small">Cannot find what you need? <a href="#/business">Request a quote</a> or <button type="button" class="link-button" data-general-wa>ask on WhatsApp</button>.</p></div>`;
+}
 function listing(route) {
   const sel = selection(route), c = cat(sel.category), s = subOf(sel.subcategory);
   const rows = filtered(sel), pages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
-  const page = Math.min(pages, sel.page), start = (page - 1) * PAGE_SIZE;
-  const title = sel.q ? 'Search results' : s ? s.name : c ? c.name : sel.application ? sel.application : 'Shop';
-  const breadcrumbs = [['Shop', (c || s || sel.q || sel.application) ? '#/shop' : null]];
-  if (c) breadcrumbs.push([c.name, s ? shopUrl(c.id) : null]);
-  if (s) breadcrumbs.push([s.name]);
-  if (!c && sel.application) breadcrumbs.push([sel.application]);
-  const intro = s ? `Products in ${s.name}, part of ${c.name}.` : c ? `${c.intro} ${c.advice}` : 'Browse the full catalogue. Filter by department, subcategory, power source, phase and application, or search by name or model.';
-  const sortOptions = [['featured', 'Featured'], ...(HAS_DATES ? [['newest', 'Newest']] : []), ['az', 'Name: A–Z'], ['za', 'Name: Z–A'], ['price-asc', 'Price: low to high'], ['price-desc', 'Price: high to low']];
+  const page = Math.min(pages, sel.page), start = (page - 1) * PAGE_SIZE, sort = sortOf(sel);
+  const facetOnly = !c && !s && !sel.q && sel.application;
+  const title = sel.q ? 'Search results' : s ? s.name : c ? c.name : facetOnly ? sel.application : 'Shop';
+  const breadcrumbs = [['Shop', (c || s || sel.q) ? '#/shop' : null]];
+  if (c) breadcrumbs.push([c.name, (s || sel.q) ? shopUrl(c.id) : null]);
+  if (s) breadcrumbs.push([s.name, sel.q ? shopUrl(c.id, s.id) : null]);
+  if (sel.q) breadcrumbs.push(['Search results']);
+  if (facetOnly) breadcrumbs.push([sel.application]);
+  const intro = s ? `Products in ${s.name}, part of ${c.name}.` : c ? `${c.intro} ${c.advice}` : 'Browse the full catalogue or search by product name or SKU.';
+  const sortOptions = [...(sel.q ? [['relevance', 'Best match']] : []), ['featured', 'Featured'], ...(HAS_DATES ? [['newest', 'Newest']] : []), ['az', 'Name: A–Z'], ['za', 'Name: Z–A'], ['price-asc', 'Price: low to high'], ['price-desc', 'Price: high to low']];
   const summary = rows.length
-    ? `<span class="result-count" role="status">${rows.length} ${rows.length === 1 ? 'product' : 'products'} <small>· showing ${start + 1}–${Math.min(start + PAGE_SIZE, rows.length)}</small></span>`
+    ? `<span class="result-count" role="status">${rows.length} ${rows.length === 1 ? 'product' : 'products'} <small>· showing ${start + 1}–${Math.min(start + PAGE_SIZE, rows.length)}${pages > 1 ? ` · page ${page} of ${pages}` : ''}</small></span>`
     : `<span class="result-count" role="status">0 products</span>`;
-  const grid = rows.length ? rows.slice(start, start + PAGE_SIZE).map(card).join('')
-    : `<div class="empty"><p>${sel.q ? `No products match “${esc(sel.q)}”.` : 'No products match the selected filters.'}</p></div>`;
-  const pagination = pages > 1 ? `<nav class="pagination" aria-label="Catalogue pages"><button type="button" data-page="${page - 1}" ${page === 1 ? 'disabled' : ''}>Previous</button>${Array.from({ length: pages }, (_, i) => `<button type="button" data-page="${i + 1}" ${page === i + 1 ? 'aria-current="page"' : ''} aria-label="Page ${i + 1}">${i + 1}</button>`).join('')}<button type="button" data-page="${page + 1}" ${page === pages ? 'disabled' : ''}>Next</button></nav>` : '';
+  const grid = rows.length ? rows.slice(start, start + PAGE_SIZE).map(p => card(p)).join('') : emptyState(sel);
+  const pagination = pages > 1 ? `<nav class="pagination" aria-label="Catalogue pages"><button type="button" data-page="${page - 1}" aria-label="Previous page" ${page === 1 ? 'disabled' : ''}>Previous</button>${pageList(page, pages).map(n => n === '…' ? '<span aria-hidden="true">…</span>' : `<button type="button" data-page="${n}" ${page === n ? 'aria-current="page"' : ''} aria-label="Page ${n}">${n}</button>`).join('')}<button type="button" data-page="${page + 1}" aria-label="Next page" ${page === pages ? 'disabled' : ''}>Next</button></nav>` : '';
   return crumb(breadcrumbs) + `
   ${sel.q ? `<section class="search-results-summary" aria-labelledby="search-results-title"><h1 id="search-results-title">Search results for “${esc(sel.q)}”</h1>${summary}</section>` : `<section class="page-intro"><h1>${esc(title)}</h1><p>${esc(intro)}</p></section>`}
-  ${PROD && !PRODUCTS.length ? notice('No products have been approved for publication yet. Add approved product IDs in <code>assets/js/config.js</code>.', 'warn') : ''}
   ${demoNotice('Demonstration catalogue: reference products come from cited retailer listings and illustrative products are unverified examples. Images are representative department visuals, not exact-model photographs.')}
   <div class="catalog-layout">
-    <div><button type="button" class="btn secondary filter-toggle" id="filter-toggle" aria-controls="filters" aria-expanded="false">${icon('filter')} Filters</button>${filterPanel(sel)}</div>
     <div class="catalog-main">
       <div class="toolbar">
         <div class="toolbar-left">${sel.q ? '' : summary}</div>
         <div class="toolbar-right">
-          <label for="sort-products">Sort <select id="sort-products" data-filter="sort">${sortOptions.map(([v, n]) => `<option value="${v}" ${v === sel.sort ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
+          <label for="sort-products">Sort <select id="sort-products" data-filter="sort">${sortOptions.map(([v, n]) => `<option value="${v}" ${v === sort ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
           <div class="view-toggle" role="group" aria-label="View"><button type="button" data-view="grid" aria-pressed="${viewMode === 'grid'}" aria-label="Grid view">${icon('grid')}</button><button type="button" data-view="list" aria-pressed="${viewMode === 'list'}" aria-label="List view">${icon('list')}</button></div>
         </div>
       </div>
       ${chips(sel)}
       <div class="product-grid ${viewMode === 'list' ? 'list' : ''}" id="results">${grid}</div>
       ${pagination}
-      ${['price-asc', 'price-desc'].includes(sel.sort) && rows.some(p => p.price === null) ? '<p class="small muted">Request Price products are listed after priced products.</p>' : ''}
+      ${['price-asc', 'price-desc'].includes(sort) && rows.some(p => !hasPrice(p)) ? '<p class="small muted">Products without a listed price (Request Price) appear after priced products.</p>' : ''}
     </div>
   </div>`;
 }
@@ -343,14 +517,14 @@ function detail(p) {
       <p class="model">${ident.length ? ident.join(' · ') : (PROD ? 'Model confirmed on enquiry' : 'Supplier SKU: pending verification')}</p>
       ${PROD ? '' : `<span class="tag ${p.evidenceStatus}">${p.evidenceStatus === 'sourced' ? 'Reference product · retailer-listed' : 'Illustrative product · not a verified offer'}</span>`}
       ${priceBlock(p, 'detail')}
-      ${p.price !== null && !PROD ? notice('Demonstration price only. It is not a NYCE SOLUTIONS sales price; request a quotation for a confirmed amount.', 'warn') : ''}
+      ${hasPrice(p) && !PROD ? notice('Demonstration price only. It is not a NYCE SOLUTIONS sales price; request a quotation for a confirmed amount.', 'warn') : ''}
       <p>${esc(p.shortDescription)}</p>
       <div class="spec-preview">${Object.entries(p.specs).slice(0, 4).map(([k, v]) => `<div><small>${esc(k)}</small><strong>${esc(v)}</strong></div>`).join('')}</div>
       <h3 class="small" style="font-size:13px;margin:0">Intended applications</h3>
       <ul class="applications-inline">${p.applications.map(a => `<li><a href="${makeUrl('shop', { application: a })}">${esc(a)}</a></li>`).join('')}</ul>
       <div class="qty-line"><label for="detail-qty">Quantity</label>${quantity(1, 'detail-qty')}</div>
       <div class="detail-actions">
-        ${p.price !== null ? `<button type="button" class="btn" data-add="${p.id}">${icon('cart')} Add to Cart</button>` : `<button type="button" class="btn" data-quote="${p.id}">Request a Quote ${icon('arrow')}</button>`}
+        ${hasPrice(p) ? `<button type="button" class="btn" data-add="${p.id}">${icon('cart')} Add to Cart</button>` : `<button type="button" class="btn" data-quote="${p.id}">Request a Quote ${icon('arrow')}</button>`}
         <button type="button" class="btn wa solid" data-wa="${p.id}" data-detail="true">${icon('wa')} Enquire on WhatsApp</button>
       </div>
       <p class="small muted" style="margin-top:12px">Availability, taxes, transport and support scope are confirmed by quotation. An enquiry is not an order.</p>
@@ -535,9 +709,10 @@ function render() {
   const r = current(), [page, id] = r.parts;
   const legacy = LEGACY.resolve(r.parts);
   if (legacy) { location.replace(legacy); return; }
+  if (page === 'shop') { const fix = canonicalShop(r); if (fix) { location.replace(fix); return; } }
   let html = '', active = page || 'home';
   if (!page) html = home();
-  else if (page === 'shop') html = listing(r);
+  else if (page === 'shop') { html = listing(r); const s = selection(r); if (s.category || s.subcategory) active = 'categories'; }
   else if (legacy === null) { html = notFound('That category does not exist. Browse the full catalogue instead.'); active = 'shop'; }
   else if (page === 'product') { const p = product(id); html = p ? detail(p) : notFound(PROD && ALL_PRODUCTS.some(x => x.id === id) ? 'This product is not published yet.' : 'That product does not exist in the catalogue.'); active = 'shop'; }
   else if (page === 'business') html = business(r.params);
@@ -551,21 +726,20 @@ function render() {
 
   const main = document.getElementById('main');
   main.innerHTML = html;
-  document.querySelectorAll('[data-nav]').forEach(a => { const on = a.dataset.nav === active; a.classList.toggle('active', on); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+  document.querySelectorAll('[data-nav], [data-nav-drawer]').forEach(a => { const on = (a.dataset.nav || a.dataset.navDrawer) === active; a.classList.toggle('active', on); if (on && a.tagName === 'A') a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+  syncNav(r);
   document.getElementById('search-input').value = r.params.get('q') || '';
   const heading = main.querySelector('h1');
   document.title = `${(heading ? (heading.innerText || heading.textContent) : 'Catalogue').replace(/\s+/g, ' ').trim()} | ${BUSINESS}`;
 
   const target = focusAfterRoute && document.getElementById(focusAfterRoute);
   if (target) {
-    if (drawerOpen && innerWidth < 1050) openDrawer(false);
     target.focus({ preventScroll: true });
   } else if (previousHash !== '' && previousHash !== location.hash) {
     // Route change: move focus to the new content and return to the top. On first load the
     // browser's natural focus order is kept so the skip link is the first Tab stop.
     main.focus({ preventScroll: true }); window.scrollTo(0, 0);
   }
-  if (!target) { drawerOpen = false; document.body.classList.remove('drawer-open'); document.getElementById('drawer-backdrop').classList.remove('open'); document.getElementById('drawer-backdrop').hidden = true; }
   focusAfterRoute = null; previousHash = location.hash || '#/'; updateCount();
 }
 function navigate(url) {
@@ -574,29 +748,19 @@ function navigate(url) {
 }
 function setFilter(key, value, focusID) {
   const sel = selection(current());
+  if (key === 'sort' && value === defaultSort(sel)) value = '';
   sel[key] = value; sel.page = 1;
-  if (key === 'category') { sel.subcategory = ''; sel.power = ''; sel.phase = ''; }
+  if (key === 'category') sel.subcategory = '';
   if (key === 'subcategory' && value) { const s = subOf(value); sel.category = s ? s.category.id : sel.category; }
+  if (key === 'category' || key === 'subcategory') dropEmptyFilters(sel);
   focusAfterRoute = focusID || null;
   navigate(makeUrl('shop', sel));
 }
 function removeFilter(key) {
   const sel = selection(current());
-  if (key === 'category') { sel.category = ''; sel.subcategory = ''; sel.power = ''; sel.phase = ''; } else sel[key] = '';
+  if (key === 'category') { sel.category = ''; sel.subcategory = ''; } else sel[key] = '';
+  if (key === 'category' || key === 'subcategory') dropEmptyFilters(sel);
   sel.page = 1; navigate(makeUrl('shop', sel));
-}
-function openDrawer(moveFocus = true) {
-  const panel = document.getElementById('filters'), backdrop = document.getElementById('drawer-backdrop'), toggle = document.getElementById('filter-toggle');
-  if (!panel) return;
-  drawerOpen = true; panel.classList.add('open'); backdrop.hidden = false; backdrop.classList.add('open'); document.body.classList.add('drawer-open');
-  if (toggle) toggle.setAttribute('aria-expanded', 'true');
-  if (moveFocus) { const close = document.getElementById('drawer-close'); if (close) close.focus(); }
-}
-function closeDrawer(returnFocus = true) {
-  const panel = document.getElementById('filters'), backdrop = document.getElementById('drawer-backdrop'), toggle = document.getElementById('filter-toggle');
-  drawerOpen = false; document.body.classList.remove('drawer-open'); backdrop.classList.remove('open'); backdrop.hidden = true;
-  if (panel) panel.classList.remove('open');
-  if (toggle) { toggle.setAttribute('aria-expanded', 'false'); if (returnFocus) toggle.focus(); }
 }
 function selectTab(name, focus = false) {
   activeTab = name;
@@ -610,7 +774,7 @@ function productURL(p) {
   const base = configured || location.href.split('#')[0];
   return base.replace(/#.*$/, '') + '#/product/' + p.id;
 }
-function priceLine(p) { return p.price === null ? 'Request Price' : `${money(p.price)}${isDemoPrice(p) ? ' (demonstration price shown on the website)' : ''}`; }
+function priceLine(p) { return !hasPrice(p) ? 'Request Price' : `${money(p.price)}${isDemoPrice(p) ? ' (demonstration price shown on the website)' : ''}`; }
 function messageFor(p, q) {
   const localNote = CONFIG.publicBaseUrl ? '' : (location.protocol === 'file:' ? ' (local file reference; configure publicBaseUrl for a public link)' : '');
   return `Hello ${BUSINESS},
@@ -698,9 +862,13 @@ document.addEventListener('click', e => {
   const el = e.target.closest('button, a');
   if (!el) return;
   if (el.classList.contains('skip')) { e.preventDefault(); document.getElementById('main').focus(); return; }
-  if (el.id === 'filter-toggle') { drawerOpen ? closeDrawer() : openDrawer(); return; }
-  if (el.id === 'drawer-close') { closeDrawer(); return; }
+  if (el.id === 'menu-button') { openNav(); return; }
+  if (el.classList.contains('nav-drawer-close')) { closeNav(); return; }
+  if (el.id === 'categories-toggle') { setDeptMenu(!deptMenuOpen()); return; }
+  if (el.closest('#nav-drawer')) closeNav();
+  if (el.closest('#department-menu')) setDeptMenu(false);
   if (el.dataset.focusField) { e.preventDefault(); const f = document.getElementById(el.dataset.focusField); if (f) f.focus(); return; }
+  if (el.hasAttribute('data-clear-filters-keep-search')) { focusAfterRoute = null; navigate(makeUrl('shop', { q: selection(current()).q })); return; }
   if (el.hasAttribute('data-clear-filters')) { focusAfterRoute = null; navigate('#/shop'); return; }
   if (el.dataset.removeFilter) { removeFilter(el.dataset.removeFilter); return; }
   if (el.dataset.view) { viewMode = el.dataset.view === 'list' ? 'list' : 'grid'; store('nyce-view-mode', viewMode); document.getElementById('results').classList.toggle('list', viewMode === 'list'); document.querySelectorAll('[data-view]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view === viewMode))); return; }
@@ -742,13 +910,24 @@ document.addEventListener('keydown', e => {
     const names = ['description', 'specifications', 'delivery'], i = names.indexOf(e.target.dataset.tab);
     if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) { e.preventDefault(); const j = e.key === 'Home' ? 0 : e.key === 'End' ? 2 : (i + (e.key === 'ArrowRight' ? 1 : 2)) % 3; selectTab(names[j], true); }
   }
-  if (e.key === 'Escape' && drawerOpen) closeDrawer();
+  if (e.key === 'Escape' && deptMenuOpen()) { e.preventDefault(); setDeptMenu(false, true); return; }
 });
+document.addEventListener('click', e => { if (deptMenuOpen() && !e.target.closest('#nav-menu')) setDeptMenu(false); });
+// Tabbing out of the open department menu closes it without stealing focus.
+document.getElementById('nav-menu').addEventListener('focusout', e => { if (deptMenuOpen() && e.relatedTarget && !e.currentTarget.contains(e.relatedTarget)) setDeptMenu(false); });
+(function bindDrawer() {
+  const d = document.getElementById('nav-drawer');
+  d.addEventListener('close', () => document.getElementById('menu-button').setAttribute('aria-expanded', 'false'));
+  d.addEventListener('click', e => {
+    if (e.target !== d) return;
+    const r = d.getBoundingClientRect();
+    if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) d.close();
+  });
+})();
 document.addEventListener('submit', e => {
-  if (e.target.id === 'global-search' || e.target.id === 'home-search') {
+  if (e.target.id === 'global-search') {
     e.preventDefault();
-    const inputID = e.target.id === 'home-search' ? 'home-search-input' : 'search-input';
-    const q = document.getElementById(inputID).value.trim();
+    const q = document.getElementById('search-input').value.trim();
     const route = current(), sel = route.parts[0] === 'shop' ? selection(route) : {};
     navigate(makeUrl('shop', { ...sel, q, page: 1 }));
     return;
@@ -765,19 +944,24 @@ document.addEventListener('submit', e => {
 document.getElementById('modal').addEventListener('click', e => {
   if (e.target.id === 'modal') { const r = e.target.getBoundingClientRect(); if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) e.target.close(); }
 });
-document.getElementById('drawer-backdrop').addEventListener('click', () => closeDrawer());
-window.addEventListener('hashchange', () => { const m = document.getElementById('modal'); if (m.open) m.close(); render(); });
-window.addEventListener('resize', () => { if (innerWidth >= 1050 && drawerOpen) closeDrawer(false); });
+// A real product photo that fails to load is replaced by the placeholder, so cards never show a broken image.
+document.addEventListener('error', e => {
+  const img = e.target;
+  if (img && img.tagName === 'IMG' && img.hasAttribute('data-photo-src') && img.parentElement) img.parentElement.outerHTML = photoPlaceholder(img.alt);
+}, true);
+window.addEventListener('hashchange', () => { const m = document.getElementById('modal'); if (m.open) m.close(); closeNav(); setDeptMenu(false); render(); });
+window.addEventListener('resize', () => { if (innerWidth < 1050) setDeptMenu(false); else fitDeptMenu(); });
 function updateHeaderOnScroll() {
-  document.querySelector('header').classList.toggle('is-compact', window.scrollY > 80);
+  const compact = window.scrollY > 80;
+  document.querySelector('header').classList.toggle('is-compact', compact);
+  if (compact && deptMenuOpen()) setDeptMenu(false);
 }
 window.addEventListener('scroll', updateHeaderOnScroll, { passive: true });
 
 /* ---------------------------------------------------------------- Boot */
 (function boot() {
   // Mode indicators and footer text driven by config.
-  const footerContact = document.getElementById('footer-contact');
-  if (footerContact) footerContact.innerHTML = `WhatsApp: ${WHATSAPP ? `<a href="https://wa.me/${WHATSAPP}">+${esc(WHATSAPP)}</a>` : `<span class="muted">${esc(PENDING)}</span>`}<br>Email: ${CONFIG.emailAddress ? `<a href="mailto:${esc(CONFIG.emailAddress)}">${esc(CONFIG.emailAddress)}</a>` : contactLine(CONFIG.emailAddress, PENDING)}<br>Facebook: <a href="${esc(CONFIG.facebookUrl)}" target="_blank" rel="noopener noreferrer">${esc(CONFIG.facebookName)}</a><br>Website: <a href="${esc(CONFIG.websiteUrl)}">${esc(CONFIG.websiteName)}</a><br>Phone: ${contactLine(CONFIG.phoneNumber, PENDING)}<br>Address &amp; hours: ${contactLine([CONFIG.physicalAddress, CONFIG.operatingHours].filter(Boolean).join(' · '), PENDING)}`;
+  buildShell();
   const year = document.getElementById('footer-year'); if (year) year.textContent = new Date().getFullYear();
   const note = document.getElementById('footer-note'); if (note) note.textContent = PROD ? 'Prices and availability are confirmed by quotation. No online payment.' : 'Demonstration catalogue · indicative prices · no live checkout or payment.';
 

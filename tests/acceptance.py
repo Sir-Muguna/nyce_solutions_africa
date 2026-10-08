@@ -2,7 +2,7 @@
 
 Usage: python3 acceptance.py <url> <label>
 Writes a JSON report and screenshots to ./test-output/<label>/."""
-import json, sys, os, time, urllib.parse
+import re, json, sys, os, time, urllib.parse
 from playwright.sync_api import sync_playwright
 
 URL, LABEL = sys.argv[1], sys.argv[2]
@@ -28,7 +28,7 @@ def shared_card_contract(pg, selector):
         const hasStock = Object.hasOwn(p, "stock") && p.stock !== undefined && p.stock !== null && p.stock !== "";
         const image = e.querySelector(".product-media .photo").getBoundingClientRect();
         return e.className === "product-card"
-          && e.querySelector(".product-content h2")
+          && e.querySelector(".product-content h2, .product-content h3")
           && e.querySelector(".product-price")
           && e.querySelector(".card-actions a[href^=\\"#/product/\\"]")
           && e.querySelector("[data-general-wa], a[href^=\\"https://wa.me/\\"]")
@@ -46,11 +46,14 @@ with sync_playwright() as p:
 
     # ---------- Navigation & routing ----------
     go(pg, '')
-    nav_texts = pg.eval_on_selector_all('#primary-nav a', 'els => els.map(e => e.textContent.trim())')
+    nav_texts = pg.eval_on_selector_all('#primary-nav > a, #primary-nav > .nav-menu > .nav-menu-toggle', 'els => els.map(e => e.textContent.trim())')
     check('Nav: no "Shop by Category" tab', 'Shop by Category' not in ' '.join(nav_texts), nav_texts)
-    check('Nav: flat Home, Shop, Categories items', nav_texts == ['Home', 'Shop', 'Categories'], nav_texts)
-    check('Nav: Categories links to Shop', pg.get_attribute('#primary-nav a[data-nav="categories"]', 'href') == '#/shop')
-    check('Header: no promotional banner, carousel, or mega menu', pg.locator('header .utility, header .promo, header .carousel, header .mega-menu').count() == 0)
+    check('Nav: Home, About Us, Categories, Shop, Business & Bulk Order, Contact', nav_texts == ['Home', 'About Us', 'Categories', 'Shop', 'Business & Bulk Order', 'Contact'], nav_texts)
+    mobile_nav_texts = pg.eval_on_selector_all('#nav-drawer .drawer-links > li > a, #nav-drawer .drawer-links > li > details > summary', 'els => els.map(e => e.textContent.trim())')
+    check('Mobile nav follows the same six-item order', mobile_nav_texts == nav_texts, mobile_nav_texts)
+    check('Nav: Categories is a disclosure button controlling the department menu', pg.get_attribute('#categories-toggle', 'aria-controls') == 'department-menu' and pg.get_attribute('#categories-toggle', 'aria-expanded') == 'false' and pg.evaluate("document.getElementById('categories-toggle').tagName") == 'BUTTON')
+    check('Nav: Business and Contact links use existing routes', pg.get_attribute('#primary-nav a[data-nav="business"]', 'href') == '#/business' and pg.get_attribute('#primary-nav a[data-nav="contact"]', 'href') == '#/contact')
+    check('Header: no promotional banner or carousel', pg.locator('header .utility, header .promo, header .carousel').count() == 0)
     check('Header: visible named search input', pg.is_visible('#search-input') and pg.get_attribute('label[for="search-input"]', 'class') == 'sr-only')
     footer_channels = pg.eval_on_selector('#footer-contact', 'e => ({text:e.innerText, links:Array.from(e.querySelectorAll("a"), a => [a.textContent.trim(), a.getAttribute("href"), a.target, a.rel])})')
     check('Footer shows all four configured contact channels', all(value in footer_channels['text'] for value in ['+254720388496', 'sales@nycesolutionsafrica.com', 'nycesolutionsafrica', 'www.nycesolutionsafrica.com']), footer_channels['text'])
@@ -61,11 +64,13 @@ with sync_playwright() as p:
     footer_links = pg.eval_on_selector_all('footer a', 'els => els.map(e => e.getAttribute("href"))')
     check('Footer: no category directory or guide links', not any(h and ('#/categories' in h or '#/category/' in h or 'guide' in h) for h in footer_links), footer_links)
     check('Footer: no "Shop by Category" text', 'Shop by Category' not in pg.inner_text('footer'))
-    check('Home: catalog-first sections render in required order', pg.eval_on_selector_all('main > *', 'els => els.map(e => e.classList[0])') == ['home-search-strip', 'home-product-section', 'category-quick-links', 'home-product-section', 'home-product-section', 'home-trust-strip', 'home-cta-band'])
+    help_copy = pg.locator('#footer-business-help').inner_text()
+    check('Footer help covers verified business lines and enquiry topics', all(term in help_copy for term in ['Solar & Renewable Energy', 'Petrol & Diesel Generators', 'Borehole & Water Solutions', 'Agriculture & Irrigation', 'Construction & Tools', 'Electricals & Wiring', 'Electronics & appliances', 'Bulk order terms']), help_copy)
+    check('Footer help adds no category and links only verified catalogue departments', pg.locator('#footer-business-help .footer-help-list a').count() == 6 and pg.locator('#footer-business-help a[href="#/shop?category=electronics"]').count() == 0 and pg.evaluate('NYCE.categories.length') == 6)
+    home_classes = pg.eval_on_selector_all('main > *', 'els => els.map(e => e.classList[0])')
+    check('Home: hero, departments, 1-4 product rows, trust strip, CTA render in order', home_classes[:2] == ['home-hero', 'home-departments'] and home_classes[-2:] == ['home-trust-strip', 'home-cta-band'] and 1 <= home_classes[2:-2].count('home-product-section') <= 4 and len(home_classes[2:-2]) == home_classes[2:-2].count('home-product-section'), home_classes)
     check('Home: cards use shared template and render available data only', shared_card_contract(pg, '.home-product-section .product-card'))
-    quick_links = pg.eval_on_selector_all('.category-quick-links a', 'els => els.map(e => [e.textContent.trim(), e.getAttribute("href")])')
-    check('Home: all six existing categories link to filtered Shop routes', len(quick_links) == 6 and all(h.startswith('#/shop?category=') for _, h in quick_links), quick_links)
-    check('Home: no hero, carousel or auto-playing slider', pg.locator('main .hero, main [aria-roledescription="carousel"], main .carousel, main [autoplay]').count() == 0)
+    check('Home: no carousel or auto-playing slider', pg.locator('main [aria-roledescription="carousel"], main .carousel, main [autoplay]').count() == 0)
 
     for href, nav in [('#/shop', 'shop'), ('#/', 'home')]:
         go(pg, href)
@@ -128,19 +133,12 @@ with sync_playwright() as p:
         if n < 1 or h1.strip() != sname:
             check(f'Subcategory listing {sid}', False, f'{n} cards, h1={h1}')
     check('All 59 subcategory routes list ≥1 product with correct heading', all(r['result'] == 'PASS' for r in results if r['check'].startswith('Subcategory listing')) and True)
-    # category discoverability via sidebar radios
+    # the removed product-filter panel stays absent
     go(pg, '#/shop')
-    radios = pg.eval_on_selector_all('input[name="filter-category"]', 'els => els.map(e => e.value)')
-    sidebar = pg.eval_on_selector('#filters', 'e => ({heading: e.querySelector(".drawer-head h2").textContent, legends: Array.from(e.querySelectorAll("legend"), x => x.textContent), labels: Array.from(e.querySelectorAll(".choice"), x => x.querySelector("span").textContent), values: Array.from(e.querySelectorAll(".choice"), x => x.querySelector(".count").textContent)})')
-    expected_categories = pg.evaluate('NYCE.categories.map(c => c.name)')
-    category_counts = pg.evaluate('NYCE.categories.map(c => NYCE.products.filter(p => p.departments.includes(c.id)).length)')
-    check('Sidebar retains filter heading and only Categories panel', sidebar['heading'] == 'Filter products' and sidebar['legends'] == ['Categories'], sidebar)
-    check('Category radios show All Categories and existing categories', sidebar['labels'] == ['All Categories', *expected_categories] and len([r for r in radios if r]) == len(expected_categories), sidebar['labels'])
-    check('Category counts are unchanged', [int(n) for n in sidebar['values'][1:]] == category_counts, sidebar['values'])
-    check('Removed sidebar filter panels are absent', not any(pg.locator(f'#filter-{key}').count() for key in ['subcategory', 'power', 'phase', 'pricing', 'application', 'source']))
-    check('Clear all filters and helper remain in sidebar', pg.locator('#filters [data-clear-filters]').count() == 1 and 'Not sure about the specification? Request a quote and describe your requirement.' in pg.inner_text('#filters'))
-    pg.click('label.choice:has(input[name="filter-category"][value="solar"])'); pg.wait_for_timeout(250)
-    check('Category radio filters the product grid', 'category=solar' in pg.evaluate('location.hash') and pg.locator('.product-card').count() > 0 and pg.locator('#filters legend').inner_text() == 'Categories')
+    check('Shop filter panel and drawer toggle are removed', pg.locator('#filters, #filter-toggle, #drawer-backdrop').count() == 0)
+    check('Department navigation remains available in the shared header', pg.locator('#primary-nav').count() == 1 and pg.locator('#menu-button').count() == 1)
+    go(pg, '#/shop?category=solar')
+    check('Department routes still filter the product grid without the panel', 'category=solar' in pg.evaluate('location.hash') and pg.locator('.product-card').count() > 0 and pg.locator('#filters').count() == 0)
 
     # ---------- Search ----------
     for q, expect in [('hisaki', 'hisaki-generator'), ('EC 7574-BS', 'tronic-extension'), ('Tronic 4-way surge-protected extension', 'tronic-extension')]:
@@ -167,8 +165,9 @@ with sync_playwright() as p:
     check('Individual chip removal', pg.locator('.chip').count() == 1 and 'phase' not in pg.evaluate('location.hash'))
     pg.click('.chips .clear-all'); pg.wait_for_timeout(250)
     check('Clear all filters → #/shop', pg.evaluate('location.hash') == '#/shop' and pg.locator('.chip').count() == 0)
-    go(pg, '#/shop?category=solar&page=2'); pg.check('input[name="filter-category"][value="water"]'); pg.wait_for_timeout(250)
-    check('Pagination resets after filter change', 'page=' not in pg.evaluate('location.hash') and 'category=water' in pg.evaluate('location.hash'))
+    go(pg, '#/shop?category=solar&page=2')
+    go(pg, '#/shop?category=water')
+    check('Changing department route resets pagination', 'page=' not in pg.evaluate('location.hash') and 'category=water' in pg.evaluate('location.hash'))
     go(pg, '#/shop?q=zzzzqqq')
     check('Empty results display factual query and count', pg.locator('.empty').count() == 1 and 'No products match “zzzzqqq”.' in pg.inner_text('.empty') and '0 products' in pg.inner_text('.search-results-summary'))
 
@@ -316,68 +315,470 @@ with sync_playwright() as p:
             p2.screenshot(path=f'{OUT}/{name}-{w}.png', full_page=(name != 'shop'))
         p2.goto(URL + '#/'); p2.wait_for_timeout(300)
         check(f'Header search visible without interaction @{w}', p2.is_visible('#search-input'))
-        home_search = p2.locator('#home-search-input').bounding_box()
         first_product = p2.locator('.home-product-section .product-card').first.bounding_box()
-        check(f'Homepage first product row appears within two viewport heights @{w}', first_product['y'] < h * 2, first_product)
-        if w == 375:
-            strip_search = p2.locator('.home-search-form').bounding_box()
-            browse_link = p2.locator('.home-browse-link').bounding_box()
-            check('Homepage search strip uses two rows on mobile', browse_link['y'] > strip_search['y'], [strip_search, browse_link])
-        if w == 1280:
-            strip_search = p2.locator('.home-search-form').bounding_box()
-            browse_link = p2.locator('.home-browse-link').bounding_box()
-            check('Homepage search strip uses one row on desktop', abs(strip_search['y'] - browse_link['y']) < 2, [strip_search, browse_link])
+        check(f'Homepage first product row starts within the first viewport @{w}', first_product['y'] < h, first_product)
+        hero_h = p2.locator('.home-hero').bounding_box()['height']
+        check(f'Homepage hero stays compact @{w}', hero_h <= (240 if w == 375 else 280), hero_h)
         home_query = 'EC 7574-BS'
-        p2.fill('#home-search-input', home_query); p2.press('#home-search-input', 'Enter'); p2.wait_for_timeout(250)
-        check(f'Homepage search submits name/SKU query @{w}', p2.evaluate('location.hash').startswith('#/shop?q=EC+7574-BS') and 'tronic-extension' in p2.eval_on_selector_all('.product-card', 'els => els.map(e => e.dataset.productId)'), p2.evaluate('location.hash'))
+        p2.fill('#search-input', home_query); p2.press('#search-input', 'Enter'); p2.wait_for_timeout(250)
+        check(f'Header search submits name/SKU query from the homepage @{w}', p2.evaluate('location.hash').startswith('#/shop?q=EC+7574-BS') and 'tronic-extension' in p2.eval_on_selector_all('.product-card', 'els => els.map(e => e.dataset.productId)'), p2.evaluate('location.hash'))
         p2.goto(URL + '#/'); p2.wait_for_timeout(300)
-        tap_targets = p2.eval_on_selector_all('#primary-nav a, .header-whatsapp, .cart-link, #search-input, #search-button', 'els => els.map(e => { const r = e.getBoundingClientRect(); return [e.tagName, r.width, r.height] })')
-        check(f'Header tap targets at least 44px @{w}', all(width >= 44 and height >= 44 for _, width, height in tap_targets), tap_targets)
+        tap_targets = p2.eval_on_selector_all('#primary-nav > a, .nav-menu-toggle, .menu-button, .header-whatsapp, .cart-link, #search-input, #search-button', 'els => els.map(e => { const r = e.getBoundingClientRect(); return [e.tagName, r.width, r.height] }).filter(t => t[1] > 0)')
+        check(f'Header tap targets at least 44px @{w}', len(tap_targets) >= 5 and all(width >= 44 and height >= 44 for _, width, height in tap_targets), tap_targets)
         if w == 375:
             logo_box = p2.locator('.logo').bounding_box()
             search_box = p2.locator('#global-search').bounding_box()
             check('Mobile search is a full-width row beneath logo', search_box['width'] >= 340 and search_box['y'] > logo_box['y'], [logo_box, search_box])
         if w == 1280:
-            widths = p2.evaluate("Object.fromEntries(['#global-search', '.logo', '.navigation', '.header-whatsapp', '.cart-link'].map(s => [s, document.querySelector(s).getBoundingClientRect().width]))")
-            check('Desktop search is the widest header item', widths['#global-search'] > max(widths[s] for s in ['.logo', '.navigation', '.header-whatsapp', '.cart-link']), widths)
+            widths = p2.evaluate("Object.fromEntries(['#global-search', '.logo', '.header-whatsapp', '.cart-link'].map(s => [s, document.querySelector(s).getBoundingClientRect().width]))")
+            check('Desktop search is the widest header-row item', widths['#global-search'] > max(widths[s] for s in ['.logo', '.header-whatsapp', '.cart-link']), widths)
         p2.evaluate('window.scrollTo(0, 500)'); p2.wait_for_timeout(150)
         check(f'Scrolling compacts sticky header but keeps search and cart @{w}', 'is-compact' in p2.get_attribute('header', 'class') and p2.is_visible('#search-input') and p2.is_visible('.cart-link'), p2.get_attribute('header', 'class'))
-        check(f'Compact header hides nav and WhatsApp action @{w}', not p2.is_visible('#primary-nav') and not p2.is_visible('.header-whatsapp'))
+        check(f'Compact header hides nav and WhatsApp action but keeps the menu button @{w}', not p2.is_visible('#primary-nav') and not p2.is_visible('.header-whatsapp') and p2.is_visible('#menu-button'))
         p2.evaluate('window.scrollTo(0, 0)'); p2.wait_for_timeout(150)
-        check(f'Scrolling up restores flat navigation @{w}', p2.is_visible('#primary-nav'))
+        check(f'Scrolling up restores navigation (bar on desktop, menu button below 1050px) @{w}', p2.is_visible('#primary-nav') if w >= 1050 else p2.is_visible('#menu-button'))
         p2.click('.header-whatsapp')
         whatsapp_number = p2.evaluate("window.NYCE.config.whatsappNumber.replace(/\\D/g, '')")
         modal_href = p2.get_attribute('#modal a[href^="https://wa.me/"]', 'href') if whatsapp_number else None
         wa_matches_config = f'wa.me/{whatsapp_number}?' in (modal_href or '') if whatsapp_number else 'number has not been configured yet' in p2.inner_text('#modal')
         check(f'Header WhatsApp uses existing configured number @{w}', p2.is_visible('#modal[open]') and 'Hello NYCE SOLUTIONS' in p2.input_value('#message-preview') and wa_matches_config)
         p2.keyboard.press('Escape')
-        if w < 1050:
-            p2.goto(URL + '#/shop'); p2.wait_for_timeout(300)
-            check(f'Filter drawer hidden by default @{w}', not p2.is_visible('#filters'))
-            p2.click('#filter-toggle'); p2.wait_for_timeout(300)
-            check(f'Filter drawer opens and takes focus @{w}', p2.is_visible('#filters') and p2.evaluate("document.activeElement.id === 'drawer-close'"))
-            p2.check('input[name="filter-category"][value="solar"]'); p2.wait_for_timeout(300)
-            check(f'Filter change keeps drawer open @{w}', p2.is_visible('#filters') and 'category=solar' in p2.evaluate('location.hash'))
-            p2.keyboard.press('Escape'); p2.wait_for_timeout(300)
-            check(f'Drawer closes with Escape, focus returns @{w}', not p2.is_visible('#filters') and p2.evaluate("document.activeElement.id === 'filter-toggle'"))
-            p2.screenshot(path=f'{OUT}/shop-drawer-{w}.png')
-            p2.click('#filter-toggle'); p2.wait_for_timeout(300)
-            p2.screenshot(path=f'{OUT}/shop-drawer-open-{w}.png')
         # touch target sizes
         p2.goto(URL + '#/shop'); p2.wait_for_timeout(300)
-        if w in (375, 1280):
-            if w == 375:
-                p2.click('#filter-toggle'); p2.wait_for_timeout(150)
-            category_panel = p2.eval_on_selector('#filters', 'e => ({display:getComputedStyle(e).display, width:e.getBoundingClientRect().width, labels:Array.from(e.querySelectorAll(".choice span:first-of-type"), x => x.textContent)})')
-            check(f'Categories panel renders at @{w}px', category_panel['display'] != 'none' and category_panel['width'] > 0 and category_panel['labels'][0] == 'All Categories' and len(category_panel['labels']) == 7, category_panel)
-            if w == 375:
-                p2.keyboard.press('Escape'); p2.wait_for_timeout(150)
+        check(f'Shop filter panel stays removed @{w}px', p2.locator('#filters, #filter-toggle').count() == 0)
         small = p2.evaluate("Array.from(document.querySelectorAll('main button, main a.btn, header button, header a')).filter(e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && r.height < 32; }).map(e => e.textContent.trim().slice(0,20))")
         check(f'Touch targets ≥32px tall @{w}', len(small) == 0, small)
         # fixed widgets overlap: only toast/dialog/drawer are fixed
         fixed = p2.evaluate("Array.from(document.querySelectorAll('body *')).filter(e => getComputedStyle(e).position === 'fixed' && getComputedStyle(e).display !== 'none' && !e.hidden).map(e => e.id || e.className)")
-        check(f'No overlapping floating widgets @{w}', all(f in ('toast', 'skip', 'drawer-backdrop', 'filters', 'filter-panel') or 'filter-panel' in str(f) or 'skip' in str(f) for f in fixed), fixed)
+        check(f'No overlapping floating widgets @{w}', all(f in ('toast', 'skip') or 'skip' in str(f) for f in fixed), fixed)
         ctx2.close()
+
+    # ---------- Shared shell: department menu, mobile drawer, footer (375 / 768 / 1440) ----------
+    shell_errors = []
+    def shell_page(width, height, touch=False):
+        c = browser.new_context(viewport={'width': width, 'height': height}, has_touch=touch, device_scale_factor=1)
+        page = c.new_page()
+        page.on('console', lambda m: console_errors.append(m.text) if m.type == 'error' else None)
+        page.on('pageerror', lambda e: console_errors.append(str(e)))
+        page.goto(URL); page.wait_for_timeout(350)
+        return c, page
+    cats = pg.evaluate("NYCE.categories.map(c => ({id: c.id, subs: c.subcategories.map(s => s.id)}))")
+    expected_menu_hrefs = sorted(['#/shop'] + [f"#/shop?category={c['id']}" for c in cats] + [f"#/shop?category={c['id']}&subcategory={s}" for c in cats for s in c['subs']])
+    total_subs = sum(len(c['subs']) for c in cats)
+    outline_ok = "getComputedStyle(document.activeElement).outlineStyle !== 'none' && parseFloat(getComputedStyle(document.activeElement).outlineWidth) >= 2"
+
+    ctx_d, d = shell_page(1440, 900)
+    check('Shell @1440: logo links home and is named', d.get_attribute('.logo', 'href') == '#/' and d.get_attribute('.logo', 'aria-label') == 'NYCE SOLUTIONS home' and d.is_visible('.logo img, .logo .logo-text'))
+    check('Shell @1440: search, WhatsApp, cart and nav bar visible; menu button hidden', all(d.is_visible(s) for s in ['#search-input', '.header-whatsapp', '.cart-link', '#primary-nav']) and not d.is_visible('#menu-button'))
+    check('Shell @1440: department menu closed by default', not d.is_visible('#department-menu') and d.get_attribute('#categories-toggle', 'aria-expanded') == 'false')
+    d.focus('#categories-toggle')
+    check('Shell @1440: focused nav control has a visible outline', d.evaluate(outline_ok))
+    d.keyboard.press('Enter'); d.wait_for_timeout(150)
+    check('Department menu opens from the keyboard (Enter)', d.get_attribute('#categories-toggle', 'aria-expanded') == 'true' and d.is_visible('#department-menu'))
+    menu = d.evaluate("""(() => { const m = document.getElementById('department-menu'), r = m.getBoundingClientRect();
+        return {left: r.left, right: r.right, bottom: r.bottom, vw: innerWidth, vh: innerHeight, groups: m.querySelectorAll('.department-group').length, subs: m.querySelectorAll('.department-group li a').length,
+                hrefs: [...m.querySelectorAll('a')].map(a => a.getAttribute('href')).sort(), noScrollX: m.scrollWidth <= m.clientWidth + 1, pageOverflow: document.documentElement.scrollWidth > innerWidth + 1}; })()""")
+    check('Department menu groups 6 departments and 59 subcategories', menu['groups'] == 6 and menu['subs'] == total_subs == 59, menu['groups'])
+    check('Department menu links are exactly the existing shop filter routes', menu['hrefs'] == expected_menu_hrefs, [h for h in menu['hrefs'] if h not in expected_menu_hrefs][:3])
+    check('Department menu stays inside the viewport @1440', menu['left'] >= 0 and menu['right'] <= menu['vw'] and menu['bottom'] <= menu['vh'] and menu['noScrollX'] and not menu['pageOverflow'], menu)
+    d.keyboard.press('Tab')
+    check('Tab moves focus into the open menu with a visible outline', d.evaluate("!!document.activeElement.closest('#department-menu')") and d.evaluate(outline_ok))
+    d.keyboard.press('Escape'); d.wait_for_timeout(100)
+    check('Escape closes the department menu and returns focus to Categories', not d.is_visible('#department-menu') and d.get_attribute('#categories-toggle', 'aria-expanded') == 'false' and d.evaluate("document.activeElement.id === 'categories-toggle'"))
+    d.click('#categories-toggle'); d.wait_for_timeout(100)
+    d.mouse.click(20, 850); d.wait_for_timeout(100)
+    check('Clicking outside closes the department menu', not d.is_visible('#department-menu'))
+    d.click('#categories-toggle'); d.focus('#primary-nav a[data-nav="contact"]'); d.wait_for_timeout(100)
+    check('Tabbing out of the department menu closes it', not d.is_visible('#department-menu'))
+    d.click('#categories-toggle'); d.click('#department-menu a[data-menu-sub="solar-1"]'); d.wait_for_timeout(300)
+    check('Subcategory link navigates, closes the menu and marks Categories active', d.evaluate('location.hash') == '#/shop?category=solar&subcategory=solar-1' and 'Lithium Starter Solar Kits' in d.inner_text('main h1') and not d.is_visible('#department-menu') and 'active' in d.get_attribute('#categories-toggle', 'class') and d.get_attribute('#primary-nav a[data-nav="shop"]', 'aria-current') is None)
+    d.click('#categories-toggle'); d.wait_for_timeout(100)
+    check('Current subcategory is marked aria-current in the menu', d.get_attribute('#department-menu a[data-menu-sub="solar-1"]', 'aria-current') == 'page' and d.locator('#department-menu [aria-current="page"]').count() == 1)
+    d.keyboard.press('Escape')
+    for route, nav, heading in [('#/business', 'business', 'Business & Bulk Orders'), ('#/contact', 'contact', 'Contact NYCE SOLUTIONS')]:
+        d.click(f'#primary-nav a[data-nav="{nav}"]'); d.wait_for_timeout(250)
+        check(f'Nav {route}: navigates and is the active link', d.evaluate('location.hash') == route and heading in d.inner_text('main h1') and d.get_attribute(f'#primary-nav a[data-nav="{nav}"]', 'aria-current') == 'page')
+    d.click('.cart-link'); d.wait_for_timeout(250)
+    check('Cart link navigates and shows an active state', d.evaluate('location.hash') == '#/cart' and 'active' in d.get_attribute('.cart-link', 'class') and d.get_attribute('.cart-link', 'aria-current') == 'page')
+    d.goto(URL); d.wait_for_timeout(300); d.evaluate('window.scrollTo(0, 600)'); d.wait_for_timeout(200)
+    check('Compact header @1440 shows the menu button and opens the drawer', d.is_visible('#menu-button'))
+    d.click('#menu-button'); d.wait_for_timeout(200)
+    check('Drawer opens on desktop from the compact header and Escape closes it', d.evaluate("document.getElementById('nav-drawer').open") and d.evaluate("document.activeElement.classList.contains('nav-drawer-close')"))
+    d.keyboard.press('Escape'); d.wait_for_timeout(150)
+    check('Escape closes the drawer and focus returns to the menu button', not d.evaluate("document.getElementById('nav-drawer').open") and d.evaluate("document.activeElement.id === 'menu-button'") and d.get_attribute('#menu-button', 'aria-expanded') == 'false')
+    ctx_d.close()
+
+    for w, h in [(375, 812), (768, 1024)]:
+        ctx_t, t = shell_page(w, h, touch=True)
+        hdr = t.evaluate("document.querySelector('header').getBoundingClientRect().height")
+        check(f'Shell @{w}: menu button, logo, search and cart visible; desktop bar hidden', all(t.is_visible(s) for s in ['#menu-button', '.logo', '#search-input', '.cart-link']) and not t.is_visible('#primary-nav') and not t.is_visible('#categories-toggle'))
+        if w == 375:
+            check('Shell @375: header is at most 120px tall', hdr <= 120, hdr)
+        t.tap('#menu-button'); t.wait_for_timeout(250)
+        drawer = t.evaluate("""(() => { const d = document.getElementById('nav-drawer'), r = d.getBoundingClientRect();
+            return {open: d.open, left: r.left, right: r.right, top: r.top, bottom: r.bottom, vw: innerWidth, vh: innerHeight, details: d.querySelectorAll('details').length,
+                    focus: document.activeElement.classList.contains('nav-drawer-close'), overflow: document.documentElement.scrollWidth > innerWidth + 1, expanded: document.getElementById('menu-button').getAttribute('aria-expanded'),
+                    name: d.getAttribute('aria-label')}; })()""")
+        check(f'Drawer opens by touch @{w}, takes focus and is named', drawer['open'] and drawer['focus'] and drawer['expanded'] == 'true' and drawer['name'] == 'Site menu', drawer)
+        check(f'Drawer fits the viewport @{w}', drawer['left'] >= 0 and drawer['right'] <= drawer['vw'] and drawer['top'] >= 0 and drawer['bottom'] <= drawer['vh'] and not drawer['overflow'], drawer)
+        check(f'Drawer lists six departments as accordions @{w}', t.locator('#nav-drawer .drawer-accordion > details[data-menu-category]').count() == 6)
+        t.tap('#drawer-category-toggle')
+        t.tap('#nav-drawer details[data-menu-category="solar"] > summary'); t.wait_for_timeout(150)
+        solar_links = t.eval_on_selector_all('#nav-drawer details[data-menu-category="solar"] a', 'els => els.map(a => a.getAttribute("href"))')
+        check(f'Department accordion expands to All + subcategories @{w}', t.evaluate("document.querySelector('#nav-drawer details[data-menu-category=solar]').open") and len(solar_links) == 1 + len(cats[0]['subs']) and solar_links[0] == '#/shop?category=solar', solar_links[:2])
+        t.focus('#nav-drawer details[data-menu-category="water"] > summary'); t.keyboard.press('Enter'); t.wait_for_timeout(100)
+        check(f'Accordion toggles from the keyboard @{w}', t.evaluate("document.querySelector('#nav-drawer details[data-menu-category=water]').open"))
+        small = t.evaluate("[...document.querySelectorAll('#nav-drawer a, #nav-drawer summary, #nav-drawer button')].filter(e => e.getBoundingClientRect().width > 0 && e.getBoundingClientRect().height < 44).map(e => e.textContent.trim().slice(0, 24))")
+        check(f'Drawer controls are at least 44px tall @{w}', len(small) == 0, small)
+        for _ in range(60):
+            t.keyboard.press('Tab')
+        check(f'Focus stays out of the page behind the open drawer @{w}', t.evaluate("!document.activeElement.closest('header, main, footer')"), t.evaluate('document.activeElement.outerHTML.slice(0, 80)'))
+        t.keyboard.press('Escape'); t.wait_for_timeout(150)
+        check(f'Escape closes the drawer and focus returns to the menu button @{w}', not t.evaluate("document.getElementById('nav-drawer').open") and t.evaluate("document.activeElement.id === 'menu-button'") and t.get_attribute('#menu-button', 'aria-expanded') == 'false')
+        t.tap('#menu-button'); t.wait_for_timeout(200)
+        t.mouse.click(w - 4, h // 2); t.wait_for_timeout(150)
+        check(f'Tapping the backdrop closes the drawer @{w}', not t.evaluate("document.getElementById('nav-drawer').open"))
+        t.tap('#menu-button'); t.tap('#nav-drawer a[data-nav-drawer="business"]'); t.wait_for_timeout(300)
+        check(f'Drawer link navigates and closes the drawer @{w}', t.evaluate('location.hash') == '#/business' and not t.evaluate("document.getElementById('nav-drawer').open") and 'Business' in t.inner_text('main h1'))
+        t.tap('#menu-button'); t.tap('#drawer-category-toggle'); t.tap('#nav-drawer details[data-menu-category="generators"] > summary'); t.tap('#nav-drawer a[data-menu-sub="generators-5"]'); t.wait_for_timeout(300)
+        check(f'Drawer subcategory link applies the existing filter route @{w}', t.evaluate('location.hash') == '#/shop?category=generators&subcategory=generators-5' and 'Silent Canopy Generators' in t.inner_text('main h1') and not t.evaluate("document.getElementById('nav-drawer').open"))
+        t.tap('#menu-button'); t.wait_for_timeout(200)
+        check(f'Drawer opens on the current department with aria-current @{w}', t.evaluate("document.querySelector('#nav-drawer details[data-menu-category=generators]').open") and t.get_attribute('#nav-drawer a[data-menu-sub="generators-5"]', 'aria-current') == 'page')
+        t.tap('#nav-drawer [data-general-wa]'); t.wait_for_timeout(250)
+        check(f'Drawer WhatsApp action closes the drawer and opens the enquiry preview @{w}', not t.evaluate("document.getElementById('nav-drawer').open") and t.evaluate("document.getElementById('modal').open") and 'Hello NYCE SOLUTIONS' in t.input_value('#message-preview'))
+        t.keyboard.press('Escape')
+        t.goto(URL + '#/'); t.wait_for_timeout(300); t.evaluate('window.scrollTo(0, 600)'); t.wait_for_timeout(200)
+        check(f'Compact header keeps menu button and search reachable @{w}', t.is_visible('#menu-button') and t.is_visible('#search-input') and t.is_visible('.cart-link') and t.evaluate("document.querySelector('header').getBoundingClientRect().height") <= 64)
+        t.screenshot(path=f'{OUT}/shell-compact-{w}.png')
+        t.evaluate('window.scrollTo(0, 0)'); t.tap('#menu-button'); t.wait_for_timeout(200)
+        t.screenshot(path=f'{OUT}/shell-drawer-{w}.png')
+        ctx_t.close()
+
+    for w, h in [(375, 812), (768, 1024), (1440, 900)]:
+        ctx_f, f = shell_page(w, h)
+        f.goto(URL + '#/shop'); f.wait_for_timeout(300)
+        foot = f.evaluate("""(() => { const links = [...document.querySelectorAll('footer a[href]')].map(a => ({href: a.getAttribute('href'), h: a.getBoundingClientRect().height, target: a.target, rel: a.rel, text: a.textContent.trim()}));
+            return {links, text: document.querySelector('footer').innerText, contact: [...document.querySelectorAll('#footer-contact li')].map(li => li.textContent.trim()), notes: document.querySelectorAll('footer .link-note').length,
+                    navs: [...document.querySelectorAll('footer nav')].map(n => n.getAttribute('aria-labelledby') && document.getElementById(n.getAttribute('aria-labelledby')).textContent), overflow: document.documentElement.scrollWidth > innerWidth + 1}; })()""")
+        internal = sorted({l['href'] for l in foot['links'] if l['href'].startswith('#/')})
+        footer_hrefs = [l['href'] for l in foot['links']]
+        check(f'Footer @{w}: no repeated destinations', len(footer_hrefs) == len(set(footer_hrefs)), footer_hrefs)
+        broken = []
+        for href in internal:
+            f.goto(URL + href); f.wait_for_timeout(120)
+            if f.locator('.route-error').count() or f.locator('main h1').count() != 1:
+                broken.append(href)
+        check(f'Footer @{w}: every internal link resolves to a real page ({len(internal)} links)', len(internal) >= 9 and not broken, broken)
+        external = [l for l in foot['links'] if not l['href'].startswith('#/')]
+        check(f'Footer @{w}: external links are https/mailto, new-tab links use noopener', all(l['href'].startswith(('https://', 'mailto:')) and (l['target'] != '_blank' or 'noopener' in l['rel']) for l in external), external)
+        check(f'Footer @{w}: shows only verified contact channels, no placeholders', len(foot['contact']) == 4 and 'To be supplied' not in foot['text'] and 'Phone' not in ' '.join(foot['contact']) and 'Address' not in ' '.join(foot['contact']), foot['contact'])
+        check(f'Footer @{w}: unapproved policy pages are labelled Draft', foot['notes'] == 4, foot['notes'])
+        check(f'Footer @{w}: link groups are named navigation landmarks', foot['navs'] == ['Explore', 'Help & information'], foot['navs'])
+        min_h = 44 if w < 800 else 32
+        check(f'Footer @{w}: link targets at least {min_h}px tall', all(l['h'] >= min_h for l in foot['links'] if l['text']), [l['text'] for l in foot['links'] if l['h'] < min_h])
+        check(f'Footer @{w}: no horizontal overflow', not foot['overflow'])
+        f.evaluate('window.scrollTo(0, document.body.scrollHeight)'); f.wait_for_timeout(150)
+        f.screenshot(path=f'{OUT}/shell-footer-{w}.png')
+        ctx_f.close()
+
+    # ---------- Shop and category discovery ----------
+    def hash_now(page_):
+        return page_.evaluate('location.hash')
+    def card_ids(page_):
+        return page_.eval_on_selector_all('.product-card', 'els => els.map(e => e.dataset.productId)')
+    def shop(page_, route, wait=200):
+        page_.goto(URL + route); page_.wait_for_timeout(wait)
+    def shop_data(page_):
+        return page_.evaluate("({products: NYCE.products.map(p => ({id: p.id, name: p.name, price: p.price, priceType: p.priceType, power: p.power, apps: p.applications, depts: p.departments, subs: p.subcategories, featured: !!p.featured})), cats: NYCE.categories.map(c => ({id: c.id, name: c.name, subs: c.subcategories.map(s => ({id: s.id, name: s.name}))}))})")
+    sd = shop_data(pg)
+    P = {p['id']: p for p in sd['products']}
+
+    # breadcrumbs
+    shop(pg, '#/shop?category=solar&subcategory=solar-1')
+    crumbs = pg.eval_on_selector_all('.breadcrumb a', 'els => els.map(e => e.getAttribute("href"))')
+    check('Breadcrumbs: Home / Shop / Department / current subcategory', crumbs == ['#/', '#/shop', '#/shop?category=solar'] and 'Lithium Starter Solar Kits' in pg.inner_text('.breadcrumb [aria-current="page"]'), crumbs)
+    shop(pg, '#/shop?category=solar&q=kit')
+    crumbs = pg.eval_on_selector_all('.breadcrumb a', 'els => els.map(e => e.getAttribute("href"))')
+    check('Breadcrumbs: search inside a department ends with the current Search results crumb', crumbs == ['#/', '#/shop', '#/shop?category=solar'] and pg.inner_text('.breadcrumb [aria-current="page"]') == 'Search results', crumbs)
+
+    # department and subcategory URL discovery
+    shop(pg, '#/shop?category=water')
+    water = next(c for c in sd['cats'] if c['id'] == 'water')
+    expected_water3 = sorted(p['id'] for p in sd['products'] if 'water-3' in p['subs'])
+    shop(pg, '#/shop?category=water&subcategory=water-3')
+    check('Subcategory URL filters results and updates the heading', hash_now(pg) == '#/shop?category=water&subcategory=water-3' and 'AC DC Borehole Pumps' in pg.inner_text('main h1') and sorted(card_ids(pg)) == expected_water3, hash_now(pg))
+    shop(pg, '#/shop?category=solar')
+    check('Department route changes independently of the removed panel', hash_now(pg) == '#/shop?category=solar' and pg.locator('#filters').count() == 0, hash_now(pg))
+    all_subcategories = [s['id'] for c in sd['cats'] for s in c['subs']]
+    check('All 59 catalogue subcategories have matching products', len(set(all_subcategories)) == 59 and all(any(sid in p['subs'] for p in sd['products']) for sid in all_subcategories))
+
+    # combined filters, sorting and state
+    shop(pg, '#/shop?category=generators&power=Diesel&pricing=quote&sort=az')
+    names = pg.eval_on_selector_all('.product-card h2', 'els => els.map(e => e.textContent.trim())')
+    expected = sorted([p['name'] for p in sd['products'] if 'generators' in p['depts'] and p['power'] == 'Diesel' and p['priceType'] == 'quote'], key=lambda s: s.lower())
+    check('Combined department + power + pricing + sort', sorted(names, key=str.lower) == expected and names == sorted(names, key=lambda s: s.lower()) and len(names) > 0, names)
+    check('Combined state is shown as chips and the count', pg.locator('.chip').count() == 3 and f'{len(expected)} product' in pg.inner_text('.result-count'), pg.inner_text('.result-count'))
+    shop(pg, '#/shop?category=agriculture')
+    check('Department route filters the catalogue with the panel removed', hash_now(pg) == '#/shop?category=agriculture' and pg.locator('.product-card').count() == 8, hash_now(pg))
+    shop(pg, '#/shop?category=electrical&power=Electric')
+    shop(pg, '#/shop?category=construction&power=Electric')
+    check('Switching department keeps a filter that still applies', hash_now(pg) == '#/shop?category=construction&power=Electric' and pg.locator('.product-card').count() == len([p for p in sd['products'] if 'construction' in p['depts'] and p['power'] == 'Electric']), hash_now(pg))
+    shop(pg, '#/shop?category=solar&pricing=priced')
+    states = pg.eval_on_selector_all('.product-card .product-price', 'els => els.map(e => e.dataset.priceState)')
+    check('Pricing filter returns only priced products and shows a chip', set(states) == {'priced'} and len(states) == len([p for p in sd['products'] if 'solar' in p['depts'] and p['priceType'] == 'demo']) and 'pricing=priced' in hash_now(pg), states)
+    shop(pg, '#/shop?pricing=demo')
+    check('Legacy pricing=demo URL is corrected to pricing=priced', hash_now(pg) == '#/shop?pricing=priced' and pg.locator('.product-card').count() > 0, hash_now(pg))
+
+    # search keeps its state and is ranked
+    shop(pg, '#/shop?q=pump')
+    opts = pg.eval_on_selector_all('#sort-products option', 'els => els.map(e => [e.value, e.textContent])')
+    check('Search results default to "Best match"; the option exists only while searching', pg.input_value('#sort-products') == 'relevance' and opts[0] == ['relevance', 'Best match'], opts[:2])
+    shop(pg, '#/shop')
+    check('Best match is not offered without a search', 'relevance' not in pg.eval_on_selector_all('#sort-products option', 'els => els.map(e => e.value)') and pg.input_value('#sort-products') == 'featured')
+    shop(pg, '#/shop?sort=relevance')
+    check('Invalid sort for the context is corrected in the URL', hash_now(pg) == '#/shop', hash_now(pg))
+    first_word = pg.evaluate("NYCE.products.find(p => p.name.toLowerCase().startsWith('hybrid')) ? 'hybrid' : ''")
+    if first_word:
+        shop(pg, f'#/shop?q={first_word}')
+        check('Best match puts names starting with the query first', pg.locator('.product-card h2').first.inner_text().lower().startswith(first_word))
+    shop(pg, '#/shop?q=pump')
+    pg.select_option('#sort-products', 'az'); pg.wait_for_timeout(250)
+    check('Changing sort keeps the search', 'q=pump' in hash_now(pg) and 'sort=az' in hash_now(pg), hash_now(pg))
+    shop(pg, '#/shop?q=pump&sort=az&category=water')
+    check('Changing department keeps search and sort', 'q=pump' in hash_now(pg) and 'sort=az' in hash_now(pg) and 'category=water' in hash_now(pg), hash_now(pg))
+    names = pg.eval_on_selector_all('.product-card h2', 'els => els.map(e => e.textContent.trim())')
+    check('Search + department + sort results all match the search', len(names) > 0 and all('pump' in n.lower() for n in names), names[:3])
+    shop(pg, '#/shop?q=a&page=2')
+    check('Broad search paginates', 'page=2' in hash_now(pg) and pg.locator('.product-card').count() > 0, hash_now(pg))
+    pg.fill('#search-input', 'kit'); pg.press('#search-input', 'Enter'); pg.wait_for_timeout(250)
+    check('A new search resets pagination and replaces the query', 'page=' not in hash_now(pg) and 'q=kit' in hash_now(pg), hash_now(pg))
+    shop(pg, '#/shop?category=solar&power=Solar&sort=az')
+    pg.fill('#search-input', 'kit'); pg.press('#search-input', 'Enter'); pg.wait_for_timeout(250)
+    check('Header search keeps the active filters and sort', 'q=kit' in hash_now(pg) and 'category=solar' in hash_now(pg) and 'power=Solar' in hash_now(pg) and 'sort=az' in hash_now(pg), hash_now(pg))
+    check('Search results show query and result count', 'kit' in pg.inner_text('.search-results-summary h1') and 'product' in pg.inner_text('.search-results-summary'))
+
+    # sorting
+    def prices_on_page(page_):
+        return page_.evaluate("Array.from(document.querySelectorAll('.product-card')).map(e => { const p = NYCE.products.find(x => x.id === e.dataset.productId); return p.price; })")
+    shop(pg, '#/shop?sort=price-asc&page=1'); first = prices_on_page(pg)
+    check('Price low to high lists priced products ascending, then Request Price', [x for x in first if x is not None] == sorted(x for x in first if x is not None) and (None not in first or first.index(None) >= len([x for x in first if x is not None])), first)
+    check('Price sort explains where Request Price products appear', 'appear after priced products' in pg.inner_text('main'))
+    shop(pg, '#/shop?sort=za'); names = pg.eval_on_selector_all('.product-card h2', 'els => els.map(e => e.textContent.trim())')
+    check('Sort Z to A', names == sorted(names, key=lambda s: s.lower(), reverse=True), names[:3])
+    shop(pg, '#/shop?sort=bogus&category=solar')
+    check('Unknown sort values are removed from the URL', hash_now(pg) == '#/shop?category=solar', hash_now(pg))
+
+    # pagination and refresh
+    shop(pg, '#/shop?page=99')
+    check('Out-of-range page is corrected to the last page', hash_now(pg) == '#/shop?page=5' and pg.locator('.product-card').count() == 1, hash_now(pg))
+    shop(pg, '#/shop?page=abc&category=nope&subcategory=nope')
+    check('Invalid page, department and subcategory values are removed from the URL', hash_now(pg) == '#/shop', hash_now(pg))
+    shop(pg, '#/shop?category=water&subcategory=solar-1')
+    check('A subcategory from another department corrects the department', hash_now(pg) == '#/shop?category=solar&subcategory=solar-1', hash_now(pg))
+    shop(pg, '#/shop?category=construction&power=Electric&sort=price-asc')
+    before = (hash_now(pg), card_ids(pg), pg.input_value('#sort-products'))
+    pg.reload(); pg.wait_for_timeout(400)
+    check('Refresh restores department, filter, sort and results', (hash_now(pg), card_ids(pg), pg.input_value('#sort-products')) == before and pg.locator('.chip').count() == 2, (hash_now(pg), before[0]))
+    shop(pg, '#/shop')
+    pg.evaluate("location.hash = '#/shop?category=solar'"); pg.wait_for_timeout(250)
+    pg.select_option('#sort-products', 'za'); pg.wait_for_timeout(200)
+    states_seen = hash_now(pg)
+    pg.go_back(); pg.wait_for_timeout(250)
+    back_one = hash_now(pg)
+    pg.go_back(); pg.wait_for_timeout(250)
+    back_two = hash_now(pg)
+    check('Back restores each earlier combination of filters and sort', states_seen == '#/shop?category=solar&sort=za' and back_one == '#/shop?category=solar' and back_two == '#/shop', (states_seen, back_one, back_two))
+    pg.go_forward(); pg.wait_for_timeout(250); pg.go_forward(); pg.wait_for_timeout(250)
+    check('Forward restores the latest state', hash_now(pg) == states_seen and pg.input_value('#sort-products') == 'za')
+
+    # product cards: priced, quote-only and unavailable-data states
+    shop(pg, '#/shop?sort=price-asc')
+    card_states = pg.evaluate("Array.from(document.querySelectorAll('.product-card')).map(e => { const p = NYCE.products.find(x => x.id === e.dataset.productId); const el = e.querySelector('.product-price'); return {state: el.dataset.priceState, text: el.firstChild.textContent.trim(), priced: p.price !== null && p.priceType !== 'quote'}; })")
+    check('Cards mark priced and quote-only products with distinct states and wording', all((c['state'] == 'priced' and c['text'].startswith('KES')) if c['priced'] else (c['state'] == 'quote' and c['text'] == 'Request Price') for c in card_states), card_states[:3])
+    ctx_u = browser.new_context(viewport={'width': 1440, 'height': 900})
+    up = ctx_u.new_page(); up.goto(URL); up.wait_for_timeout(300)
+    unavailable_id = up.evaluate("(() => { const p = NYCE.products.find(x => x.priceType === 'demo'); delete p.price; return p.id; })()")
+    shop(up, '#/shop?sort=price-asc')
+    un = up.evaluate("(id) => { const e = document.querySelector(`.product-card[data-product-id=\"${id}\"] .product-price`); return e ? {state: e.dataset.priceState, text: e.firstChild.textContent.trim(), note: e.querySelector('.price-note').textContent} : null; }", unavailable_id)
+    check('A record with no usable price is labelled "Price not available", not a price or a quote', un is not None and un['state'] == 'unavailable' and un['text'] == 'Price not available' and 'Contact us' in un['note'], un)
+    ctx_u.close()
+
+    # empty and no-match states
+    shop(pg, '#/shop?q=zzzzqqq')
+    empty = pg.inner_text('.empty')
+    check('No-match state: factual message, count, search hint and next steps', 'No products match “zzzzqqq”.' in empty and 'product names and SKUs' in empty and '0 products' in pg.inner_text('.search-results-summary') and pg.locator('.empty [data-remove-filter="q"]').count() == 1 and pg.locator('.empty a[href="#/shop"]').count() == 1, empty[:160])
+    check('No-match state links to every department, a quote and WhatsApp', pg.locator('.empty-links a').count() == 6 and pg.locator('.empty a[href="#/business"]').count() == 1 and pg.locator('.empty [data-general-wa]').count() == 1)
+    pg.click('.empty [data-remove-filter="q"]'); pg.wait_for_timeout(250)
+    check('"Clear search" returns to the full catalogue', hash_now(pg) == '#/shop' and pg.locator('.product-card').count() == 12, hash_now(pg))
+    shop(pg, '#/shop?category=solar&power=Gas')
+    check('Filter-only empty state names the filters, not a search', 'No products match the selected filters.' in pg.inner_text('.empty') and pg.locator('.empty [data-remove-filter="q"]').count() == 0 and pg.locator('.empty [data-clear-filters-keep-search]').count() == 1)
+    pg.click('.empty [data-clear-filters-keep-search]'); pg.wait_for_timeout(250)
+    check('"Clear filters" resets filters', hash_now(pg) == '#/shop' and pg.locator('.chip').count() == 0, hash_now(pg))
+    shop(pg, '#/shop?q=pump&category=generators')
+    check('Search + filter empty state offers both resets', 'with the selected filters' in pg.inner_text('.empty') and pg.locator('.empty [data-remove-filter="q"]').count() == 1 and pg.locator('.empty [data-clear-filters-keep-search]').count() == 1)
+    pg.click('.empty [data-clear-filters-keep-search]'); pg.wait_for_timeout(250)
+    check('"Clear filters" keeps the search term', hash_now(pg) == '#/shop?q=pump' and pg.locator('.product-card').count() > 0, hash_now(pg))
+    shop(pg, '#/shop?category=solar&power=Gas')
+    empty_toolbar = pg.inner_text('.result-count')
+    check('Empty results show "0 products" and no pagination', empty_toolbar.startswith('0 products') and pg.locator('.pagination').count() == 0, empty_toolbar)
+
+    # keyboard use and labelling
+    shop(pg, '#/shop')
+    check('Shop filter panel remains absent and sort stays labelled', pg.locator('#filters').count() == 0 and pg.locator('label[for="sort-products"]').count() == 1)
+    pg.focus('#sort-products'); pg.keyboard.press('ArrowDown'); pg.wait_for_timeout(250)
+    check('Keyboard changes the sort select', 'sort=' in hash_now(pg), hash_now(pg))
+    shop(pg, '#/shop?category=solar&power=Solar')
+    pg.focus('.chip'); pg.keyboard.press('Enter'); pg.wait_for_timeout(250)
+    check('Active filter chips remain removable with the keyboard', hash_now(pg) != '#/shop?category=solar&power=Solar' and pg.locator('.chip').count() == 1)
+
+    # responsive grid
+    for w, h, cols in [(375, 812, 2), (768, 1024, 2), (1440, 900, 3)]:
+        ctx_g, gp = shell_page(w, h, touch=(w < 1050))
+        shop(gp, '#/shop?category=construction')
+        grid = gp.evaluate("(() => { const main = document.querySelector('.catalog-main').getBoundingClientRect(), layout = document.querySelector('.catalog-layout').getBoundingClientRect(); return {cols: getComputedStyle(document.getElementById('results')).gridTemplateColumns.split(' ').length, overflow: document.documentElement.scrollWidth > innerWidth + 1, sq: [...document.querySelectorAll('.product-media .photo')].every(e => Math.abs(e.getBoundingClientRect().width - e.getBoundingClientRect().height) < 1), panelAbsent: !document.getElementById('filters') && !document.getElementById('filter-toggle'), fullWidth: Math.abs(main.width - layout.width) < 1}; })()")
+        check(f'Shop grid @{w}: {cols} columns, panel absent, full width, square images, no overflow', grid['cols'] == cols and grid['sq'] and not grid['overflow'] and grid['panelAbsent'] and grid['fullWidth'], grid)
+        shop(gp, '#/shop?category=solar&power=Solar')
+        check(f'URL filters remain active without a drawer @{w}', 'category=solar' in hash_now(gp) and 'power=Solar' in hash_now(gp) and gp.locator('.chip').count() == 2 and gp.locator('#filters').count() == 0)
+        gp.screenshot(path=f'{OUT}/shop-discovery-{w}.png')
+        ctx_g.close()
+    # large catalogues: pagination is windowed and keeps state
+    if URL.startswith('http'):
+        ctx_w = browser.new_context(viewport={'width': 1440, 'height': 900})
+        wp = ctx_w.new_page(); cfg = pg.evaluate("fetch('assets/js/config.js').then(r => r.text())")
+        wp.route('**/assets/js/config.js', lambda route: route.fulfill(body=cfg.replace('cataloguePageSize: 12', 'cataloguePageSize: 3'), content_type='application/javascript'))
+        wp.goto(URL + '#/shop?page=9&sort=az'); wp.wait_for_timeout(400)
+        labels = wp.eval_on_selector_all('.pagination > *', 'els => els.map(e => e.textContent.trim())')
+        check('Pagination is windowed with ellipses for many pages', labels == ['Previous', '1', '…', '8', '9', '10', '…', '17', 'Next'], labels)
+        check('Current page is marked and announced', wp.get_attribute('.pagination [aria-current="page"]', 'aria-label') == 'Page 9' and 'page 9 of 17' in wp.inner_text('.result-count'))
+        wp.click('.pagination button[aria-label="Next page"]'); wp.wait_for_timeout(250)
+        check('Next keeps filters and sort and moves one page', hash_now(wp) == '#/shop?sort=az&page=10', hash_now(wp))
+        wp.goto(URL + '#/shop?page=40'); wp.wait_for_timeout(300)
+        check('Out-of-range page is corrected with many pages', hash_now(wp) == '#/shop?page=17', hash_now(wp))
+        ctx_w.close()
+        ctx_e = browser.new_context(viewport={'width': 1440, 'height': 900})
+        ep = ctx_e.new_page(); ep.on('pageerror', lambda e: console_errors.append(str(e)))
+        ep.route('**/assets/js/config.js', lambda route: route.fulfill(body=cfg.replace('siteMode: "demo"', 'siteMode: "production"'), content_type='application/javascript'))
+        ep.goto(URL + '#/shop'); ep.wait_for_timeout(400)
+        check('Production mode with no published products shows a customer-facing empty catalogue, not owner instructions', 'The catalogue is being prepared' in ep.inner_text('main') and 'config.js' not in ep.inner_text('main') and ep.locator('.empty a[href="#/business"]').count() == 1)
+        ctx_e.close()
+
+    # ---------- Focused homepage (375 / 768 / 1440) ----------
+    allowed_trust = [r'^\d+ departments and \d+ subcategories in one catalogue$', r'^Send product enquiries on WhatsApp$', r'^Prices, availability and taxes are confirmed by quotation$', r'^Delivery details are confirmed per enquiry$']
+    unsupported = r'(?i)\b(in stock|out of stock|sold out|stock status|reviews?|rated|rating|stars?|certified|certification|kebs|iso ?\d+|warranty|guarantee|discount|\d+ ?% ?off|limited (time|offer)|hurry|last chance|only \d+ left|free (shipping|delivery)|same[- ]day|next[- ]day|24 ?/ ?7|nationwide|countrywide|best price|lowest price)\b'
+    cats_home = pg.evaluate("NYCE.categories.map(c => ({id: c.id, name: c.name, subs: c.subcategories.length, n: NYCE.products.filter(p => p.departments.includes(c.id)).length}))")
+    for w, h in [(375, 812), (768, 1024), (1440, 900)]:
+        ctx_h, hp = shell_page(w, h, touch=(w < 1050))
+        info = hp.evaluate("""(() => {
+            const text = s => [...document.querySelectorAll(s)].map(e => e.textContent.trim().replace(/\\s+/g, ' '));
+            const cards = [...document.querySelectorAll('main .product-card')];
+            const rows = [...document.querySelectorAll('.home-product-section')].map(s => ({title: s.querySelector('h2').textContent.trim(), ids: [...s.querySelectorAll('.product-card')].map(c => c.dataset.productId), more: s.querySelector('.home-section-head a').getAttribute('href'), moreText: s.querySelector('.home-section-head a').textContent.trim(),
+                priceTops: [...s.querySelectorAll('.product-price')].map(e => Math.round(e.getBoundingClientRect().top)), actionTops: [...s.querySelectorAll('.card-actions')].map(e => Math.round(e.getBoundingClientRect().top)), titleH: [...s.querySelectorAll('.product-content h3')].map(e => Math.round(e.getBoundingClientRect().height)),
+                cols: getComputedStyle(s.querySelector('.product-grid')).gridTemplateColumns.split(' ').length}));
+            const outside = [...document.querySelectorAll('main *')].filter(e => { if (e.closest('svg') && e.tagName !== 'svg') return false; const r = e.getBoundingClientRect(); return r.width > 0 && (r.right > innerWidth + 1 || r.left < -1); }).map(e => String(e.getAttribute('class') || e.tagName)).slice(0, 5);
+            const empties = [...document.querySelectorAll('main section')].filter(s => !s.textContent.trim() || s.getBoundingClientRect().height < 20).map(s => s.className);
+            return {rows, ids: cards.map(c => c.dataset.productId), outside, empties, heroLinks: [...document.querySelectorAll('.home-hero-actions a')].map(a => [a.textContent.trim(), a.getAttribute('href')]),
+                h1: text('main h1'), heroText: text('.home-hero')[0], depts: [...document.querySelectorAll('.home-departments .department-card')].map(a => ({href: a.getAttribute('href'), name: a.querySelector('h3').textContent.trim(), meta: a.querySelector('div > div > span') ? a.querySelector('div > div > span').textContent.trim() : ''})),
+                trust: text('.home-trust-strip > div'), cta: [...document.querySelectorAll('.home-cta-band a, .home-cta-band button')].map(e => [e.textContent.trim(), e.getAttribute('href'), e.hasAttribute('data-general-wa')]), ctaText: text('.home-cta-band')[0],
+                imgs: cards.map(c => { const r = c.querySelector('.product-media .photo').getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height)]; }),
+                unnamedImg: document.querySelectorAll('main svg[role=img]:not([aria-label]), main img:not([alt])').length, brokenImg: [...document.querySelectorAll('main img')].filter(i => i.complete && i.naturalWidth === 0).length,
+                cardData: cards.map(c => { const p = NYCE.products.find(x => x.id === c.dataset.productId); return {ok: !!p && c.querySelector('.product-content h3 a').textContent.trim() === p.name, price: c.querySelector('.product-price').textContent, expected: p && p.price !== null ? 'KES ' + p.price.toLocaleString('en-KE') : 'Request Price'}; }),
+                cardsText: cards.map(c => c.textContent).join(' '), headings: [...document.querySelectorAll('main h1, main h2, main h3')].map(e => Number(e.tagName[1])), overflow: document.documentElement.scrollWidth > innerWidth + 1}; })()""")
+        check(f'Homepage @{w}: one h1 (the hero) and a sensible heading outline', info['h1'] == ['Power your home. Equip your business.'] and info['headings'][0] == 1 and all(b - a <= 1 for a, b in zip(info['headings'], info['headings'][1:])), info['headings'][:8])
+        check(f'Homepage @{w}: hero has exactly one primary and one secondary action', info['heroLinks'] == [['Shop products', '#/shop'], ['Request a quote', '#/business']], info['heroLinks'])
+        check(f'Homepage @{w}: no empty or collapsed sections', not info['empties'] and len(info['rows']) >= 1, info['empties'])
+        check(f'Homepage @{w}: at most four product rows, each with 2-4 products', 1 <= len(info['rows']) <= 4 and all(2 <= len(r['ids']) <= 4 for r in info['rows']), [(r['title'], len(r['ids'])) for r in info['rows']])
+        check(f'Homepage @{w}: every product appears once on the page', len(info['ids']) == len(set(info['ids'])), info['ids'])
+        check(f'Homepage @{w}: product rows use real catalogue records, names and price states', all(c['ok'] and c['price'].startswith(c['expected']) for c in info['cardData']), [c for c in info['cardData'] if not c['ok'] or not c['price'].startswith(c['expected'])][:2])
+        check(f'Homepage @{w}: row "view all" links use existing shop routes', all(r['more'] == '#/shop' or r['more'].startswith('#/shop?category=') for r in info['rows']), [r['more'] for r in info['rows']])
+        check(f'Homepage @{w}: department cards match the catalogue and shop routes', [d['href'] for d in info['depts']] == [f"#/shop?category={c['id']}" for c in cats_home] and [d['name'] for d in info['depts']] == [c['name'] for c in cats_home], info['depts'][:2])
+        check(f'Homepage @{w}: department counts come from the data', all(f"{c['subs']} subcategories" in d['meta'] and (f"{c['n']} products" in d['meta']) for c, d in zip(cats_home, info['depts']) if c['n'] > 1) or w == 375, [d['meta'] for d in info['depts']][:2])
+        check(f'Homepage @{w}: trust statements are limited to verified wording', len(info['trust']) in (3, 4) and all(any(re.match(rx, t) for rx in allowed_trust) for t in info['trust']), info['trust'])
+        dept_counts = re.match(r'^(\d+) departments and (\d+) subcategories', info['trust'][0])
+        check(f'Homepage @{w}: trust counts equal the catalogue ({len(cats_home)} departments, {sum(c["subs"] for c in cats_home)} subcategories)', bool(dept_counts) and int(dept_counts.group(1)) == len(cats_home) and int(dept_counts.group(2)) == sum(c['subs'] for c in cats_home))
+        check(f'Homepage @{w}: no discounts, urgency, stock, reviews, certification or delivery-coverage claims', not re.search(unsupported, info['heroText'] + ' ' + ' '.join(info['trust']) + ' ' + info['ctaText'] + ' ' + info['cardsText']), re.findall(unsupported, info['heroText'] + ' '.join(info['trust']) + info['ctaText'] + info['cardsText'])[:3])
+        check(f'Homepage @{w}: CTA offers quote, WhatsApp and contact', [c[1] for c in info['cta'] if c[1]] == ['#/business', '#/contact'] and any(c[2] for c in info['cta']), info['cta'])
+        check(f'Homepage @{w}: product images are square and identical in size', len({tuple(i) for i in info['imgs']}) == 1 and abs(info['imgs'][0][0] - info['imgs'][0][1]) <= 1, sorted({tuple(i) for i in info['imgs']}))
+        check(f'Homepage @{w}: images have text alternatives and none are broken', info['unnamedImg'] == 0 and info['brokenImg'] == 0, info)
+        def aligned(r):
+            step = r['cols']
+            return all(len(set(r[k][i:i + step])) == 1 for k in ('priceTops', 'actionTops', 'titleH') for i in range(0, len(r[k]), step))
+        check(f'Homepage @{w}: price, title and action positions align across each visual row of cards', all(aligned(r) for r in info['rows']), [(r['title'], r['priceTops'], r['actionTops']) for r in info['rows']][:2])
+        check(f'Homepage @{w}: product grid uses {2 if w < 720 else 4} columns', all(r['cols'] == (2 if w < 720 else 4) for r in info['rows']), [r['cols'] for r in info['rows']])
+        check(f'Homepage @{w}: no horizontal overflow and nothing outside the viewport', not info['overflow'] and not info['outside'], info['outside'])
+        # every link and action on the page resolves
+        links = hp.evaluate("[...new Set([...document.querySelectorAll('main a[href]')].map(a => a.getAttribute('href')))]")
+        internal = [l for l in links if l.startswith('#/')]
+        broken = []
+        for l in internal:
+            hp.goto(URL + l); hp.wait_for_timeout(100)
+            if hp.locator('.route-error').count() or hp.locator('main h1').count() != 1:
+                broken.append(l)
+        check(f'Homepage @{w}: all {len(internal)} internal links resolve', len(internal) >= 20 and not broken, broken)
+        hp.goto(URL); hp.wait_for_timeout(300)
+        wa = hp.eval_on_selector_all('main a[href^="https://wa.me/"]', 'els => els.map(a => [a.target, a.rel])')
+        check(f'Homepage @{w}: card WhatsApp links open safely in a new tab', len(wa) == sum(len(r['ids']) for r in info['rows']) and all(t == '_blank' and 'noopener' in rel for t, rel in wa), wa[:2])
+        # keyboard: hero actions are reachable in order and activate with Enter
+        hp.focus('.home-hero-actions a:first-child')
+        check(f'Homepage @{w}: hero primary action takes a visible focus outline', hp.evaluate(outline_ok))
+        hp.keyboard.press('Tab')
+        check(f'Homepage @{w}: Tab moves from the primary to the secondary hero action', hp.evaluate("document.activeElement.getAttribute('href') === '#/business'"))
+        hp.keyboard.press('Tab'); hp.keyboard.press('Tab')
+        check(f'Homepage @{w}: Tab then reaches the department cards', hp.evaluate("!!document.activeElement.closest('.home-departments')"))
+        hp.focus('.home-hero-actions a:first-child'); hp.keyboard.press('Enter'); hp.wait_for_timeout(250)
+        check(f'Homepage @{w}: Enter on the hero primary action opens the shop', hp.evaluate('location.hash') == '#/shop')
+        hp.goto(URL); hp.wait_for_timeout(300)
+        # cart state and enquiry behaviour are untouched
+        priced = hp.evaluate("NYCE.products.find(p => p.price !== null).id")
+        hp.goto(URL + f'#/product/{priced}'); hp.wait_for_timeout(250)
+        hp.click('[data-add]'); hp.wait_for_timeout(150)
+        hp.goto(URL); hp.wait_for_timeout(300)
+        check(f'Homepage @{w}: cart count survives visiting the homepage', hp.inner_text('#cart-count') == '1')
+        first_id = info['rows'][0]['ids'][0]
+        (hp.tap if w < 1050 else hp.click)(f'.product-card[data-product-id="{first_id}"] .card-actions a:first-child'); hp.wait_for_timeout(250)
+        check(f'Homepage @{w}: "View details" opens the product page', hp.evaluate('location.hash') == f'#/product/{first_id}' and hp.locator('main h1').count() == 1)
+        hp.goto(URL); hp.wait_for_timeout(300)
+        (hp.tap if w < 1050 else hp.click)('.home-cta-band [data-general-wa]'); hp.wait_for_timeout(250)
+        check(f'Homepage @{w}: CTA WhatsApp opens the enquiry preview', hp.evaluate("document.getElementById('modal').open") and 'Hello NYCE SOLUTIONS' in hp.input_value('#message-preview') and 'not an order' in hp.input_value('#message-preview'))
+        hp.keyboard.press('Escape')
+        hp.goto(URL); hp.wait_for_timeout(300)
+        hp.evaluate('window.scrollTo(0, document.body.scrollHeight)'); hp.wait_for_timeout(150)
+        hp.screenshot(path=f'{OUT}/home-bottom-{w}.png')
+        hp.evaluate('window.scrollTo(0, 0)'); hp.wait_for_timeout(100)
+        hp.screenshot(path=f'{OUT}/home-top-{w}.png')
+        ctx_h.close()
+
+    # Missing images and incomplete records degrade gracefully (console resource errors for the deliberately missing file are expected here).
+    ctx_m = browser.new_context(viewport={'width': 1440, 'height': 900})
+    hm = ctx_m.new_page(); hm_errors = []
+    hm.on('pageerror', lambda e: hm_errors.append(str(e)))
+    hm.goto(URL); hm.wait_for_timeout(300)
+    ids = hm.evaluate("[...document.querySelectorAll('main .product-card')].map(c => c.dataset.productId)")
+    hm.evaluate("""(ids) => { const P = id => NYCE.products.find(p => p.id === id);
+        P(ids[0]).image = { src: 'assets/images/equipment.webp' }; P(ids[1]).image = undefined; P(ids[2]).image = { tile: 99 }; P(ids[3]).image = { src: 'assets/images/does-not-exist.jpg' };
+        delete P(ids[4]).price; P(ids[5]).alt = ''; P(ids[6]).departments = undefined; P(ids[9]).image = { src: 'assets/images/equipment.webp' }; }""", ids)
+    hm.goto(URL + '#/about'); hm.wait_for_timeout(200); hm.goto(URL + '#/'); hm.wait_for_timeout(700)
+    inc = hm.evaluate("""(ids) => ({cards: ids.slice(0, 10).map(id => { const c = document.querySelector(`.product-card[data-product-id="${id}"]`); return c ? {fallback: !!c.querySelector('.photo-fallback'), img: c.querySelector('img[data-photo-src]') ? {loading: c.querySelector('img[data-photo-src]').getAttribute('loading'), w: c.querySelector('img').getAttribute('width'), h: c.querySelector('img').getAttribute('height'), loaded: c.querySelector('img').naturalWidth > 0} : null, price: c.querySelector('.product-price').textContent.slice(0, 13), sq: Math.abs(c.querySelector('.photo').getBoundingClientRect().width - c.querySelector('.photo').getBoundingClientRect().height) < 1} : null; }),
+        sections: document.querySelectorAll('.home-product-section').length, overflow: document.documentElement.scrollWidth > innerWidth + 1})""", ids)
+    cs = inc['cards']
+    check('Incomplete data: no image / unusable tile / missing file all show the placeholder', all(cs[i] and cs[i]['fallback'] for i in (1, 2, 3)), cs[1:4])
+    check('Incomplete data: a record without a price shows Request Price', cs[4] and cs[4]['price'].startswith('Request Price'), cs[4])
+    check('Incomplete data: a record without departments does not break the homepage', inc['sections'] >= 1 and not hm_errors, hm_errors[:2])
+    check('Incomplete data: placeholder and photo cards stay square and the page does not overflow', len([c for c in cs if c]) >= 8 and all(c['sq'] for c in cs if c) and not inc['overflow'], cs)
+    if URL.startswith('http'):
+        check('Real photographs: first row loads eagerly, lower rows lazily, with intrinsic size', cs[0] and cs[0]['img'] and cs[0]['img']['loading'] is None and cs[0]['img']['w'] == '600' and cs[0]['img']['loaded'] and cs[9] and cs[9]['img'] and cs[9]['img']['loading'] == 'lazy', [cs[0], cs[9]])
+    else:
+        check('Standalone build: photo paths that cannot load fall back to the placeholder', cs[0] and cs[0]['fallback'] and cs[9] and cs[9]['fallback'], [cs[0], cs[9]])
+    ctx_m.close()
+    if URL.startswith('http'):
+        ctx_p = browser.new_context(viewport={'width': 1440, 'height': 900})
+        pp = ctx_p.new_page(); pp_errors = []
+        pp.on('pageerror', lambda e: pp_errors.append(str(e)))
+        cfg = pg.evaluate("fetch('assets/js/config.js').then(r => r.text())")
+        pp.route('**/assets/js/config.js', lambda route: route.fulfill(body=cfg.replace('siteMode: "demo"', 'siteMode: "production"'), content_type='application/javascript'))
+        pp.goto(URL); pp.wait_for_timeout(400)
+        pc = pp.evaluate("({rows: document.querySelectorAll('.home-product-section').length, depts: document.querySelectorAll('.home-departments .department-card').length, metas: [...document.querySelectorAll('.home-departments .department-card')].map(a => a.textContent), empty: [...document.querySelectorAll('main section')].filter(s => !s.textContent.trim()).length, words: /demonstration|illustrative|representative/i.test(document.querySelector('main').innerText)})")
+        check('Production mode with no approved products: no product rows, no empty sections, no demo wording', pc['rows'] == 0 and pc['depts'] == 6 and pc['empty'] == 0 and not pc['words'] and not pp_errors and all('0 products' not in m for m in pc['metas']), pc)
+        ctx_p.close()
 
     # image fallback
     go(pg, '#/shop')
