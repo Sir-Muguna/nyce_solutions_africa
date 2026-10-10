@@ -1,0 +1,3276 @@
+{
+  "engine": "axe-core 4.10.3 / Chromium",
+  "viewports": [
+    [
+      375,
+      812
+    ],
+    [
+      768,
+      1024
+    ],
+    [
+      1280,
+      800
+    ],
+    [
+      1920,
+      1080
+    ]
+  ],
+  "states": 48,
+  "failed_states": 0,
+  "results": [
+    {
+      "label": "375-route-0",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            [
+              "#menu-button"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".category-card[href=\"#/shop?category=solar\"] > .category-caption > div > h3"
+            ],
+            [
+              ".category-card[href=\"#/shop?category=agriculture\"] > .category-caption > div > h3"
+            ],
+            [
+              ".category-card[href=\"#/shop?category=electrical\"] > .category-caption > div > h3"
+            ],
+            [
+              ".category-card[href=\"#/shop?category=water\"] > .category-caption > div > h3"
+            ],
+            [
+              ".category-card[href=\"#/shop?category=construction\"] > .category-caption > div > h3"
+            ],
+            [
+              ".product-media[href$=\"#/product/alps-6kw\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/alps-6kw\"]"
+            ],
+            [
+              "article[data-product-id=\"alps-6kw\"] > .product-content > .product-price[data-price-state=\"priced\"]"
+            ],
+            [
+              "article[data-product-id=\"alps-6kw\"] > .product-content > .product-price[data-price-state=\"priced\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/alps-6kw\"]"
+            ],
+            [
+              "article[data-product-id=\"alps-6kw\"] > .product-content > .card-actions > .wa[target=\"_blank\"][rel=\"noopener noreferrer\"]"
+            ],
+            [
+              ".product-media[href=\"#/product/doyin-solar-pump\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href=\"#/product/doyin-solar-pump\"]"
+            ],
+            [
+              "article[data-product-id=\"doyin-solar-pump\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"doyin-solar-pump\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href=\"#/product/doyin-solar-pump\"]"
+            ],
+            [
+              "article[data-product-id=\"doyin-solar-pump\"] > .product-content > .card-actions > .wa[target=\"_blank\"][rel=\"noopener noreferrer\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/jiadi-tractor\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/jiadi-tractor\"]"
+            ],
+            [
+              "article[data-product-id=\"jiadi-tractor\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/tolsen-hoist\"] > .photo > .photo-label"
+            ],
+            [
+              "a[aria-label=\"View Starter lithium solar kit\"] > .photo > .photo-label"
+            ],
+            [
+              ".product-media[href$=\"#/product/srne-home\"] > .photo > .photo-label"
+            ],
+            [
+              ".product-media[href=\"#/product/commercial-solar\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href=\"#/product/commercial-solar\"]"
+            ],
+            [
+              "article[data-product-id=\"commercial-solar\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"commercial-solar\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href=\"#/product/commercial-solar\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/must-inverter\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/must-inverter\"]"
+            ],
+            [
+              "article[data-product-id=\"must-inverter\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"must-inverter\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/must-inverter\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/irrigation-kit\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/irrigation-kit\"]"
+            ],
+            [
+              "article[data-product-id=\"irrigation-kit\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"irrigation-kit\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".product-media[href$=\"#/product/beehive\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/beehive\"]"
+            ],
+            [
+              "article[data-product-id=\"beehive\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"beehive\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              "a[aria-label=\"View Automatic egg incubator\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/incubator\"]"
+            ],
+            [
+              "article[data-product-id=\"incubator\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"incubator\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              "a[aria-label=\"View Maize milling machine\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/posho-mill\"]"
+            ],
+            [
+              "article[data-product-id=\"posho-mill\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"posho-mill\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "375-route-1",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            [
+              "#menu-button"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".product-media[href$=\"#/product/alps-6kw\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/alps-6kw\"]"
+            ],
+            [
+              "article[data-product-id=\"alps-6kw\"] > .product-content > .product-price[data-price-state=\"priced\"]"
+            ],
+            [
+              "article[data-product-id=\"alps-6kw\"] > .product-content > .product-price[data-price-state=\"priced\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/alps-6kw\"]"
+            ],
+            [
+              "article[data-product-id=\"alps-6kw\"] > .product-content > .card-actions > .wa[target=\"_blank\"][rel=\"noopener noreferrer\"]"
+            ],
+            [
+              ".product-media[href=\"#/product/doyin-solar-pump\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href=\"#/product/doyin-solar-pump\"]"
+            ],
+            [
+              "article[data-product-id=\"doyin-solar-pump\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"doyin-solar-pump\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href=\"#/product/doyin-solar-pump\"]"
+            ],
+            [
+              "article[data-product-id=\"doyin-solar-pump\"] > .product-content > .card-actions > .wa[target=\"_blank\"][rel=\"noopener noreferrer\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/jiadi-tractor\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/jiadi-tractor\"]"
+            ],
+            [
+              "article[data-product-id=\"jiadi-tractor\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"jiadi-tractor\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/jiadi-tractor\"]"
+            ],
+            [
+              "article[data-product-id=\"jiadi-tractor\"] > .product-content > .card-actions > .wa[target=\"_blank\"][rel=\"noopener noreferrer\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/tolsen-hoist\"] > .photo > .photo-label"
+            ],
+            [
+              "article[data-product-id=\"tolsen-hoist\"] > .product-content > .product-price[data-price-state=\"priced\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/tolsen-hoist\"]"
+            ],
+            [
+              "article[data-product-id=\"tolsen-hoist\"] > .product-content > .card-actions > .wa[target=\"_blank\"][rel=\"noopener noreferrer\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/lenhard-welder\"] > .photo > .photo-label"
+            ],
+            [
+              "article[data-product-id=\"lenhard-welder\"] > .product-content > .product-price[data-price-state=\"priced\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/lenhard-welder\"]"
+            ],
+            [
+              "article[data-product-id=\"lenhard-welder\"] > .product-content > .card-actions > .wa[target=\"_blank\"][rel=\"noopener noreferrer\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/cordless-drill\"] > .photo > .photo-label"
+            ],
+            [
+              ".product-media[href=\"#/product/hisaki-generator\"] > .photo > .photo-label"
+            ],
+            [
+              "a[aria-label=\"View Starter lithium solar kit\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/starter-solar\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/srne-home\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/srne-home\"]"
+            ],
+            [
+              ".product-media[href=\"#/product/commercial-solar\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href=\"#/product/commercial-solar\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/must-inverter\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/must-inverter\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/srne-battery\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/srne-battery\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "375-route-2",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "nodes": [
+            [
+              ".chips"
+            ]
+          ]
+        },
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            [
+              "#menu-button"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".product-media[href$=\"#/product/alps-6kw\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/alps-6kw\"]"
+            ],
+            [
+              "article[data-product-id=\"alps-6kw\"] > .product-content > .product-price[data-price-state=\"priced\"]"
+            ],
+            [
+              "article[data-product-id=\"alps-6kw\"] > .product-content > .product-price[data-price-state=\"priced\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/alps-6kw\"]"
+            ],
+            [
+              ".product-media[href=\"#/product/doyin-solar-pump\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href=\"#/product/doyin-solar-pump\"]"
+            ],
+            [
+              "article[data-product-id=\"doyin-solar-pump\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"doyin-solar-pump\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href=\"#/product/doyin-solar-pump\"]"
+            ],
+            [
+              "a[aria-label=\"View Starter lithium solar kit\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/starter-solar\"]"
+            ],
+            [
+              "article[data-product-id=\"starter-solar\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"starter-solar\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/starter-solar\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/srne-home\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/srne-home\"]"
+            ],
+            [
+              "article[data-product-id=\"srne-home\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"srne-home\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/srne-home\"]"
+            ],
+            [
+              ".product-media[href=\"#/product/commercial-solar\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href=\"#/product/commercial-solar\"]"
+            ],
+            [
+              "article[data-product-id=\"commercial-solar\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"commercial-solar\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href=\"#/product/commercial-solar\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/must-inverter\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/must-inverter\"]"
+            ],
+            [
+              "article[data-product-id=\"must-inverter\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"must-inverter\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/must-inverter\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/srne-battery\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/srne-battery\"]"
+            ],
+            [
+              "article[data-product-id=\"srne-battery\"] > .product-content > .product-price[data-price-state=\"priced\"]"
+            ],
+            [
+              "article[data-product-id=\"srne-battery\"] > .product-content > .product-price[data-price-state=\"priced\"] > .price-note"
+            ],
+            [
+              ".product-media[href$=\"#/product/solar-heater\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/solar-heater\"]"
+            ],
+            [
+              "article[data-product-id=\"solar-heater\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"solar-heater\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".product-media[href=\"#/product/solar-connectors\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href=\"#/product/solar-connectors\"]"
+            ],
+            [
+              "article[data-product-id=\"solar-connectors\"] > .product-content > .product-price[data-price-state=\"priced\"]"
+            ],
+            [
+              "article[data-product-id=\"solar-connectors\"] > .product-content > .product-price[data-price-state=\"priced\"] > .price-note"
+            ],
+            [
+              "a[aria-label=\"View Solar pumping inverter\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/pump-inverter\"]"
+            ],
+            [
+              "article[data-product-id=\"pump-inverter\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"pump-inverter\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "375-route-3",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            [
+              "#menu-button"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".breadcrumb > a:nth-child(7)"
+            ],
+            [
+              "span[aria-current=\"page\"]"
+            ],
+            [
+              "#gallery-content > .photo > .photo-label"
+            ],
+            [
+              ".gallery-caption"
+            ],
+            [
+              "button[data-gallery=\"0\"] > .photo > .photo-label"
+            ],
+            [
+              "button[data-gallery=\"1\"] > span"
+            ],
+            [
+              "button[data-qty-step=\"-1\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/alps-6kw\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/alps-6kw\"]"
+            ],
+            [
+              "div[data-price-state=\"priced\"]"
+            ],
+            [
+              "div[data-price-state=\"priced\"] > .price-note"
+            ],
+            [
+              ".product-media[href$=\"#/product/srne-home\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/srne-home\"]"
+            ],
+            [
+              "article[data-product-id=\"srne-home\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"srne-home\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".product-media[href=\"#/product/commercial-solar\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href=\"#/product/commercial-solar\"]"
+            ],
+            [
+              "article[data-product-id=\"commercial-solar\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"commercial-solar\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "375-route-4",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            [
+              "#menu-button"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "button[data-qty-step=\"-1\"]"
+            ],
+            [
+              "a[aria-label=\"View Starter lithium solar kit\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/starter-solar\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/alps-6kw\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/alps-6kw\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/srne-home\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/srne-home\"]"
+            ],
+            [
+              ".product-media[href=\"#/product/commercial-solar\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href=\"#/product/commercial-solar\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "375-route-5",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            [
+              "#menu-button"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#enq-message"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "375-route-6",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            [
+              "#menu-button"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#enq-message"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "375-route-7",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            [
+              "#menu-button"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "375-open-menu",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "label": "375-contact-errors",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            [
+              "#menu-button"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#enq-message"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "375-populated-cart",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            [
+              "#menu-button"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".price-note"
+            ],
+            [
+              "button[data-qty-step=\"-1\"]"
+            ],
+            [
+              "#cart-qty-alps-6kw"
+            ],
+            [
+              "#toast > span"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "375-enquiry-modal",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#modal-content > p:nth-child(2)"
+            ],
+            [
+              "#message-preview"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "768-route-0",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            [
+              "#menu-button"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".category-card[href=\"#/shop?category=solar\"] > .category-caption > div > h3"
+            ],
+            [
+              ".category-card[href=\"#/shop?category=agriculture\"] > .category-caption > div > h3"
+            ],
+            [
+              ".category-card[href=\"#/shop?category=water\"] > .category-caption > div > h3"
+            ],
+            [
+              ".category-card[href=\"#/shop?category=construction\"] > .category-caption > div > h3"
+            ],
+            [
+              "section[aria-labelledby=\"home-featured\"] > .home-section-head > a[href$=\"#/shop\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/alps-6kw\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/alps-6kw\"]"
+            ],
+            [
+              "article[data-product-id=\"alps-6kw\"] > .product-content > .product-price[data-price-state=\"priced\"]"
+            ],
+            [
+              "article[data-product-id=\"alps-6kw\"] > .product-content > .product-price[data-price-state=\"priced\"] > .price-note"
+            ],
+            [
+              ".product-media[href=\"#/product/doyin-solar-pump\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href=\"#/product/doyin-solar-pump\"]"
+            ],
+            [
+              "article[data-product-id=\"doyin-solar-pump\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"doyin-solar-pump\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".product-media[href$=\"#/product/jiadi-tractor\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/jiadi-tractor\"]"
+            ],
+            [
+              "article[data-product-id=\"jiadi-tractor\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"jiadi-tractor\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".product-media[href$=\"#/product/tolsen-hoist\"] > .photo > .photo-label"
+            ],
+            [
+              "a[aria-label=\"View Starter lithium solar kit\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/starter-solar\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/srne-home\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/srne-home\"]"
+            ],
+            [
+              ".product-media[href=\"#/product/commercial-solar\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href=\"#/product/commercial-solar\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/must-inverter\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/must-inverter\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/irrigation-kit\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/irrigation-kit\"]"
+            ],
+            [
+              "article[data-product-id=\"irrigation-kit\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"irrigation-kit\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/irrigation-kit\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/beehive\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/beehive\"]"
+            ],
+            [
+              "article[data-product-id=\"beehive\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"beehive\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/beehive\"]"
+            ],
+            [
+              "a[aria-label=\"View Automatic egg incubator\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/incubator\"]"
+            ],
+            [
+              "article[data-product-id=\"incubator\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"incubator\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/incubator\"]"
+            ],
+            [
+              "a[aria-label=\"View Maize milling machine\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/posho-mill\"]"
+            ],
+            [
+              "article[data-product-id=\"posho-mill\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"posho-mill\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/posho-mill\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "768-route-1",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            [
+              "#menu-button"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".product-media[href$=\"#/product/alps-6kw\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/alps-6kw\"]"
+            ],
+            [
+              ".product-media[href=\"#/product/doyin-solar-pump\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href=\"#/product/doyin-solar-pump\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/jiadi-tractor\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/jiadi-tractor\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/tolsen-hoist\"] > .photo > .photo-label"
+            ],
+            [
+              ".product-media[href$=\"#/product/lenhard-welder\"] > .photo > .photo-label"
+            ],
+            [
+              ".product-media[href$=\"#/product/cordless-drill\"] > .photo > .photo-label"
+            ],
+            [
+              ".product-media[href=\"#/product/hisaki-generator\"] > .photo > .photo-label"
+            ],
+            [
+              "a[aria-label=\"View Starter lithium solar kit\"] > .photo > .photo-label"
+            ],
+            [
+              ".product-media[href$=\"#/product/srne-home\"] > .photo > .photo-label"
+            ],
+            [
+              ".product-media[href=\"#/product/commercial-solar\"] > .photo > .photo-label"
+            ],
+            [
+              ".product-media[href$=\"#/product/must-inverter\"] > .photo > .photo-label"
+            ],
+            [
+              ".product-media[href$=\"#/product/srne-battery\"] > .photo > .photo-label"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "768-route-2",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "nodes": [
+            [
+              ".chips"
+            ]
+          ]
+        },
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            [
+              "#menu-button"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".product-media[href$=\"#/product/alps-6kw\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/alps-6kw\"]"
+            ],
+            [
+              "article[data-product-id=\"alps-6kw\"] > .product-content > .product-price[data-price-state=\"priced\"]"
+            ],
+            [
+              "article[data-product-id=\"alps-6kw\"] > .product-content > .product-price[data-price-state=\"priced\"] > .price-note"
+            ],
+            [
+              ".product-media[href=\"#/product/doyin-solar-pump\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href=\"#/product/doyin-solar-pump\"]"
+            ],
+            [
+              "article[data-product-id=\"doyin-solar-pump\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"doyin-solar-pump\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              "a[aria-label=\"View Starter lithium solar kit\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/starter-solar\"]"
+            ],
+            [
+              "article[data-product-id=\"starter-solar\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"starter-solar\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".product-media[href$=\"#/product/srne-home\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/srne-home\"]"
+            ],
+            [
+              "article[data-product-id=\"srne-home\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"srne-home\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".product-media[href=\"#/product/commercial-solar\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href=\"#/product/commercial-solar\"]"
+            ],
+            [
+              "article[data-product-id=\"commercial-solar\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"commercial-solar\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".product-media[href$=\"#/product/must-inverter\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/must-inverter\"]"
+            ],
+            [
+              "article[data-product-id=\"must-inverter\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"must-inverter\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".product-media[href$=\"#/product/srne-battery\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/srne-battery\"]"
+            ],
+            [
+              "article[data-product-id=\"srne-battery\"] > .product-content > .product-price[data-price-state=\"priced\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/solar-heater\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/solar-heater\"]"
+            ],
+            [
+              "article[data-product-id=\"solar-heater\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              ".product-media[href=\"#/product/solar-connectors\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href=\"#/product/solar-connectors\"]"
+            ],
+            [
+              "article[data-product-id=\"solar-connectors\"] > .product-content > .product-price[data-price-state=\"priced\"]"
+            ],
+            [
+              "a[aria-label=\"View Solar pumping inverter\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/pump-inverter\"]"
+            ],
+            [
+              "article[data-product-id=\"pump-inverter\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "768-route-3",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            [
+              "#menu-button"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".breadcrumb > a[href=\"#/\"]"
+            ],
+            [
+              ".breadcrumb > a[href$=\"#/shop\"]"
+            ],
+            [
+              ".breadcrumb > a[href=\"#/shop?category=solar\"]"
+            ],
+            [
+              ".breadcrumb > a:nth-child(7)"
+            ],
+            [
+              "span[aria-current=\"page\"]"
+            ],
+            [
+              "#gallery-content > .photo > .photo-label"
+            ],
+            [
+              ".gallery-caption"
+            ],
+            [
+              "button[data-gallery=\"0\"] > .photo > .photo-label"
+            ],
+            [
+              "button[data-gallery=\"1\"] > span"
+            ],
+            [
+              ".cat-name > a[href=\"#/shop?category=solar\"]"
+            ],
+            [
+              "h1"
+            ],
+            [
+              "button[data-qty-step=\"-1\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/alps-6kw\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/alps-6kw\"]"
+            ],
+            [
+              "div[data-price-state=\"priced\"]"
+            ],
+            [
+              "div[data-price-state=\"priced\"] > .price-note"
+            ],
+            [
+              ".product-media[href$=\"#/product/srne-home\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/srne-home\"]"
+            ],
+            [
+              "article[data-product-id=\"srne-home\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"srne-home\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".product-media[href=\"#/product/commercial-solar\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href=\"#/product/commercial-solar\"]"
+            ],
+            [
+              "article[data-product-id=\"commercial-solar\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"commercial-solar\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "768-route-4",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            [
+              "#menu-button"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "button[data-qty-step=\"-1\"]"
+            ],
+            [
+              "a[aria-label=\"View Starter lithium solar kit\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/starter-solar\"]"
+            ],
+            [
+              "article[data-product-id=\"starter-solar\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"starter-solar\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".product-media[href$=\"#/product/alps-6kw\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/alps-6kw\"]"
+            ],
+            [
+              "div[data-price-state=\"priced\"]"
+            ],
+            [
+              "div[data-price-state=\"priced\"] > .price-note"
+            ],
+            [
+              ".product-media[href$=\"#/product/srne-home\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/srne-home\"]"
+            ],
+            [
+              "article[data-product-id=\"srne-home\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              ".product-media[href=\"#/product/commercial-solar\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href=\"#/product/commercial-solar\"]"
+            ],
+            [
+              "article[data-product-id=\"commercial-solar\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "768-route-5",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            [
+              "#menu-button"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#enq-message"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "768-route-6",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            [
+              "#menu-button"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#enq-message"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "768-route-7",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            [
+              "#menu-button"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "768-open-menu",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "label": "768-contact-errors",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            [
+              "#menu-button"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#enq-message"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "768-populated-cart",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            [
+              "#menu-button"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".price-note"
+            ],
+            [
+              "button[data-qty-step=\"-1\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "768-enquiry-modal",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#modal-content > p:nth-child(2)"
+            ],
+            [
+              "#message-preview"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "1280-route-0",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "section[aria-labelledby=\"home-featured\"] > .home-section-head > a[href$=\"#/shop\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/alps-6kw\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/alps-6kw\"]"
+            ],
+            [
+              ".product-media[href=\"#/product/doyin-solar-pump\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href=\"#/product/doyin-solar-pump\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/jiadi-tractor\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/jiadi-tractor\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/tolsen-hoist\"] > .photo > .photo-label"
+            ],
+            [
+              "a[aria-label=\"View Starter lithium solar kit\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/starter-solar\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/srne-home\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/srne-home\"]"
+            ],
+            [
+              ".product-media[href=\"#/product/commercial-solar\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href=\"#/product/commercial-solar\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/must-inverter\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/must-inverter\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/irrigation-kit\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/irrigation-kit\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/beehive\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/beehive\"]"
+            ],
+            [
+              "a[aria-label=\"View Automatic egg incubator\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/incubator\"]"
+            ],
+            [
+              "a[aria-label=\"View Maize milling machine\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/posho-mill\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "1280-route-1",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".product-media[href$=\"#/product/alps-6kw\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/alps-6kw\"]"
+            ],
+            [
+              "article[data-product-id=\"alps-6kw\"] > .product-content > .product-price[data-price-state=\"priced\"]"
+            ],
+            [
+              "article[data-product-id=\"alps-6kw\"] > .product-content > .product-price[data-price-state=\"priced\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/alps-6kw\"]"
+            ],
+            [
+              "article[data-product-id=\"alps-6kw\"] > .product-content > .card-actions > .wa[target=\"_blank\"][rel=\"noopener noreferrer\"]"
+            ],
+            [
+              ".product-media[href=\"#/product/doyin-solar-pump\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href=\"#/product/doyin-solar-pump\"]"
+            ],
+            [
+              "article[data-product-id=\"doyin-solar-pump\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"doyin-solar-pump\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href=\"#/product/doyin-solar-pump\"]"
+            ],
+            [
+              "article[data-product-id=\"doyin-solar-pump\"] > .product-content > .card-actions > .wa[target=\"_blank\"][rel=\"noopener noreferrer\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/jiadi-tractor\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/jiadi-tractor\"]"
+            ],
+            [
+              "article[data-product-id=\"jiadi-tractor\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"jiadi-tractor\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/jiadi-tractor\"]"
+            ],
+            [
+              "article[data-product-id=\"jiadi-tractor\"] > .product-content > .card-actions > .wa[target=\"_blank\"][rel=\"noopener noreferrer\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/tolsen-hoist\"] > .photo > .photo-label"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/tolsen-hoist\"]"
+            ],
+            [
+              "article[data-product-id=\"tolsen-hoist\"] > .product-content > .card-actions > .wa[target=\"_blank\"][rel=\"noopener noreferrer\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/lenhard-welder\"] > .photo > .photo-label"
+            ],
+            [
+              ".product-media[href$=\"#/product/cordless-drill\"] > .photo > .photo-label"
+            ],
+            [
+              ".product-media[href=\"#/product/hisaki-generator\"] > .photo > .photo-label"
+            ],
+            [
+              "a[aria-label=\"View Starter lithium solar kit\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/starter-solar\"]"
+            ],
+            [
+              "article[data-product-id=\"starter-solar\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/srne-home\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/srne-home\"]"
+            ],
+            [
+              "article[data-product-id=\"srne-home\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              ".product-media[href=\"#/product/commercial-solar\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href=\"#/product/commercial-solar\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/must-inverter\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/must-inverter\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/srne-battery\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/srne-battery\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "1280-route-2",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "nodes": [
+            [
+              ".chips"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".product-media[href$=\"#/product/alps-6kw\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/alps-6kw\"]"
+            ],
+            [
+              ".product-media[href=\"#/product/doyin-solar-pump\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href=\"#/product/doyin-solar-pump\"]"
+            ],
+            [
+              "a[aria-label=\"View Starter lithium solar kit\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/starter-solar\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/srne-home\"] > .photo > .photo-label"
+            ],
+            [
+              ".product-media[href=\"#/product/commercial-solar\"] > .photo > .photo-label"
+            ],
+            [
+              ".product-media[href$=\"#/product/must-inverter\"] > .photo > .photo-label"
+            ],
+            [
+              ".product-media[href$=\"#/product/srne-battery\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/srne-battery\"]"
+            ],
+            [
+              "article[data-product-id=\"srne-battery\"] > .product-content > .product-price[data-price-state=\"priced\"]"
+            ],
+            [
+              "article[data-product-id=\"srne-battery\"] > .product-content > .product-price[data-price-state=\"priced\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/srne-battery\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/solar-heater\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/solar-heater\"]"
+            ],
+            [
+              "article[data-product-id=\"solar-heater\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"solar-heater\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/solar-heater\"]"
+            ],
+            [
+              ".product-media[href=\"#/product/solar-connectors\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href=\"#/product/solar-connectors\"]"
+            ],
+            [
+              "article[data-product-id=\"solar-connectors\"] > .product-content > .product-price[data-price-state=\"priced\"]"
+            ],
+            [
+              "article[data-product-id=\"solar-connectors\"] > .product-content > .product-price[data-price-state=\"priced\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href=\"#/product/solar-connectors\"]"
+            ],
+            [
+              "a[aria-label=\"View Solar pumping inverter\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/pump-inverter\"]"
+            ],
+            [
+              "article[data-product-id=\"pump-inverter\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"pump-inverter\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              "article[data-product-id=\"macire-5feb147d94b109c9\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"macire-5feb147d94b109c9\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "1280-route-3",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".breadcrumb > a[href=\"#/\"]"
+            ],
+            [
+              ".breadcrumb > a[href$=\"#/shop\"]"
+            ],
+            [
+              ".breadcrumb > a[href=\"#/shop?category=solar\"]"
+            ],
+            [
+              ".breadcrumb > a:nth-child(7)"
+            ],
+            [
+              "span[aria-current=\"page\"]"
+            ],
+            [
+              "#gallery-content > .photo > .photo-label"
+            ],
+            [
+              "button[data-gallery=\"0\"] > .photo > .photo-label"
+            ],
+            [
+              "button[data-gallery=\"1\"] > span"
+            ],
+            [
+              ".cat-name > a[href=\"#/shop?category=solar\"]"
+            ],
+            [
+              "div:nth-child(1) > dt"
+            ],
+            [
+              "div:nth-child(1) > dd"
+            ],
+            [
+              "div:nth-child(3) > dt"
+            ],
+            [
+              "div:nth-child(3) > dd"
+            ],
+            [
+              ".detail-copy > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              ".detail-copy > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".small:nth-child(6)"
+            ],
+            [
+              ".applications-inline > li > a"
+            ],
+            [
+              "label[for=\"detail-qty\"]"
+            ],
+            [
+              "button[data-qty-step=\"-1\"]"
+            ],
+            [
+              "#detail-qty"
+            ],
+            [
+              ".detail-actions > .btn[data-quote=\"starter-solar\"][type=\"button\"]"
+            ],
+            [
+              "#tab-description"
+            ],
+            [
+              "#tab-specifications"
+            ],
+            [
+              ".product-media[href$=\"#/product/alps-6kw\"] > .photo > .photo-label"
+            ],
+            [
+              ".product-media[href$=\"#/product/srne-home\"] > .photo > .photo-label"
+            ],
+            [
+              ".product-media[href=\"#/product/commercial-solar\"] > .photo > .photo-label"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "1280-route-4",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "button[data-qty-step=\"-1\"]"
+            ],
+            [
+              "a[aria-label=\"View Starter lithium solar kit\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/starter-solar\"]"
+            ],
+            [
+              "article[data-product-id=\"starter-solar\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"starter-solar\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".product-media[href$=\"#/product/alps-6kw\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/alps-6kw\"]"
+            ],
+            [
+              "div[data-price-state=\"priced\"]"
+            ],
+            [
+              "div[data-price-state=\"priced\"] > .price-note"
+            ],
+            [
+              ".product-media[href$=\"#/product/srne-home\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/srne-home\"]"
+            ],
+            [
+              "article[data-product-id=\"srne-home\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"srne-home\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".product-media[href=\"#/product/commercial-solar\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href=\"#/product/commercial-solar\"]"
+            ],
+            [
+              "article[data-product-id=\"commercial-solar\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"commercial-solar\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "1280-route-5",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#enq-message"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "1280-route-6",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#enq-message"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "1280-route-7",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "label": "1280-open-menu",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            [
+              "#menu-button"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".category-card[href=\"#/shop?category=generators\"] > .category-caption > div > h3"
+            ],
+            [
+              "section[aria-labelledby=\"home-featured\"] > .home-section-head > a[href$=\"#/shop\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/alps-6kw\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/alps-6kw\"]"
+            ],
+            [
+              "article[data-product-id=\"alps-6kw\"] > .product-content > .product-price[data-price-state=\"priced\"]"
+            ],
+            [
+              "article[data-product-id=\"alps-6kw\"] > .product-content > .product-price[data-price-state=\"priced\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/alps-6kw\"]"
+            ],
+            [
+              ".product-media[href=\"#/product/doyin-solar-pump\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href=\"#/product/doyin-solar-pump\"]"
+            ],
+            [
+              "article[data-product-id=\"doyin-solar-pump\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"doyin-solar-pump\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href=\"#/product/doyin-solar-pump\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/jiadi-tractor\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/jiadi-tractor\"]"
+            ],
+            [
+              "article[data-product-id=\"jiadi-tractor\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"jiadi-tractor\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/jiadi-tractor\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/tolsen-hoist\"] > .photo > .photo-label"
+            ],
+            [
+              "a[aria-label=\"View Starter lithium solar kit\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/starter-solar\"]"
+            ],
+            [
+              "article[data-product-id=\"starter-solar\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"starter-solar\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/starter-solar\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/srne-home\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/srne-home\"]"
+            ],
+            [
+              "article[data-product-id=\"srne-home\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"srne-home\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/srne-home\"]"
+            ],
+            [
+              ".product-media[href=\"#/product/commercial-solar\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href=\"#/product/commercial-solar\"]"
+            ],
+            [
+              "article[data-product-id=\"commercial-solar\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"commercial-solar\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href=\"#/product/commercial-solar\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/must-inverter\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/must-inverter\"]"
+            ],
+            [
+              "article[data-product-id=\"must-inverter\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"must-inverter\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/must-inverter\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/irrigation-kit\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/irrigation-kit\"]"
+            ],
+            [
+              "article[data-product-id=\"irrigation-kit\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"irrigation-kit\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/irrigation-kit\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/beehive\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/beehive\"]"
+            ],
+            [
+              "article[data-product-id=\"beehive\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"beehive\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/beehive\"]"
+            ],
+            [
+              "a[aria-label=\"View Automatic egg incubator\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/incubator\"]"
+            ],
+            [
+              "article[data-product-id=\"incubator\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"incubator\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/incubator\"]"
+            ],
+            [
+              "a[aria-label=\"View Maize milling machine\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/posho-mill\"]"
+            ],
+            [
+              "article[data-product-id=\"posho-mill\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"posho-mill\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/posho-mill\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "1280-contact-errors",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            [
+              "#menu-button"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#enq-message"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "1280-populated-cart",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "button[data-qty-step=\"-1\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "1280-enquiry-modal",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#modal-content > p:nth-child(2)"
+            ],
+            [
+              "#message-preview"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "1920-route-0",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".category-card[href=\"#/shop?category=solar\"] > .category-caption > div > h3"
+            ],
+            [
+              ".category-card[href=\"#/shop?category=water\"] > .category-caption > div > h3"
+            ],
+            [
+              ".category-card[href=\"#/shop?category=construction\"] > .category-caption > div > h3"
+            ],
+            [
+              "section[aria-labelledby=\"home-featured\"] > .home-section-head > a[href$=\"#/shop\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/alps-6kw\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/alps-6kw\"]"
+            ],
+            [
+              ".product-media[href=\"#/product/doyin-solar-pump\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href=\"#/product/doyin-solar-pump\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/jiadi-tractor\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/jiadi-tractor\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/tolsen-hoist\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/tolsen-hoist\"]"
+            ],
+            [
+              "a[aria-label=\"View Starter lithium solar kit\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/starter-solar\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/srne-home\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/srne-home\"]"
+            ],
+            [
+              ".product-media[href=\"#/product/commercial-solar\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href=\"#/product/commercial-solar\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/must-inverter\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/must-inverter\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/irrigation-kit\"] > .photo > .photo-label"
+            ],
+            [
+              ".product-media[href$=\"#/product/beehive\"] > .photo > .photo-label"
+            ],
+            [
+              "a[aria-label=\"View Automatic egg incubator\"] > .photo > .photo-label"
+            ],
+            [
+              "a[aria-label=\"View Maize milling machine\"] > .photo > .photo-label"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "1920-route-1",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".product-media[href$=\"#/product/alps-6kw\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/alps-6kw\"]"
+            ],
+            [
+              "article[data-product-id=\"alps-6kw\"] > .product-content > .product-price[data-price-state=\"priced\"]"
+            ],
+            [
+              "article[data-product-id=\"alps-6kw\"] > .product-content > .product-price[data-price-state=\"priced\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/alps-6kw\"]"
+            ],
+            [
+              "article[data-product-id=\"alps-6kw\"] > .product-content > .card-actions > .wa[target=\"_blank\"][rel=\"noopener noreferrer\"]"
+            ],
+            [
+              ".product-media[href=\"#/product/doyin-solar-pump\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href=\"#/product/doyin-solar-pump\"]"
+            ],
+            [
+              "article[data-product-id=\"doyin-solar-pump\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"doyin-solar-pump\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href=\"#/product/doyin-solar-pump\"]"
+            ],
+            [
+              "article[data-product-id=\"doyin-solar-pump\"] > .product-content > .card-actions > .wa[target=\"_blank\"][rel=\"noopener noreferrer\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/jiadi-tractor\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/jiadi-tractor\"]"
+            ],
+            [
+              "article[data-product-id=\"jiadi-tractor\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"jiadi-tractor\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/jiadi-tractor\"]"
+            ],
+            [
+              "article[data-product-id=\"jiadi-tractor\"] > .product-content > .card-actions > .wa[target=\"_blank\"][rel=\"noopener noreferrer\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/tolsen-hoist\"] > .photo > .photo-label"
+            ],
+            [
+              "article[data-product-id=\"tolsen-hoist\"] > .product-content > .product-price[data-price-state=\"priced\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/tolsen-hoist\"]"
+            ],
+            [
+              "article[data-product-id=\"tolsen-hoist\"] > .product-content > .card-actions > .wa[target=\"_blank\"][rel=\"noopener noreferrer\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/lenhard-welder\"] > .photo > .photo-label"
+            ],
+            [
+              ".product-media[href$=\"#/product/cordless-drill\"] > .photo > .photo-label"
+            ],
+            [
+              ".product-media[href=\"#/product/hisaki-generator\"] > .photo > .photo-label"
+            ],
+            [
+              "a[aria-label=\"View Starter lithium solar kit\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/starter-solar\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/srne-home\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/srne-home\"]"
+            ],
+            [
+              ".product-media[href=\"#/product/commercial-solar\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href=\"#/product/commercial-solar\"]"
+            ],
+            [
+              "article[data-product-id=\"commercial-solar\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"commercial-solar\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href=\"#/product/commercial-solar\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/must-inverter\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/must-inverter\"]"
+            ],
+            [
+              "article[data-product-id=\"must-inverter\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"must-inverter\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/must-inverter\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/srne-battery\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/srne-battery\"]"
+            ],
+            [
+              "article[data-product-id=\"srne-battery\"] > .product-content > .product-price[data-price-state=\"priced\"]"
+            ],
+            [
+              "article[data-product-id=\"srne-battery\"] > .product-content > .product-price[data-price-state=\"priced\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/srne-battery\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "1920-route-2",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "nodes": [
+            [
+              ".chips"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".product-media[href$=\"#/product/alps-6kw\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/alps-6kw\"]"
+            ],
+            [
+              ".product-media[href=\"#/product/doyin-solar-pump\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href=\"#/product/doyin-solar-pump\"]"
+            ],
+            [
+              "a[aria-label=\"View Starter lithium solar kit\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/starter-solar\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/srne-home\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/srne-home\"]"
+            ],
+            [
+              "article[data-product-id=\"srne-home\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"srne-home\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/srne-home\"]"
+            ],
+            [
+              ".product-media[href=\"#/product/commercial-solar\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href=\"#/product/commercial-solar\"]"
+            ],
+            [
+              "article[data-product-id=\"commercial-solar\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"commercial-solar\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href=\"#/product/commercial-solar\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/must-inverter\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/must-inverter\"]"
+            ],
+            [
+              "article[data-product-id=\"must-inverter\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"must-inverter\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/must-inverter\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/srne-battery\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/srne-battery\"]"
+            ],
+            [
+              "article[data-product-id=\"srne-battery\"] > .product-content > .product-price[data-price-state=\"priced\"]"
+            ],
+            [
+              "article[data-product-id=\"srne-battery\"] > .product-content > .product-price[data-price-state=\"priced\"] > .price-note"
+            ],
+            [
+              ".product-media[href$=\"#/product/solar-heater\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/solar-heater\"]"
+            ],
+            [
+              "article[data-product-id=\"solar-heater\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"solar-heater\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".product-media[href=\"#/product/solar-connectors\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href=\"#/product/solar-connectors\"]"
+            ],
+            [
+              "article[data-product-id=\"solar-connectors\"] > .product-content > .product-price[data-price-state=\"priced\"]"
+            ],
+            [
+              "article[data-product-id=\"solar-connectors\"] > .product-content > .product-price[data-price-state=\"priced\"] > .price-note"
+            ],
+            [
+              "a[aria-label=\"View Solar pumping inverter\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/pump-inverter\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "1920-route-3",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".breadcrumb > a[href=\"#/\"]"
+            ],
+            [
+              ".breadcrumb > a[href$=\"#/shop\"]"
+            ],
+            [
+              ".breadcrumb > a[href=\"#/shop?category=solar\"]"
+            ],
+            [
+              ".breadcrumb > a:nth-child(7)"
+            ],
+            [
+              "span[aria-current=\"page\"]"
+            ],
+            [
+              "#gallery-content > .photo > .photo-label"
+            ],
+            [
+              ".gallery-caption"
+            ],
+            [
+              "button[data-gallery=\"0\"] > .photo > .photo-label"
+            ],
+            [
+              "button[data-gallery=\"1\"] > span"
+            ],
+            [
+              "button[data-qty-step=\"-1\"]"
+            ],
+            [
+              "#tab-description"
+            ],
+            [
+              "#tab-specifications"
+            ],
+            [
+              "#tab-delivery"
+            ],
+            [
+              ".product-media[href$=\"#/product/alps-6kw\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/alps-6kw\"]"
+            ],
+            [
+              "div[data-price-state=\"priced\"]"
+            ],
+            [
+              "div[data-price-state=\"priced\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/alps-6kw\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/srne-home\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/srne-home\"]"
+            ],
+            [
+              "article[data-product-id=\"srne-home\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"srne-home\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href$=\"#/product/srne-home\"]"
+            ],
+            [
+              ".product-media[href=\"#/product/commercial-solar\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href=\"#/product/commercial-solar\"]"
+            ],
+            [
+              "article[data-product-id=\"commercial-solar\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"commercial-solar\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".sm.btn[href=\"#/product/commercial-solar\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "1920-route-4",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "button[data-qty-step=\"-1\"]"
+            ],
+            [
+              "a[aria-label=\"View Starter lithium solar kit\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/starter-solar\"]"
+            ],
+            [
+              "article[data-product-id=\"starter-solar\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"starter-solar\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".product-media[href$=\"#/product/alps-6kw\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/alps-6kw\"]"
+            ],
+            [
+              "div[data-price-state=\"priced\"]"
+            ],
+            [
+              "div[data-price-state=\"priced\"] > .price-note"
+            ],
+            [
+              ".product-media[href$=\"#/product/srne-home\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href$=\"#/product/srne-home\"]"
+            ],
+            [
+              "article[data-product-id=\"srne-home\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"srne-home\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".product-media[href=\"#/product/commercial-solar\"] > .photo > .photo-label"
+            ],
+            [
+              "h2 > a[href=\"#/product/commercial-solar\"]"
+            ],
+            [
+              "article[data-product-id=\"commercial-solar\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"commercial-solar\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "1920-route-5",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#enq-message"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "1920-route-6",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#enq-message"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "1920-route-7",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "label": "1920-open-menu",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            [
+              "#menu-button"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".category-card[href=\"#/shop?category=solar\"] > .category-caption > div > h3"
+            ],
+            [
+              ".category-card[href=\"#/shop?category=water\"] > .category-caption > div > h3"
+            ],
+            [
+              ".category-card[href=\"#/shop?category=construction\"] > .category-caption > div > h3"
+            ],
+            [
+              ".category-card[href=\"#/shop?category=generators\"] > .category-caption > div > h3"
+            ],
+            [
+              "section[aria-labelledby=\"home-featured\"] > .home-section-head > a[href$=\"#/shop\"]"
+            ],
+            [
+              ".product-media[href$=\"#/product/alps-6kw\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/alps-6kw\"]"
+            ],
+            [
+              "article[data-product-id=\"alps-6kw\"] > .product-content > .product-price[data-price-state=\"priced\"]"
+            ],
+            [
+              "article[data-product-id=\"alps-6kw\"] > .product-content > .product-price[data-price-state=\"priced\"] > .price-note"
+            ],
+            [
+              ".product-media[href=\"#/product/doyin-solar-pump\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href=\"#/product/doyin-solar-pump\"]"
+            ],
+            [
+              "article[data-product-id=\"doyin-solar-pump\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"doyin-solar-pump\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".product-media[href$=\"#/product/jiadi-tractor\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/jiadi-tractor\"]"
+            ],
+            [
+              "article[data-product-id=\"jiadi-tractor\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"jiadi-tractor\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".product-media[href$=\"#/product/tolsen-hoist\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/tolsen-hoist\"]"
+            ],
+            [
+              "article[data-product-id=\"tolsen-hoist\"] > .product-content > .product-price[data-price-state=\"priced\"]"
+            ],
+            [
+              "article[data-product-id=\"tolsen-hoist\"] > .product-content > .product-price[data-price-state=\"priced\"] > .price-note"
+            ],
+            [
+              "a[aria-label=\"View Starter lithium solar kit\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/starter-solar\"]"
+            ],
+            [
+              "article[data-product-id=\"starter-solar\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"starter-solar\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".product-media[href$=\"#/product/srne-home\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/srne-home\"]"
+            ],
+            [
+              "article[data-product-id=\"srne-home\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"srne-home\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".product-media[href=\"#/product/commercial-solar\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href=\"#/product/commercial-solar\"]"
+            ],
+            [
+              "article[data-product-id=\"commercial-solar\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"commercial-solar\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".product-media[href$=\"#/product/must-inverter\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/must-inverter\"]"
+            ],
+            [
+              "article[data-product-id=\"must-inverter\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"must-inverter\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".product-media[href$=\"#/product/irrigation-kit\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/irrigation-kit\"]"
+            ],
+            [
+              "article[data-product-id=\"irrigation-kit\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"irrigation-kit\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              ".product-media[href$=\"#/product/beehive\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/beehive\"]"
+            ],
+            [
+              "article[data-product-id=\"beehive\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"beehive\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              "a[aria-label=\"View Automatic egg incubator\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/incubator\"]"
+            ],
+            [
+              "article[data-product-id=\"incubator\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"incubator\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ],
+            [
+              "a[aria-label=\"View Maize milling machine\"] > .photo > .photo-label"
+            ],
+            [
+              "h3 > a[href$=\"#/product/posho-mill\"]"
+            ],
+            [
+              "article[data-product-id=\"posho-mill\"] > .product-content > .product-price[data-price-state=\"quote\"]"
+            ],
+            [
+              "article[data-product-id=\"posho-mill\"] > .product-content > .product-price[data-price-state=\"quote\"] > .price-note"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "1920-contact-errors",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#enq-message"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "1920-populated-cart",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".price-note"
+            ],
+            [
+              "button[data-qty-step=\"-1\"]"
+            ],
+            [
+              "#cart-qty-alps-6kw"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "1920-enquiry-modal",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "overflow": false,
+      "brokenImages": [],
+      "unnamedImages": 0,
+      "h1Count": 1,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#modal-content > p:nth-child(2)"
+            ],
+            [
+              "#message-preview"
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

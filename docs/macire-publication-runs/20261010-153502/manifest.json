@@ -1,0 +1,21 @@
+{
+  "status": "published",
+  "before": {
+    "assets/js/catalogue.js": "905244a69d0b37a5ef825b213875c9f5a8db7951b98fd902ae54ec0008beefcd",
+    "assets/js/app.js": "1c3ca5361587d8f4a7d3728137c8c6f187b15fd1240bce1c26bd117c153d5e24",
+    "tests/acceptance.py": "a7522bc2835f761e01896276d9b497a1ee1c28e60f0eebe899892dbf4826dfbd",
+    "data/macire-catalogue-drafts.json": "efef99c83e5f09eae3092bbe34fd32ddcedf18969000e5b4e488f7791bdf689d"
+  },
+  "after": {
+    "assets/js/catalogue.js": "f4ad7c0971fa383d7e73c75523d36936de869bc6cb9166a7688ccae81ccfc0c7",
+    "assets/js/app.js": "b99f5a3fa1e5f219b10f6cbe0f1aa6c9e002821199a6b8a2e9746b2c7a94c3d4",
+    "tests/acceptance.py": "42cc06d3cfd73e3da3b072e0607b1fe89bef068fc7636b06b30ce348441b02ea",
+    "data/macire-catalogue-drafts.json": "efef99c83e5f09eae3092bbe34fd32ddcedf18969000e5b4e488f7791bdf689d"
+  },
+  "validation": {
+    "schema_errors": 0,
+    "duplicates": 0,
+    "browser_passed": 450,
+    "browser_failed": 0
+  }
+}

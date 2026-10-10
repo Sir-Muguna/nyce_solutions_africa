@@ -29,8 +29,9 @@ const APPROVED = new Set(Array.isArray(CONFIG.approvedProductIds) ? CONFIG.appro
 
 const CATEGORIES = DATA.categories;
 const ALL_PRODUCTS = DATA.products;
-// Production mode shows only owner-approved products. Demo mode shows every record.
-const PRODUCTS = PROD ? ALL_PRODUCTS.filter(p => APPROVED.has(p.id) || p.approved === true) : ALL_PRODUCTS;
+// Draft records are never shown, in any mode. Production mode additionally shows only owner-approved products.
+const PUBLISHABLE = ALL_PRODUCTS.filter(p => p.verificationStatus !== 'draft');
+const PRODUCTS = PROD ? PUBLISHABLE.filter(p => APPROVED.has(p.id) || p.approved === true) : PUBLISHABLE;
 const HAS_DATES = PRODUCTS.some(p => p.dateAdded);
 
 const APPLICATIONS = [
@@ -71,6 +72,8 @@ const icon = n => `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">${IC
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const money = n => `${CURRENCY} ${Number(n).toLocaleString(LOCALE, { maximumFractionDigits: 0 })}`;
 const cat = id => CATEGORIES.find(c => c.id === id);
+// Retired subcategory IDs and the subcategory they were merged into, so old links keep working.
+const SUB_ALIASES = { 'water-2': 'solar-7' };
 const subOf = id => { for (const c of CATEGORIES) { const s = c.subcategories.find(x => x.id === id); if (s) return { ...s, category: c }; } return null; };
 const product = id => PRODUCTS.find(p => p.id === id);
 const inDept = (p, c) => !c || (p.categories || []).includes(c);
@@ -90,6 +93,7 @@ const shopUrl = (category, subcategory) => makeUrl('shop', { category, subcatego
 const hasPrice = p => typeof p.price === 'number' && Number.isFinite(p.price) && p.price >= 0 && p.priceType !== 'quote';
 const priceState = p => hasPrice(p) ? 'priced' : (p.price === null || p.priceType === 'quote') ? 'quote' : 'unavailable';
 const isDemoPrice = p => hasPrice(p) && p.priceType === 'demo' && !PROD;
+const DEMO_PRICES = PRODUCTS.some(isDemoPrice);
 
 /* ---------------------------------------------------------------- Storage helpers */
 function store(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch { return false; } }
@@ -98,7 +102,7 @@ function load(key, fallback) { try { const v = JSON.parse(localStorage.getItem(k
 /* ---------------------------------------------------------------- 2. Cart state */
 const CART_KEY = 'nyce-demo-cart-v2';
 let cart = {}, canStore = true, toastTimer, previousHash = '', activeTab = 'description', galleryIndex = 0;
-let imageFailed = false, focusAfterRoute = null, formPreview = '';
+let imageFailed = false, focusAfterRoute = null, formPreview = '', undoCart = null, lastAdd = { key: '', t: 0 };
 let viewMode = load('nyce-view-mode', 'grid') === 'list' ? 'list' : 'grid';
 (function restoreCart() {
   const data = load(CART_KEY, {});
@@ -121,16 +125,16 @@ function addCart(id, q) {
   if (next > MAX_QTY) { notify(`Maximum ${MAX_QTY} units per product in this cart.`); return false; }
   cart[id] = next; saveCart(); notify(`${q} × ${p.name} added to the cart.`, true); return true;
 }
-function notify(message, link = false) {
+function notify(message, link = false, undo = false) {
   const el = document.getElementById('toast');
   clearTimeout(toastTimer);
-  el.innerHTML = `<span>${esc(message)}</span>${link ? '<a href="#/cart">View cart</a>' : ''}`;
+  el.innerHTML = `<span>${esc(message)}</span>${link ? '<a href="#/cart">View cart</a>' : ''}${undo ? '<button type="button" class="toast-undo" data-undo-cart>Undo</button>' : ''}`;
   el.classList.add('visible');
   toastTimer = setTimeout(() => el.classList.remove('visible'), 5000);
 }
 
 /* ---------------------------------------------------------------- 3. Shared components */
-const photoPlaceholder = alt => `<span class="photo"><img src="${esc(ASSETS.placeholder || '')}" alt="${esc(alt)}" loading="lazy"><span class="photo-fallback" aria-hidden="true">Image unavailable</span></span>`;
+const photoPlaceholder = alt => `<span class="photo"><img src="${esc(ASSETS.placeholder || '')}" alt="${esc(alt)}" width="800" height="600" decoding="async" loading="lazy"><span class="photo-fallback" aria-hidden="true">Image unavailable</span></span>`;
 function photo(tile, alt, opts = {}) {
   const { label = !PROD, mode = 'meet' } = opts;
   // A missing sprite, a failed sprite load or a record without a usable tile shows the placeholder instead of a broken image.
@@ -153,12 +157,6 @@ function priceBlock(p, size = 'card') {
   const note = isDemoPrice(p) ? 'Demonstration price · not a sales offer' : 'Taxes and delivery confirmed by quotation';
   return `<div class="product-price" data-price-state="priced">${money(p.price)}<span class="price-note">${note}</span></div>`;
 }
-function recordTag(p) {
-  if (PROD) return '';
-  return p.evidenceStatus === 'sourced'
-    ? `<span class="tag sourced record-tag">Reference product</span>`
-    : `<span class="tag illustrative record-tag">Illustrative product</span>`;
-}
 // Real photographs (image.src) are used when a record has one; otherwise the category sprite tile; otherwise a placeholder.
 const PHOTO_SRC = /^(assets\/|https:\/\/)[\w\-./%]+$/i;
 function productPhoto(p, alt, opts = {}) {
@@ -166,17 +164,17 @@ function productPhoto(p, alt, opts = {}) {
   if (typeof img.src === 'string' && PHOTO_SRC.test(img.src)) {
     return `<span class="photo"><img src="${esc(img.src)}" alt="${esc(alt)}" width="600" height="600" decoding="async" ${opts.eager ? '' : 'loading="lazy"'} data-photo-src></span>`;
   }
-  return photo(img.tile, alt, { label: false, mode: 'slice' });
+  return photo(img.tile, 'Representative equipment image; exact product photograph pending', { label: true, mode: 'slice' });
 }
 function card(p, opts) {
   const { heading = 'h2', eager = false } = opts && typeof opts === 'object' ? opts : {};
   const h = heading === 'h3' ? 'h3' : 'h2', name = p.name || 'Product';
   const stock = Object.prototype.hasOwnProperty.call(p, 'stock') && p.stock !== undefined && p.stock !== null && p.stock !== '';
   const whatsapp = validNumber()
-    ? `<a class="btn wa sm" href="https://wa.me/${WHATSAPP}?text=${encodeURIComponent(generalMessage())}" target="_blank" rel="noopener noreferrer">${icon('wa')} WhatsApp</a>`
-    : `<button type="button" class="btn wa sm" data-general-wa>${icon('wa')} WhatsApp</button>`;
+    ? `<a class="btn wa sm" href="${waLink(messageFor(p, 1))}" target="_blank" rel="noopener noreferrer" aria-label="Request a quote for ${esc(name)} on WhatsApp">${icon('wa')} WhatsApp</a>`
+    : `<button type="button" class="btn wa sm" data-wa="${p.id}" aria-label="Request a quote for ${esc(name)} on WhatsApp">${icon('wa')} WhatsApp</button>`;
   return `<article class="product-card" data-product-id="${p.id}">
-    <a href="#/product/${p.id}" class="product-media" aria-label="View ${esc(name)}">${productPhoto(p, p.alt || name, { eager })}${recordTag(p)}</a>
+    <a href="#/product/${p.id}" class="product-media" aria-label="View ${esc(name)}">${productPhoto(p, p.alt || name, { eager })}</a>
     <div class="product-content">
       <${h}><a href="#/product/${p.id}">${esc(name)}</a></${h}>
       ${p.sku ? `<p class="product-sku">SKU: ${esc(p.sku)}</p>` : ''}
@@ -190,8 +188,7 @@ function card(p, opts) {
   </article>`;
 }
 function categoryCard(c) {
-  const n = countDept(c.id), subs = c.subcategories.length;
-  return `<a href="${shopUrl(c.id)}" class="category-card">${photo(c.imageTile, `${c.name} equipment`, { label: false, mode: 'slice' })}<div class="category-caption"><div><h3>${esc(c.name)}</h3><span>${subs} ${subs === 1 ? 'subcategory' : 'subcategories'}${n ? ` · ${n} ${n === 1 ? 'product' : 'products'}` : ''}</span></div><span class="round-arrow">${icon('arrow')}</span></div></a>`;
+  return `<a href="${shopUrl(c.id)}" class="category-card">${photo(c.imageTile, `${c.name} equipment`, { label: false, mode: 'slice' })}<div class="category-caption"><div><h3>${esc(c.name)}</h3></div><span class="round-arrow">${icon('arrow')}</span></div></a>`;
 }
 function contactLine(value, pending) { return value ? esc(value) : `<span class="muted">${esc(pending)}</span>`; }
 const PENDING = (CONFIG.placeholders && CONFIG.placeholders.contactPending) || 'To be supplied';
@@ -199,6 +196,8 @@ const PENDING = (CONFIG.placeholders && CONFIG.placeholders.contactPending) || '
 /* ---------------------------------------------------------------- 3b. Shell: category menu, mobile drawer, footer */
 const NAV_LINKS = [['#/', 'Home', 'home'], ['#/about', 'About Us', 'about'], ['#/shop', 'Shop', 'shop'], ['#/business', 'Business & Bulk Order', 'business'], ['#/contact', 'Contact', 'contact']];
 const safeUrl = u => /^https:\/\/[^\s"'<>]+$/i.test(String(u || ''));
+const PHONE_DIGITS = String(CONFIG.phoneNumber || '').replace(/\D/g, '');
+const phoneLink = () => `<a href="tel:+${PHONE_DIGITS}">${esc(CONFIG.phoneNumber)}</a>`;
 const menuLink = (c, s, cls = '', label = '') => `<a href="${shopUrl(c.id, s ? s.id : '')}"${cls ? ` class="${cls}"` : ''} data-menu-category="${c.id}"${s ? ` data-menu-sub="${s.id}"` : ''}>${esc(label || (s ? s.name : c.name))}</a>`;
 function categoryMenuHTML() {
   return `<div class="category-menu-head"><a href="#/shop" class="menu-all">Browse all products ${icon('arrow')}</a></div>
@@ -221,7 +220,7 @@ function buildFooter() {
     const items = [];
     if (validNumber()) items.push(['WhatsApp', `<a href="https://wa.me/${WHATSAPP}">+${esc(WHATSAPP)}</a>`]);
     if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(CONFIG.emailAddress || '')) items.push(['Email', `<a href="mailto:${esc(CONFIG.emailAddress)}">${esc(CONFIG.emailAddress)}</a>`]);
-    if (CONFIG.phoneNumber) items.push(['Phone', esc(CONFIG.phoneNumber)]);
+    if (CONFIG.phoneNumber) items.push(['Phone', PHONE_DIGITS.length >= 8 ? phoneLink() : esc(CONFIG.phoneNumber)]);
     if (safeUrl(CONFIG.facebookUrl)) items.push(['Facebook', `<a href="${esc(CONFIG.facebookUrl)}" target="_blank" rel="noopener noreferrer">${esc(CONFIG.facebookName || CONFIG.facebookUrl)}</a>`]);
     if (safeUrl(CONFIG.websiteUrl)) items.push(['Website', `<a href="${esc(CONFIG.websiteUrl)}">${esc(CONFIG.websiteName || CONFIG.websiteUrl)}</a>`]);
     if (CONFIG.physicalAddress) items.push(['Address', esc(CONFIG.physicalAddress)]);
@@ -229,12 +228,21 @@ function buildFooter() {
     list.innerHTML = items.map(([label, value]) => `<li><span class="footer-contact-label">${label}</span>${value}</li>`).join('');
     list.hidden = !items.length;
   }
-  // Policy pages still carry the owner-approval placeholder, so say so wherever they are linked.
-  if ((CONFIG.placeholders || {}).policyPending) document.querySelectorAll('[data-policy-link]').forEach(a => a.insertAdjacentHTML('beforeend', ' <span class="link-note">Draft</span>'));
 }
 function buildShell() {
   const menu = document.getElementById('category-menu'); if (menu) menu.innerHTML = categoryMenuHTML();
   const drawer = document.getElementById('nav-drawer'); if (drawer) drawer.innerHTML = drawerHTML();
+  const strip = document.getElementById('category-strip');
+  if (strip) strip.innerHTML = `<div class="category-strip-scroll"><a href="#/shop" data-strip-category="">All products</a>${CATEGORIES.map(c => `<a href="${shopUrl(c.id)}" data-strip-category="${c.id}">${esc(c.name)}</a>`).join('')}</div>`;
+  const footCats = document.getElementById('footer-category-links');
+  if (footCats) footCats.innerHTML = CATEGORIES.map(c => `<a href="${shopUrl(c.id)}">${esc(c.name)}</a>`).join('');
+  const phone = document.getElementById('nav-phone');
+  if (phone && PHONE_DIGITS.length >= 8) {
+    phone.href = `tel:+${PHONE_DIGITS}`;
+    phone.setAttribute('aria-label', `Call ${BUSINESS} on ${CONFIG.phoneNumber}`);
+    phone.innerHTML = `${icon('phone')}<span>${esc(CONFIG.phoneNumber)}</span>`;
+    phone.hidden = false;
+  }
   buildFooter();
 }
 const deptPanel = () => document.getElementById('category-menu');
@@ -269,12 +277,18 @@ function syncNav(route) {
     const on = !!sel.category && el.dataset.menuCategory === sel.category && (el.dataset.menuSub || '') === (sel.subcategory || '');
     if (on) el.setAttribute('aria-current', 'page'); else el.removeAttribute('aria-current');
   });
+  document.querySelectorAll('[data-strip-category]').forEach(a => {
+    const on = route.parts[0] === 'shop' && a.dataset.stripCategory === sel.category;
+    if (on) { a.setAttribute('aria-current', 'page'); a.parentElement.scrollLeft = a.offsetLeft - 16; } else a.removeAttribute('aria-current');
+  });
+  const pill = document.querySelector('.browse-nav [aria-current]');
+  if (pill) pill.closest('ul').scrollLeft = pill.offsetLeft - 16;
 }
 
 /* ---------------------------------------------------------------- 4. Home */
 // Product rows come only from real catalogue data: featured, best-seller and dated records when present, then category rows.
 // A product appears once on the page, a row needs at least two products, and there are never more than four rows.
-const HOME_MAX_ROWS = 4, HOME_ROW_SIZE = 4;
+const HOME_MAX_ROWS = 3, HOME_ROW_SIZE = 4;
 function homeRows() {
   const shown = new Set(), rows = [];
   const usable = PRODUCTS.filter(p => p && p.id && p.name);
@@ -293,10 +307,8 @@ function homeRows() {
 }
 function home() {
   const rows = homeRows();
-  const subCount = CATEGORIES.reduce((n, c) => n + c.subcategories.length, 0);
-  // Every statement below is stated elsewhere in this site's own copy or computed from the catalogue; nothing is promised beyond that.
+  // Every statement below is stated elsewhere in this site's own copy; nothing is promised beyond that.
   const trust = [
-    ['grid', `${CATEGORIES.length} categories and ${subCount} subcategories in one catalogue`],
     validNumber() ? ['wa', 'Send product enquiries on WhatsApp'] : null,
     ['message', 'Prices, availability and taxes are confirmed by quotation'],
     ['truck', 'Delivery details are confirmed per enquiry']
@@ -305,17 +317,28 @@ function home() {
     <div class="home-section-head"><h2 id="${row.id}">${esc(row.title)}</h2><a href="${row.href}">${row.more}${row.more === 'View all' ? `<span class="sr-only"> ${esc(row.title)}</span>` : ''}</a></div>
     <div class="product-grid home-product-grid">${row.items.map(p => card(p, { heading: 'h3', eager: index === 0 })).join('')}</div>
   </section>`;
+  // Each description lists only product types present in the catalogue for that application.
+  const segments = [
+    ['home', 'Homes & domestic', 'Solar kits, lithium batteries, hybrid inverters, solar water heaters, changeover switches and backup generators.', 'Home Backup Power', 'Browse home power'],
+    ['leaf', 'Farms & agriculture', 'Solar and electric borehole pumps, irrigation kits and pipes, sprayers, incubators, milling machines and walking tractors.', 'Farm & Irrigation', 'Browse farm equipment'],
+    ['message', 'Commercial & institutional', 'Quotations for businesses, schools, hotels and institutions. Send your equipment list, quantities and destination.', '', 'Request a quotation'],
+    ['tool', 'Industrial & construction', 'Three-phase diesel generators, welding equipment, hoists, concrete mixers, cables and distribution boards.', 'Construction & Workshop', 'Browse construction & workshop']
+  ].filter(([, , , app]) => !app || PRODUCTS.some(p => (p.applications || []).includes(app)));
   return `
   <section class="home-hero" aria-labelledby="home-title">
     <h1 id="home-title">Power your home. Equip your business.</h1>
-    <p>Solar and backup power, water solutions, electricals, farm equipment, construction and workshop tools.</p>
+    <p>Solar, water pumps, generators, electricals, farm and workshop equipment for homes, farms and businesses.</p>
     <div class="home-hero-actions"><a class="btn light" href="#/shop">Shop products</a><a class="btn outline-light" href="#/business">Request a quote</a></div>
   </section>
   <section class="home-categories" aria-labelledby="home-categories-title">
-    <div class="home-section-head"><h2 id="home-categories-title">shop by category</h2></div>
+    <div class="home-section-head"><h2 id="home-categories-title">Product sectors</h2><a href="#/shop">View full catalogue</a></div>
     <div class="category-grid">${CATEGORIES.map(categoryCard).join('')}</div>
   </section>
   ${rows.map(productRow).join('')}
+  <section class="home-segments" aria-labelledby="home-segments-title">
+    <div class="home-section-head"><h2 id="home-segments-title">Equipment for every customer</h2></div>
+    <div class="application-grid home-segment-grid">${segments.map(([ic, title, text, app, cta]) => `<a class="application" href="${app ? makeUrl('shop', { application: app }) : '#/business'}">${icon(ic)}<h3>${title}</h3><p>${text}</p><span class="text-link">${cta} ${icon('arrow')}</span></a>`).join('')}</div>
+  </section>
   <section class="home-trust-strip" aria-label="Service information">
     ${trust.map(([ic, text]) => `<div>${icon(ic)}<span>${esc(text)}</span></div>`).join('')}
   </section>
@@ -337,21 +360,23 @@ const defaultSort = sel => sel.q ? 'relevance' : 'featured';
 const sortOf = sel => sel.sort || defaultSort(sel);
 // Filters come only from fields present in the catalogue records. A filter is offered only when it can separate the current results.
 const FACETS = [
-  { key: 'pricing', legend: 'Pricing', values: p => { const s = priceState(p); return s === 'priced' ? ['priced'] : s === 'quote' ? ['quote'] : []; }, label: v => v === 'priced' ? (PROD ? 'Priced products' : 'Priced (demonstration prices)') : 'Request Price' },
+  { key: 'pricing', legend: 'Pricing', values: p => { const s = priceState(p); return s === 'priced' ? ['priced'] : s === 'quote' ? ['quote'] : []; }, label: v => v === 'priced' ? (DEMO_PRICES ? 'Priced (demonstration prices)' : 'Priced products') : 'Request Price' },
   { key: 'application', legend: 'Application', values: p => Array.isArray(p.applications) ? p.applications.filter(Boolean) : [], label: v => v },
-  { key: 'power', legend: 'Power source', values: p => p.power ? [p.power] : [], label: v => v }
+  { key: 'power', legend: 'Power source', values: p => p.power ? [p.power] : [], label: v => v },
+  { key: 'phase', legend: 'Phase', values: p => p.phase ? [p.phase] : [], label: v => v }
 ];
 function selection(route) {
   const g = k => route.params.get(k) || '';
-  let category = g('category'), subcategory = g('subcategory');
+  let category = g('category'), subcategory = SUB_ALIASES[g('subcategory')] || g('subcategory');
   if (subcategory) { const s = subOf(subcategory); if (s) category = s.category.id; else subcategory = ''; }
   if (category && !cat(category)) category = '';
   const q = g('q'), pricing = g('pricing') === 'demo' ? 'priced' : g('pricing');
   return { category, subcategory, q, power: g('power'), phase: g('phase'), pricing, source: PROD ? '' : g('source'), application: g('application'), sort: validSort(g('sort'), q) ? g('sort') : '', page: Math.max(1, Math.floor(Number(g('page')) || 1)) };
 }
-// Search results must match only product name and internal SKU.
+// Search matches product name, internal SKU, verified brand and category/subcategory names (not unverified model numbers).
 function searchText(p) {
-  return [p.name, p.sku].join(' ').toLowerCase();
+  const places = [...(p.categories || []).map(id => (cat(id) || {}).name), ...(p.subcategories || []).map(id => (subOf(id) || {}).name)];
+  return [p.name, p.sku, p.brand, ...places].filter(Boolean).join(' ').toLowerCase();
 }
 const queryTerms = q => { const s = String(q || '').trim().toLowerCase(); return s ? s.split(/\s+/) : []; };
 // Products matching the selection. `skip` ignores one control ('category', 'subcategory' or a filter key) so that
@@ -361,7 +386,7 @@ function scoped(sel, skip = '') {
   return PRODUCTS.filter(p => (skip === 'category' || inDept(p, sel.category)) && (skip === 'category' || skip === 'subcategory' || inSub(p, sel.subcategory))
     && (!terms.length || terms.every(t => searchText(p).includes(t)))
     && FACETS.every(f => skip === f.key || !sel[f.key] || f.values(p).includes(sel[f.key]))
-    && (!sel.phase || p.phase === sel.phase) && (!sel.source || p.evidenceStatus === sel.source));
+    && (!sel.source || p.evidenceStatus === sel.source));
 }
 function relevance(p, query, terms) {
   const name = String(p.name || '').toLowerCase(), sku = String(p.sku || '').toLowerCase();
@@ -389,7 +414,18 @@ function filtered(sel) {
 // Drop a filter value that would return nothing after the category or subcategory changed.
 function dropEmptyFilters(sel) {
   FACETS.forEach(f => { if (sel[f.key] && !scoped(sel, f.key).some(p => f.values(p).includes(sel[f.key]))) sel[f.key] = ''; });
-  if (sel.phase && !scoped(sel, 'phase-none').some(p => p.phase === sel.phase)) sel.phase = '';
+}
+// A filter is shown only when its values can split the current results; option counts come from the catalogue.
+function filterBar(sel) {
+  const controls = FACETS.map(f => {
+    const pool = scoped(sel, f.key), counts = new Map();
+    pool.forEach(p => f.values(p).forEach(v => counts.set(v, (counts.get(v) || 0) + 1)));
+    const splits = counts.size > 1 || (counts.size === 1 && [...counts.values()][0] < pool.length);
+    if (!splits && !sel[f.key]) return '';
+    const opts = [...counts].sort((a, b) => String(f.label(a[0])).localeCompare(String(f.label(b[0]))));
+    return `<label class="filter-control" for="filter-${f.key}"><span>${f.legend}</span><select id="filter-${f.key}" data-filter="${f.key}"><option value="">All</option>${opts.map(([v, n]) => `<option value="${esc(v)}"${sel[f.key] === v ? ' selected' : ''}>${esc(f.label(v))} (${n})</option>`).join('')}</select></label>`;
+  }).filter(Boolean);
+  return controls.length ? `<div class="filter-bar" role="group" aria-label="Filter products">${controls.join('')}</div>` : '';
 }
 const activeFilterCount = sel => ['category', 'subcategory', 'power', 'phase', 'pricing', 'application', 'source'].filter(k => sel[k]).length - (sel.category && sel.subcategory ? 1 : 0);
 function pageList(page, pages) {
@@ -408,6 +444,17 @@ function canonicalShop(route) {
   const url = makeUrl('shop', sel), want = new URLSearchParams(url.split('?')[1] || '');
   return ['category', 'subcategory', 'q', 'power', 'phase', 'pricing', 'source', 'application', 'sort', 'page'].some(k => (route.params.get(k) || '') !== (want.get(k) || '')) ? url : '';
 }
+const countPill = (href, label, n, current) => `<li><a href="${href}"${current ? ' aria-current="page"' : ''}>${esc(label)}</a></li>`;
+// Category pages list their subcategories; the unfiltered shop lists the categories. Counts are published products only.
+function browseNav(sel, c, s) {
+  if (c) return `<nav class="browse-nav" aria-label="${esc(c.name)} subcategories"><ul>${countPill(shopUrl(c.id), `All ${c.name}`, countDept(c.id), !s)}${c.subcategories.map(sc => countPill(shopUrl(c.id, sc.id), sc.name, countSub(sc.id), !!s && s.id === sc.id)).join('')}</ul></nav>`;
+  if (sel.q || sel.application) return '';
+  return `<nav class="browse-nav browse-categories" aria-label="Product categories"><ul>${CATEGORIES.map(cc => countPill(shopUrl(cc.id), cc.name, countDept(cc.id), false)).join('')}</ul></nav>`;
+}
+function relatedCategories(c) {
+  const others = CATEGORIES.filter(x => x.id !== c.id && countDept(x.id));
+  return others.length ? `<nav class="related-categories" aria-labelledby="related-categories-title"><h2 id="related-categories-title">Browse other categories</h2><ul>${others.map(x => countPill(shopUrl(x.id), x.name, countDept(x.id), false)).join('')}</ul></nav>` : '';
+}
 function chips(sel) {
   const list = [];
   const c = cat(sel.category), s = subOf(sel.subcategory);
@@ -416,7 +463,7 @@ function chips(sel) {
   if (s) list.push(['subcategory', s.name]);
   if (sel.power) list.push(['power', sel.power]);
   if (sel.phase) list.push(['phase', sel.phase]);
-  if (sel.pricing) list.push(['pricing', sel.pricing === 'priced' ? (PROD ? 'Priced products' : 'Demonstration prices') : 'Request Price']);
+  if (sel.pricing) list.push(['pricing', sel.pricing === 'priced' ? (DEMO_PRICES ? 'Demonstration prices' : 'Priced products') : 'Request Price']);
   if (sel.application) list.push(['application', sel.application]);
   if (sel.source) list.push(['source', sel.source === 'sourced' ? 'Reference products' : 'Illustrative products']);
   if (!list.length) return '';
@@ -424,10 +471,15 @@ function chips(sel) {
 }
 function emptyState(sel) {
   if (!PRODUCTS.length) return `<div class="empty"><h2>The catalogue is being prepared</h2><p>No products are published yet. Send an enquiry and describe the equipment you need.</p><div class="actions"><a class="btn" href="#/business">Request a quote</a><a class="btn secondary" href="#/contact">Contact us</a></div></div>`;
+  const sub = subOf(sel.subcategory);
+  if (sub && !sel.q && !countSub(sub.id)) {
+    return `<div class="empty"><h2>No products listed in ${esc(sub.name)} yet</h2><p>Describe what you need and ${esc(BUSINESS)} will confirm availability and price.</p>
+      <div class="actions"><a class="btn" href="#/business">Request a quote</a><button type="button" class="btn wa" data-general-wa>${icon('wa')} Ask on WhatsApp</button><a class="btn secondary" href="${shopUrl(sub.category.id)}">View all ${esc(sub.category.name)}</a></div></div>`;
+  }
   const filtersOn = activeFilterCount(sel) > 0;
   const msg = sel.q ? `No products match “${esc(sel.q)}”${filtersOn ? ' with the selected filters' : ''}.` : 'No products match the selected filters.';
   const depts = CATEGORIES.filter(cc => PRODUCTS.some(p => inDept(p, cc.id)));
-  return `<div class="empty"><h2>No matching products</h2><p>${msg}</p>${sel.q ? '<p class="small">Search looks at product names and SKUs. Check the spelling or try a shorter term.</p>' : ''}
+  return `<div class="empty"><h2>No matching products</h2><p>${msg}</p>${sel.q ? '<p class="small">Search looks at product names, brands, SKUs and category names. Check the spelling or try a shorter term.</p>' : ''}
     <div class="actions">${sel.q ? '<button type="button" class="btn secondary" data-remove-filter="q">Clear search</button>' : ''}${filtersOn ? '<button type="button" class="btn secondary" data-clear-filters-keep-search>Clear filters</button>' : ''}<a class="btn" href="#/shop">Browse all products</a></div>
     <nav class="empty-links" aria-label="Browse by category"><span>Browse by category:</span>${depts.map(cc => `<a href="${shopUrl(cc.id)}">${esc(cc.name)}</a>`).join('')}</nav>
     <p class="small">Cannot find what you need? <a href="#/business">Request a quote</a> or <button type="button" class="link-button" data-general-wa>ask on WhatsApp</button>.</p></div>`;
@@ -443,7 +495,7 @@ function listing(route) {
   if (s) breadcrumbs.push([s.name, sel.q ? shopUrl(c.id, s.id) : null]);
   if (sel.q) breadcrumbs.push(['Search results']);
   if (facetOnly) breadcrumbs.push([sel.application]);
-  const intro = s ? `Products in ${s.name}, part of ${c.name}.` : c ? `${c.intro} ${c.advice}` : 'Browse the full catalogue or search by product name or SKU.';
+  const intro = s ? `Products in ${esc(s.name)}, part of <a href="${shopUrl(c.id)}">${esc(c.name)}</a>.` : c ? esc(`${c.intro} ${c.advice}`) : 'Browse the full catalogue by category, or search by product name or SKU.';
   const sortOptions = [...(sel.q ? [['relevance', 'Best match']] : []), ['featured', 'Featured'], ...(HAS_DATES ? [['newest', 'Newest']] : []), ['az', 'Name: A–Z'], ['za', 'Name: Z–A'], ['price-asc', 'Price: low to high'], ['price-desc', 'Price: high to low']];
   const summary = rows.length
     ? `<span class="result-count" role="status">${rows.length} ${rows.length === 1 ? 'product' : 'products'} <small>· showing ${start + 1}–${Math.min(start + PAGE_SIZE, rows.length)}${pages > 1 ? ` · page ${page} of ${pages}` : ''}</small></span>`
@@ -451,8 +503,9 @@ function listing(route) {
   const grid = rows.length ? rows.slice(start, start + PAGE_SIZE).map(p => card(p)).join('') : emptyState(sel);
   const pagination = pages > 1 ? `<nav class="pagination" aria-label="Catalogue pages"><button type="button" data-page="${page - 1}" aria-label="Previous page" ${page === 1 ? 'disabled' : ''}>Previous</button>${pageList(page, pages).map(n => n === '…' ? '<span aria-hidden="true">…</span>' : `<button type="button" data-page="${n}" ${page === n ? 'aria-current="page"' : ''} aria-label="Page ${n}">${n}</button>`).join('')}<button type="button" data-page="${page + 1}" aria-label="Next page" ${page === pages ? 'disabled' : ''}>Next</button></nav>` : '';
   return crumb(breadcrumbs) + `
-  ${sel.q ? `<section class="search-results-summary" aria-labelledby="search-results-title"><h1 id="search-results-title">Search results for “${esc(sel.q)}”</h1>${summary}</section>` : `<section class="page-intro"><h1>${esc(title)}</h1><p>${esc(intro)}</p></section>`}
-  ${demoNotice('Demonstration catalogue: reference products come from cited retailer listings and illustrative products are unverified examples. Images are representative category visuals, not exact-model photographs.')}
+  ${sel.q ? `<section class="search-results-summary" aria-labelledby="search-results-title"><h1 id="search-results-title">Search results for “${esc(sel.q)}”</h1>${summary}</section>` : `<section class="page-intro"><h1>${esc(title)}</h1><p>${intro}</p></section>`}
+  ${browseNav(sel, c, s)}
+  ${demoNotice('Product images are representative category visuals, not exact-model photographs. Specifications, availability and prices are confirmed by quotation.')}
   <div class="catalog-layout">
     <div class="catalog-main">
       <div class="toolbar">
@@ -467,13 +520,17 @@ function listing(route) {
       ${pagination}
       ${['price-asc', 'price-desc'].includes(sort) && rows.some(p => !hasPrice(p)) ? '<p class="small muted">Products without a listed price (Request Price) appear after priced products.</p>' : ''}
     </div>
-  </div>`;
+  </div>
+  ${c && !sel.q ? relatedCategories(c) : ''}`;
 }
 
 /* ---------------------------------------------------------------- 5. Product detail */
-function specTable(p) { return `<table class="spec-table"><tbody>${Object.entries(p.specs).map(([k, v]) => `<tr><th scope="row">${esc(k)}</th><td>${esc(v)}</td></tr>`).join('')}</tbody></table>`; }
-function technical(p) { return `<div class="technical-card">${icon('layers')}<h3>${esc(p.name)}</h3><p>${esc(Object.entries(p.specs).slice(0, 3).map(([k, v]) => `${k}: ${v}`).join(' · '))}</p><span class="tag">Specification overview · not a photograph</span></div>`; }
-function galleryItem(p, i) { const g = p.gallery[i] || p.gallery[0]; return g.type === 'spec' ? technical(p) : photo(g.tile, p.alt); }
+const TBC = 'To Be Confirmed';
+// Illustrative records carry planning fields, not verified model specifications, so they are not shown as specs.
+const verifiedSpecs = p => p.evidenceStatus !== 'illustrative' && p.specs && Object.keys(p.specs).length ? p.specs : null;
+function specTable(p) { return `<table class="spec-table"><tbody>${Object.entries(verifiedSpecs(p)).map(([k, v]) => `<tr><th scope="row">${esc(k)}</th><td>${esc(v)}</td></tr>`).join('')}</tbody></table>`; }
+function technical(p) { const s = verifiedSpecs(p); return `<div class="technical-card">${icon('layers')}<h3>${esc(p.name)}</h3><p>${s ? esc(Object.entries(s).slice(0, 3).map(([k, v]) => `${k}: ${v}`).join(' · ')) : `Specifications: ${TBC}`}</p><span class="tag">Specification overview · not a photograph</span></div>`; }
+function galleryItem(p, i) { const g = p.gallery[i] || p.gallery[0]; return g.type === 'spec' ? technical(p) : productPhoto(p, p.alt); }
 function relatedTo(p) {
   const explicit = (p.related || []).map(product).filter(Boolean);
   if (explicit.length) return explicit.slice(0, 4);
@@ -485,29 +542,31 @@ function detail(p) {
   activeTab = 'description'; galleryIndex = 0;
   const c = primaryCat(p), s = primarySub(p), related = relatedTo(p);
   const otherAssignments = p.subcategories.slice(1).map(subOf).filter(Boolean);
-  const ident = [p.model ? `<strong>Model:</strong> ${esc(p.model)}` : '', p.sku ? `<strong>SKU:</strong> ${esc(p.sku)}` : '', p.brand ? `<strong>Brand:</strong> ${esc(p.brand)}${PROD ? '' : ' <span class="small">(retailer-listed)</span>'}` : ''].filter(Boolean);
+  const specs = verifiedSpecs(p);
+  const facts = [['Brand', p.brand || TBC], ['Model', p.model || TBC], ...(p.sku ? [['SKU', p.sku]] : []), ['Availability', p.stock || TBC]];
   return crumb([['Shop', '#/shop'], [c.name, shopUrl(c.id)], [s.name, shopUrl(c.id, s.id)], [p.name]]) + `
   <div class="product-detail">
     <div>
       <button type="button" class="gallery-main" id="gallery-main" data-enlarge="${p.id}" aria-label="Enlarge image of ${esc(p.name)}"><span class="zoom-hint">${icon('zoom')}</span><span id="gallery-content">${galleryItem(p, 0)}</span></button>
-      <p class="gallery-caption">${PROD ? 'Tap or click the image to enlarge.' : 'Representative category image; exact product photography is pending. Tap or click to enlarge.'}</p>
-      <div class="thumbnails" role="group" aria-label="Product gallery">${p.gallery.map((g, i) => `<button type="button" class="thumb" data-gallery="${i}" data-id="${p.id}" aria-pressed="${i === 0}" aria-label="Show ${esc(g.label)}">${g.type === 'spec' ? '<span>Spec<br>overview</span>' : photo(g.tile, p.alt, { label: false })}</button>`).join('')}</div>
+      <p class="gallery-caption">${!p.image?.src || p.image.src === ASSETS.placeholder ? 'Product photograph pending.' : 'Tap or click the image to enlarge.'}</p>
+      <div class="thumbnails" role="group" aria-label="Product gallery">${p.gallery.map((g, i) => `<button type="button" class="thumb" data-gallery="${i}" data-id="${p.id}" aria-pressed="${i === 0}" aria-label="Show ${esc(g.label)}">${g.type === 'spec' ? '<span>Spec<br>overview</span>' : galleryItem(p, i)}</button>`).join('')}</div>
     </div>
     <div class="detail-copy">
       <span class="cat-name"><a href="${shopUrl(c.id)}">${esc(c.name)}</a> · <a href="${shopUrl(c.id, s.id)}">${esc(s.name)}</a></span>
       <h1>${esc(p.name)}</h1>
-      <p class="model">${ident.length ? ident.join(' · ') : (PROD ? 'Model confirmed on enquiry' : 'Supplier SKU: pending verification')}</p>
-      ${PROD ? '' : `<span class="tag ${p.evidenceStatus}">${p.evidenceStatus === 'sourced' ? 'Reference product · retailer-listed' : 'Illustrative product · not a verified offer'}</span>`}
+      <dl class="key-facts">${facts.map(([k, v]) => `<div><dt>${k}</dt><dd${v === TBC ? ' class="tbc"' : ''}>${esc(v)}</dd></div>`).join('')}</dl>
       ${priceBlock(p, 'detail')}
-      ${hasPrice(p) && !PROD ? notice('Demonstration price only. It is not a NYCE SOLUTIONS sales price; request a quotation for a confirmed amount.', 'warn') : ''}
+      ${isDemoPrice(p) ? notice('Demonstration price only. It is not a NYCE SOLUTIONS sales price; request a quotation for a confirmed amount.', 'warn') : ''}
       <p>${esc(p.shortDescription)}</p>
-      <div class="spec-preview">${Object.entries(p.specs).slice(0, 4).map(([k, v]) => `<div><small>${esc(k)}</small><strong>${esc(v)}</strong></div>`).join('')}</div>
+      ${specs ? `<div class="spec-preview">${Object.entries(specs).slice(0, 4).map(([k, v]) => `<div><small>${esc(k)}</small><strong>${esc(v)}</strong></div>`).join('')}</div>` : ''}
       <h3 class="small" style="font-size:13px;margin:0">Intended applications</h3>
       <ul class="applications-inline">${p.applications.map(a => `<li><a href="${makeUrl('shop', { application: a })}">${esc(a)}</a></li>`).join('')}</ul>
       <div class="qty-line"><label for="detail-qty">Quantity</label>${quantity(1, 'detail-qty')}</div>
       <div class="detail-actions">
-        ${hasPrice(p) ? `<button type="button" class="btn" data-add="${p.id}">${icon('cart')} Add to Cart</button>` : `<button type="button" class="btn" data-quote="${p.id}">Request a Quote ${icon('arrow')}</button>`}
-        <button type="button" class="btn wa solid" data-wa="${p.id}" data-detail="true">${icon('wa')} Enquire on WhatsApp</button>
+        ${hasPrice(p) ? `<button type="button" class="btn" data-add="${p.id}">${icon('cart')} Add to Cart</button>` : `<button type="button" class="btn" data-quote="${p.id}">Request a Quote Online ${icon('arrow')}</button>`}
+        ${validNumber()
+          ? `<a class="btn wa solid" href="${waLink(messageFor(p, 1))}" target="_blank" rel="noopener noreferrer" data-wa-quote="${p.id}">${icon('wa')} Request a Quote on WhatsApp</a>`
+          : `<button type="button" class="btn wa solid" data-wa="${p.id}" data-detail="true">${icon('wa')} Request a Quote on WhatsApp</button>`}
       </div>
       <p class="small muted" style="margin-top:12px">Availability, taxes, transport and support scope are confirmed by quotation. An enquiry is not an order.</p>
       ${otherAssignments.length ? `<p class="small muted">Also listed under: ${otherAssignments.map(o => `<a href="${shopUrl(o.category.id, o.id)}">${esc(o.name)}</a>`).join(', ')}</p>` : ''}
@@ -521,13 +580,10 @@ function detail(p) {
   <section class="tab-panel" role="tabpanel" id="panel-description" aria-labelledby="tab-description" tabindex="0">
     <h2>About this product</h2><p>${esc(p.description)}</p>
     <h3>Intended applications</h3><ul>${p.applications.map(a => `<li>${esc(a)} — final suitability depends on your requirements and the selected specification.</li>`).join('')}</ul>
-    ${PROD ? '' : p.evidenceStatus === 'sourced'
-      ? `<p>Product identity and the listed fields were checked against a retailer listing${p.sourceChecked ? ` on ${esc(p.sourceChecked)}` : ''}. This is not manufacturer certification or evidence of NYCE SOLUTIONS stock. The source reference is recorded in the internal source register.</p>`
-      : '<p>This unbranded example illustrates the category. Specifications and pricing are illustrative and need owner approval before publication.</p>'}
+    ${specs ? '' : `<p>Brand, model and specifications are ${TBC.toLowerCase()}. Request a quotation for the exact model offered.</p>`}
   </section>
   <section class="tab-panel" role="tabpanel" id="panel-specifications" aria-labelledby="tab-specifications" tabindex="0" hidden>
-    <h2>Key specifications</h2>${specTable(p)}
-    ${PROD ? '' : notice(p.evidenceStatus === 'sourced' ? 'Retailer-listed fields only. Confirm against the manufacturer datasheet before purchase.' : 'Illustrative planning fields, not a verified model specification.')}
+    <h2>Key specifications</h2>${specs ? specTable(p) + (PROD ? '' : notice('Retailer-listed fields. Confirm against the manufacturer datasheet before purchase.')) : `<p>Specifications: <strong>${TBC}</strong>. Request the manufacturer datasheet with your quotation.</p>`}
   </section>
   <section class="tab-panel" role="tabpanel" id="panel-delivery" aria-labelledby="tab-delivery" tabindex="0" hidden>
     <h2>Delivery &amp; support</h2>
@@ -556,7 +612,7 @@ function enquiryForm(type, params) {
   const p = product(params.get('product')), isBusiness = type === 'business';
   let equipment = p ? `${p.name}${p.model ? ` · Model ${p.model}` : ''}${p.sku ? ` · SKU ${p.sku}` : ''}\nProduct link: ${productURL(p)}` : '';
   if (params.get('from') === 'cart' && cartCount()) equipment = cartSummary();
-  let q = Number(params.get('qty') || 1); if (!Number.isInteger(q) || q < 1) q = 1;
+  let q = params.get('from') === 'cart' && cartCount() ? cartCount() : Number(params.get('qty') || 1); if (!Number.isInteger(q) || q < 1) q = 1;
   const topic = params.get('topic') || (isBusiness ? 'Quotation request' : '');
   return `<form id="enquiry-form" data-type="${type}" novalidate>
     <div id="form-errors" role="alert" aria-live="assertive"></div>
@@ -564,21 +620,20 @@ function enquiryForm(type, params) {
       ${field('enq-name', 'Full name *', '<input id="enq-name" name="name" required autocomplete="name" maxlength="100" aria-describedby="enq-name-error">')}
       ${field('enq-email', 'Email address *', '<input id="enq-email" name="email" type="email" required autocomplete="email" maxlength="150" aria-describedby="enq-email-error">')}
       ${field('enq-company', 'Business / organisation', '<input id="enq-company" name="company" autocomplete="organization" maxlength="150">', 'Optional')}
-      ${field('enq-phone', 'Phone / WhatsApp', '<input id="enq-phone" name="phone" type="tel" autocomplete="tel" maxlength="30">', 'Optional, include your country code')}
+      ${field('enq-phone', 'Phone / WhatsApp', '<input id="enq-phone" name="phone" type="tel" autocomplete="tel" maxlength="30" aria-describedby="enq-phone-error">', 'Optional, include your country code, e.g. +254 7XX XXX XXX')}
       ${field('enq-location', 'Town / county and country *', '<input id="enq-location" name="location" required maxlength="150" placeholder="e.g. Nakuru, Kenya" aria-describedby="enq-location-error">', '', !isBusiness)}
       ${isBusiness ? field('enq-qty', 'Quantity *', `<input id="enq-qty" name="quantity" type="number" inputmode="numeric" min="1" max="9999" step="1" required value="${q}" aria-describedby="enq-qty-error">`, 'For several items, list quantities in the equipment list below.') : ''}
       ${field('enq-topic', `${isBusiness ? 'Project / application' : 'Enquiry topic'} *`, `<select id="enq-topic" name="topic" required aria-describedby="enq-topic-error"><option value="">Select a topic</option>${TOPICS.map(t => `<option ${t === topic ? 'selected' : ''}>${t}</option>`).join('')}</select>`, '', true)}
       ${field('enq-message', `${isBusiness ? 'Equipment list and requirements' : 'Your message'} *`, `<textarea id="enq-message" name="message" required minlength="10" maxlength="4000" placeholder="Include equipment, quantities, specifications and your preferred timing." aria-describedby="enq-message-error">${esc(equipment)}</textarea>`, '', true)}
     </div>
-    ${PROD ? '' : '<label class="check-label"><input type="checkbox" name="demo" required id="enq-demo"> <span>I understand this is a demonstration: the form prepares a preview and does not send a message.</span></label><span class="error" id="enq-demo-error" style="display:none;color:var(--danger);font-size:12px"></span>'}
-    <button class="btn" type="submit">${PROD ? 'Prepare enquiry' : `Preview ${isBusiness ? 'quotation request' : 'enquiry'}`} ${icon('arrow')}</button>
+    <button class="btn" type="submit">Prepare ${isBusiness ? 'quotation request' : 'enquiry'} ${icon('arrow')}</button>
     <p class="small muted" style="margin:12px 0 0">Required fields are marked *. Nothing is sent or saved to a server from this page — the prepared text can be copied or sent on WhatsApp.</p>
     <div id="form-feedback" role="status" aria-live="polite"></div>
   </form>`;
 }
 function business(params) {
   return crumb([['Business & Bulk Orders']]) + `
-  <section class="page-intro"><h1>Business &amp; Bulk Orders</h1><p>Prepare a quotation request for a business, contractor, farm, school, hotel or institutional project. A clear brief gets a faster, more accurate quotation.</p></section>
+  <section class="page-intro"><h1>Business &amp; Bulk Orders</h1><p>Prepare a quotation request for a business, contractor, farm, school, hotel, institutional or industrial project in ${MARKETS}. A clear brief gets a faster, more accurate quotation.</p></section>
   <div class="two-col">
     <div>
       <h2>Tell us what the job needs</h2>
@@ -591,12 +646,12 @@ function business(params) {
       ${notice('Pricing, delivery, payment terms and any service scope are confirmed in writing. No minimum order or bulk discount is implied.')}
       <div class="actions"><a class="btn secondary" href="#/shop">Browse the catalogue first</a><button type="button" class="btn wa" data-general-wa>${icon('wa')} Ask on WhatsApp</button></div>
     </div>
-    <div class="content-panel" id="quote"><h2>Request a quote</h2>${PROD ? '' : '<p class="muted small">Demonstration form · preview and copy only</p>'}${enquiryForm('business', params)}</div>
+    <div class="content-panel" id="quote"><h2>Request a quote</h2>${enquiryForm('business', params)}</div>
   </div>`;
 }
 function contact(params) {
   return crumb([['Contact']]) + `
-  <section class="page-intro"><h1>Contact NYCE SOLUTIONS</h1><p>Ask about a product, a delivery destination or the details needed for a quotation.</p></section>
+  <section class="page-intro"><h1>Contact NYCE SOLUTIONS</h1><p>Ask about a product, an equipment list, a delivery destination or the details needed for a quotation. We serve customers in ${MARKETS}.</p></section>
   <div class="two-col">
     <div>
       <h2>How to reach us</h2>
@@ -606,33 +661,67 @@ function contact(params) {
         <li>${icon('mail')}<div><strong>Email</strong><small>${CONFIG.emailAddress ? `<a href="mailto:${esc(CONFIG.emailAddress)}">${esc(CONFIG.emailAddress)}</a>` : contactLine(CONFIG.emailAddress, PENDING)}</small></div></li>
         <li>${icon('pin')}<div><strong>Address</strong><small>${contactLine(CONFIG.physicalAddress, PENDING)}</small></div></li>
         <li>${icon('clock')}<div><strong>Operating hours</strong><small>${contactLine(CONFIG.operatingHours, PENDING)}</small></div></li>
+        ${safeUrl(CONFIG.facebookUrl) ? `<li>${icon('message')}<div><strong>Facebook</strong><small><a href="${esc(CONFIG.facebookUrl)}" target="_blank" rel="noopener noreferrer">${esc(CONFIG.facebookName || CONFIG.facebookUrl)}</a></small></div></li>` : ''}
+        ${safeUrl(CONFIG.websiteUrl) ? `<li>${icon('grid')}<div><strong>Website</strong><small><a href="${esc(CONFIG.websiteUrl)}">${esc(CONFIG.websiteName || CONFIG.websiteUrl)}</a></small></div></li>` : ''}
       </ul>
       <button type="button" class="btn wa solid" data-general-wa>${icon('wa')} ${WHATSAPP ? 'Open a WhatsApp enquiry' : 'Preview a WhatsApp enquiry'}</button>
       ${notice('Kenya delivery and enquiries from other African countries are confirmed per enquiry. Cross-border delivery remains an enquiry until coverage and terms are confirmed.')}
     </div>
-    <div class="content-panel"><h2>Send an enquiry</h2>${PROD ? '' : '<p class="muted small">Demonstration form · nothing is transmitted</p>'}${enquiryForm('contact', params)}</div>
+    <div class="content-panel"><h2>Send an enquiry</h2>${enquiryForm('contact', params)}</div>
   </div>`;
 }
+// Verified company context supplied by the owner. Sector descriptions list only product types present in the catalogue.
+const COMPANY_SUMMARY = 'NYCE SOLUTIONS is a Kenyan enterprise specialising in the procurement, retail and distribution of solar-energy infrastructure, power-backup systems, water solutions, industrial equipment, hardware and tools.';
+const MARKETS = 'Kenya and other African markets';
+const SECTORS = [
+  ['sun', 'Solar and renewable energy', 'Solar kits, hybrid inverters, lithium batteries, solar water heaters and solar pumping equipment.', [['solar']]],
+  ['bolt', 'Generators and backup systems', 'Petrol and diesel generators, changeover switches and voltage stabilisers for backup power.', [['generators'], ['electrical', 'electrical-3']]],
+  ['drop', 'Water and irrigation solutions', 'Borehole and booster pumps, pump controls, water treatment, irrigation kits and pipes.', [['water'], ['agriculture']]],
+  ['tool', 'Industrial and construction machinery', 'Concrete mixers, hoists, welding machines and diesel welding generators for sites and workshops.', [['construction', 'construction-2'], ['construction', 'construction-3']]],
+  ['layers', 'Hardware and hand tools', 'Power and hand tools, ladders, cables, switches, sockets and distribution boards.', [['construction', 'construction-5'], ['electrical']]]
+];
+const sectorLinks = links => links.map(([c, s]) => { const cc = cat(c), ss = s && subOf(s); return cc && (!s || ss) ? `<a href="${shopUrl(c, s || '')}">${esc(ss ? ss.name : cc.name)}</a>` : ''; }).filter(Boolean).join(' · ');
 function about() {
+  const details = [
+    ['Business name', BUSINESS],
+    ['Based in', 'Kenya'],
+    ['Markets served', MARKETS],
+    ['Physical address', CONFIG.physicalAddress || TBC],
+    ['Operating hours', CONFIG.operatingHours || TBC],
+    ['Company registration', TBC],
+    ['Warranty terms', `${TBC} — confirmed in writing for each product`],
+    ['Delivery coverage', `${TBC} — confirmed per enquiry`]
+  ];
   return crumb([['About Us']]) + `
-  <section class="page-intro"><h1>Equipment for the way you live and work</h1><p>NYCE SOLUTIONS brings power, water and practical equipment into one catalogue for homes, farms, businesses and institutions.</p></section>
+  <section class="page-intro"><h1>About NYCE SOLUTIONS</h1><p>${esc(COMPANY_SUMMARY)}</p></section>
   <section class="about-grid">${photo(4, 'Workshop tools on a workbench', { mode: 'slice' })}<div>
-    <h2>Start with the right questions</h2>
-    <p>Whether you are planning home backup power, improving water supply on a farm or equipping a workshop, the details matter: loads, flow and head, cable sizes, fuel and phase.</p>
-    <p>Browse six categories, compare the specifications that matter and send an enquiry built around your application. The catalogue serves individual consumers, businesses, electrical contractors, construction companies, farms, schools, hotels and government and institutional buyers in Kenya, with enquiries welcome from other African countries.</p>
+    <h2>What we do</h2>
+    <p>We source, sell and distribute equipment for power, water, farming, construction and everyday hardware needs, serving customers in ${MARKETS}.</p>
+    <ul class="about-customers">
+      <li><strong>Domestic households</strong> — home solar, backup power and water supply.</li>
+      <li><strong>Agricultural operations</strong> — pumping, irrigation and farm equipment.</li>
+      <li><strong>Commercial organisations</strong> — businesses, schools, hotels and institutions.</li>
+      <li><strong>Industrial customers</strong> — machinery, generators and site equipment.</li>
+    </ul>
     <div class="actions"><a class="btn" href="#/shop">View Full Catalogue ${icon('arrow')}</a><a class="btn secondary" href="#/business">Business &amp; Bulk Orders</a></div>
   </div></section>
-  <section class="section"><div class="application-grid">
-    <div class="application">${icon('search')}<h3>Find your starting point</h3><p>Browse six categories or search by name and model to find the right equipment.</p></div>
-    <div class="application">${icon('layers')}<h3>Compare the essentials</h3><p>Review power, capacity, phase and other relevant details before you ask for a quotation.</p></div>
-    <div class="application">${icon('wa')}<h3>Enquire on WhatsApp</h3><p>Every product prepares a message with the product, quantity and link so the conversation starts with the right details.</p></div>
+  <section class="section" aria-labelledby="sectors-title"><div class="section-head"><div><h2 id="sectors-title">Our business sectors</h2><p>Five sectors, each linked to the matching part of the catalogue.</p></div></div>
+    <div class="application-grid sector-grid">${SECTORS.map(([ic, title, text, links]) => `<div class="application">${icon(ic)}<h3>${title}</h3><p>${text}</p><p class="sector-links">Browse: ${sectorLinks(links)}</p></div>`).join('')}</div>
+  </section>
+  <section class="section" aria-labelledby="how-title"><div class="section-head"><div><h2 id="how-title">How enquiries work</h2></div></div><div class="application-grid">
+    <div class="application">${icon('search')}<h3>Find the equipment</h3><p>Browse the catalogue by category or search by product name, brand or category.</p></div>
+    <div class="application">${icon('wa')}<h3>Send an enquiry</h3><p>Send the product, quantity and destination on WhatsApp, or request a quotation for a full equipment list.</p></div>
+    <div class="application">${icon('message')}<h3>Receive a written quotation</h3><p>Availability, delivery cost, taxes and payment terms are confirmed in writing before any order.</p></div>
   </div></section>
-  ${demoNotice('Company history, legal details, team information and service capabilities have not been supplied. This page makes no claims about those details until the owner provides approved content.')}`;
+  <section class="section" aria-labelledby="details-title"><h2 id="details-title">Company details</h2>
+    <dl class="key-facts company-facts">${details.map(([k, v]) => `<div><dt>${k}</dt><dd${String(v).startsWith(TBC) ? ' class="tbc"' : ''}>${esc(v)}</dd></div>`).join('')}</dl>
+    <p class="small muted">Details marked To Be Confirmed will be published once supplied by ${esc(BUSINESS)}. <a href="#/contact">Contact us</a> for anything not listed here.</p>
+  </section>`;
 }
 function cartPage() {
   const items = Object.entries(cart);
   return crumb([['Cart']]) + `
-  <section class="page-intro"><h1>Cart</h1><p>Adjust quantities and review the subtotal, then send the list as an enquiry. ${PROD ? 'This cart does not reserve stock or place an order; a quotation confirms the final amount.' : 'This is a prototype cart: no order is submitted, no inventory is reserved and no payment is processed.'}</p></section>
+  <section class="page-intro"><h1>Cart</h1><p>Adjust quantities and review the subtotal, then send the list as a WhatsApp enquiry or a quotation request. The cart does not place an order, reserve stock or take payment.</p></section>
   ${items.length ? `<div class="cart-layout">
     <div>${items.map(([id, q]) => { const p = product(id); return `<article class="cart-item" data-cart-id="${id}"><a href="#/product/${id}" aria-label="View ${esc(p.name)}">${photo(p.image.tile, p.alt, { label: false })}</a><div><h3><a href="#/product/${id}">${esc(p.name)}</a></h3><span class="price-note">${money(p.price)} each${isDemoPrice(p) ? ' · demonstration price' : ''}</span><div class="actions" style="gap:8px;align-items:center">${quantity(q, 'cart-qty-' + id, 'cart:' + id)}<button type="button" class="remove" data-remove="${id}">Remove</button></div></div><div class="cart-line-total" data-line-total="${id}">${money(p.price * q)}</div></article>`; }).join('')}
       <div class="actions" style="margin-top:16px"><a class="btn secondary" href="#/shop">Continue shopping</a><button type="button" class="btn secondary" data-clear-cart>Clear cart</button></div>
@@ -646,15 +735,20 @@ function cartPage() {
       <a class="btn secondary" href="#/business?from=cart">Request a quotation</a>
       <p style="margin-top:14px">${canStore ? 'Cart items are stored in this browser only.' : 'Browser storage is unavailable; the cart lasts for this open page only.'} No order has been submitted, no inventory has been reserved and no payment has been processed.</p>
     </aside>
-  </div>` : `<div class="empty">${icon('cart')}<h2 style="margin-top:12px">Your cart is empty</h2><p>Add a priced product to build an enquiry list, or request a quote for any product.</p><div class="actions"><a class="btn" href="${makeUrl('shop', { pricing: 'demo' })}">Browse priced products ${icon('arrow')}</a><a class="btn secondary" href="#/shop">View Full Catalogue</a></div></div>`}`;
+  </div>` : `<div class="empty">${icon('cart')}<h2 style="margin-top:12px">Your cart is empty</h2><p>Add a priced product to build an enquiry list, or request a quote for any product.</p><div class="actions"><a class="btn" href="${makeUrl('shop', { pricing: 'priced' })}">Browse priced products ${icon('arrow')}</a><a class="btn secondary" href="#/shop">View Full Catalogue</a></div></div>`}`;
 }
 function checkoutPage() {
   const items = Object.entries(cart);
   if (!items.length) return crumb([['Cart', '#/cart'], ['Enquiry summary']]) + `<section class="page-intro"><h1>Enquiry summary</h1></section><div class="empty"><h2>Nothing to summarise yet</h2><p>Your cart is empty. Add priced products first.</p><div class="actions"><a class="btn" href="#/shop">View Full Catalogue</a></div></div>`;
   return crumb([['Cart', '#/cart'], ['Enquiry summary']]) + `
-  <section class="page-intro"><h1>Enquiry summary</h1><p>This is the prototype checkout step. It prepares an enquiry — it does not place an order, reserve stock or take payment.</p></section>
+  <section class="page-intro"><h1>Enquiry summary</h1><p>Check the items, quantities and prices, then send the list to ${esc(BUSINESS)}. This step sends an enquiry — it does not place an order, reserve stock or take payment.</p></section>
   ${notice('<strong>No order has been submitted.</strong> No inventory has been reserved and no payment has been processed. Send the list as a WhatsApp enquiry or a quotation request to continue.', 'warn')}
-  <div class="data-table-wrap"><table class="data-table"><thead><tr><th scope="col">Item</th><th scope="col">Model / SKU</th><th scope="col">Quantity</th><th scope="col">Unit price</th><th scope="col">Line total</th></tr></thead><tbody>${items.map(([id, q]) => { const p = product(id); return `<tr><td><a href="#/product/${id}">${esc(p.name)}</a></td><td>${esc(p.model || p.sku || '—')}</td><td>${q}</td><td>${money(p.price)}</td><td>${money(p.price * q)}</td></tr>`; }).join('')}</tbody><tfoot><tr><th scope="row" colspan="4">Subtotal${PROD ? '' : ' (demonstration prices)'}</th><td><strong>${money(cartTotal())}</strong></td></tr></tfoot></table></div>
+  <ol class="order-steps" aria-label="How ordering works">
+    <li><strong>Send your enquiry</strong><span>On WhatsApp or as a quotation request.</span></li>
+    <li><strong>Receive a written quotation</strong><span>${esc(BUSINESS)} confirms availability, delivery cost, taxes and payment terms.</span></li>
+    <li><strong>Order confirmed</strong><span>Only when you accept the written quotation.</span></li>
+  </ol>
+  <div class="data-table-wrap"><table class="data-table"><thead><tr><th scope="col">Item</th><th scope="col">Model / SKU</th><th scope="col">Quantity</th><th scope="col">Unit price</th><th scope="col">Line total</th></tr></thead><tbody>${items.map(([id, q]) => { const p = product(id); return `<tr><td><a href="#/product/${id}">${esc(p.name)}</a></td><td>${esc(p.model || p.sku || '—')}</td><td>${q}</td><td>${money(p.price)}</td><td>${money(p.price * q)}</td></tr>`; }).join('')}</tbody><tfoot><tr><th scope="row" colspan="2">Total quantity</th><td>${cartCount()}</td><th scope="row">Subtotal${DEMO_PRICES ? ' (demonstration prices)' : ''}</th><td><strong>${money(cartTotal())}</strong></td></tr></tfoot></table></div>
   <p class="muted small">Taxes, delivery and other charges are not calculated. A written quotation confirms the final amount.</p>
   <div class="actions"><button type="button" class="btn wa solid" data-cart-wa>${icon('wa')} Send list on WhatsApp</button><a class="btn" href="#/business?from=cart">Request a quotation</a><a class="btn secondary" href="#/cart">Back to cart</a></div>`;
 }
@@ -664,10 +758,34 @@ const POLICIES = {
   privacy: ['Privacy policy', 'This site does not submit forms to a server or use analytics or tracking scripts. The cart uses local browser storage where available. Enquiry text you prepare stays in your browser until you copy or send it.', 'Data-controller details, purposes, retention, contact channel, hosting, processors and cookie choices for the production site.'],
   terms: ['Terms of sale', 'No transaction can be completed on this site. Prices shown are indicative; availability, taxes, payment terms and supply conditions are confirmed by written quotation.', 'Legal entity details, approved sales terms, price and tax treatment, payment methods, order acceptance rules and product conditions.']
 };
+const enquiryEnd = '\nThis is an enquiry, not an order.';
+// Page-specific next steps: [label, route, topic] for the form link, plus a prefilled WhatsApp message.
+const POLICY_CTA = {
+  delivery: { title: 'Need delivery to your location?', text: 'Share the equipment, quantity and your town or county and country. Delivery options, cost and lead time are confirmed for each enquiry.', form: ['Request a quotation with delivery', 'business', 'Delivery enquiry'], wa: 'Ask about delivery on WhatsApp',
+    msg: `I would like to ask about delivery.\nEquipment / product: ________\nQuantity: ________\nDelivery town or county and country: ________\nPreferred timing: ________\nPlease confirm delivery options, cost and lead time.` },
+  returns: { title: 'Questions about returns or warranty?', text: 'Tell us the product and your question. Returns and warranty terms are confirmed in writing for each product before purchase.', form: ['Send a support enquiry', 'contact', 'Support information'], wa: 'Ask on WhatsApp',
+    msg: `I would like to ask about returns or warranty terms.\nProduct: ________\nQuotation or invoice reference (if any): ________\nMy question: ________` },
+  privacy: { title: 'Questions about your information?', text: `Ask how the enquiry details you share with ${BUSINESS} are used, or request a change to them.`, form: ['Contact us', 'contact', ''], email: 'Email us about privacy',
+    msg: '' },
+  terms: { title: 'Ready to buy?', text: 'Prices, availability, taxes and payment terms are confirmed in a written quotation. An enquiry is not an order.', form: ['Request a written quotation', 'business', 'Quotation request'], wa: 'Request a quotation on WhatsApp',
+    msg: `I would like a written quotation, including payment terms, for:\nEquipment / product: ________\nQuantity: ________\nDelivery town or county and country: ________` }
+};
+const policyMessage = key => `Hello ${BUSINESS},\n${POLICY_CTA[key].msg}${enquiryEnd}`;
+function policyCta(key) {
+  const c = POLICY_CTA[key], [label, route, topic] = c.form;
+  const email = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(CONFIG.emailAddress || '') ? CONFIG.emailAddress : '';
+  const reach = [PHONE_DIGITS.length >= 8 ? `Call ${phoneLink()}` : '', CONFIG.operatingHours ? esc(CONFIG.operatingHours) : ''].filter(Boolean).join(' · ');
+  const actions = [
+    `<a class="btn light" href="${makeUrl(route, { topic })}">${label} ${icon('arrow')}</a>`,
+    c.wa ? `<button type="button" class="btn wa solid" data-policy-wa="${key}">${icon('wa')} ${c.wa}</button>` : '',
+    c.email && email ? `<a class="btn outline-light" href="mailto:${esc(email)}?subject=${encodeURIComponent('Privacy question')}">${icon('mail')} ${c.email}</a>` : '',
+    key === 'terms' && cartCount() ? `<a class="btn outline-light" href="#/checkout">Review your enquiry list</a>` : ''
+  ].filter(Boolean).join('');
+  return `<section class="band policy-cta" aria-labelledby="policy-cta-title"><div><h2 id="policy-cta-title">${c.title}</h2><p>${esc(c.text)}</p>${reach ? `<p class="policy-reach">${reach}</p>` : ''}</div><div class="band-actions">${actions}</div></section>`;
+}
 function policyPage(key) {
   const p = POLICIES[key]; if (!p) return notFound();
-  const pending = (CONFIG.placeholders && CONFIG.placeholders.policyPending) || 'Owner approval required';
-  return crumb([[p[0]]]) + `<section class="page-intro"><h1>${p[0]}</h1></section><div class="policy-card"><span class="tag illustrative">${esc(pending)}</span><p style="margin-top:14px">${p[1]}</p><h3>Still to be confirmed by the business</h3><p class="muted">${p[2]}</p><a class="btn secondary" href="#/contact">Send an enquiry</a></div>`;
+  return crumb([[p[0]]]) + `<section class="page-intro"><h1>${p[0]}</h1></section><div class="policy-card"><p>${p[1]}</p></div>${policyCta(key)}`;
 }
 function notFound(message = 'The address you opened does not exist in this catalogue.') {
   return `<section class="route-error"><h1>Page not found</h1><p class="muted">${esc(message)}</p><div class="actions"><a class="btn" href="#/shop">View Full Catalogue ${icon('arrow')}</a><a class="btn secondary" href="#/">Go to the homepage</a></div></section>`;
@@ -680,6 +798,7 @@ const LEGACY = {
     const [page, dept, sub] = parts;
     if (page === 'categories') return '#/shop';
     if (page === 'category') {
+      if (SUB_ALIASES[sub]) { const merged = subOf(SUB_ALIASES[sub]); return shopUrl(merged.category.id, merged.id); }
       const c = cat(dept); if (!c) return null;
       if (sub && !c.subcategories.some(s => s.id === sub)) return null;
       return shopUrl(dept, sub || '');
@@ -687,6 +806,49 @@ const LEGACY = {
     return undefined;
   }
 };
+function syncMetadata(route, main) {
+  const [page, id] = route.parts;
+  const item = page === 'product' ? product(id) : null;
+  const selected = page === 'shop' ? selection(route) : null;
+  const category = selected && cat(selected.category);
+  const sub = selected && subOf(selected.subcategory);
+  const descriptions = {
+    about: COMPANY_SUMMARY,
+    contact: `Contact ${BUSINESS} for equipment enquiries, quotations and support in Kenya and other African markets.`,
+    business: `Request an equipment quotation or discuss bulk procurement with ${BUSINESS}. Prices and availability are confirmed by enquiry.`,
+    cart: `Review equipment quantities and prepare a quotation enquiry with ${BUSINESS}. No payment or confirmed order is submitted.`,
+    checkout: `Review your quotation request with ${BUSINESS}. Pricing, availability and delivery are confirmed before an order is accepted.`
+  };
+  const description = item ? item.shortDescription : selected ? `Browse ${sub ? sub.name : category ? category.name : 'equipment'} from ${BUSINESS}. Request confirmed product details, pricing and availability.` : descriptions[page] || `${BUSINESS} supplies solar energy, generators, water and irrigation equipment, construction machinery, hardware and tools in Kenya and other African markets.`;
+  document.querySelector('meta[name="description"]').content = description;
+  const configured = String(CONFIG.publicBaseUrl || '').trim();
+  const base = configured || String(CONFIG.websiteUrl || '').trim();
+  let canonical = document.querySelector('link[rel="canonical"]');
+  if (/^https:\/\//i.test(base)) {
+    const url = new URL(base);
+    url.hash = ''; url.search = '';
+    if (url.pathname.endsWith('/index.html')) url.pathname = url.pathname.slice(0, -10);
+    if (!canonical) { canonical = document.createElement('link'); canonical.rel = 'canonical'; document.head.appendChild(canonical); }
+    canonical.href = url.href;
+  } else if (canonical) canonical.remove();
+  const privateRoute = ['cart', 'checkout', 'business', 'contact'].includes(page) || selected && (selected.q || selected.page > 1) || main.querySelector('.route-error');
+  document.querySelector('meta[name="robots"]').content = PROD && /^https:\/\//i.test(configured) && !privateRoute ? 'index,follow' : 'noindex,follow';
+  document.getElementById('route-structured-data')?.remove();
+  if (canonical && !main.querySelector('.route-error')) {
+    const schema = { '@context': 'https://schema.org', '@type': 'WebSite', name: BUSINESS, url: canonical.href };
+    if (item && item.verificationStatus === 'verified' && item.evidenceStatus !== 'illustrative') {
+      Object.assign(schema, { '@type': 'Product', name: item.name, description: item.shortDescription, url: productURL(item) });
+      if (item.brand) schema.brand = { '@type': 'Brand', name: item.brand };
+      if (item.model) schema.model = item.model;
+      if (item.sku) schema.sku = item.sku;
+      if (item.image?.src && item.imageSource && item.image.src !== ASSETS.placeholder) schema.image = new URL(item.image.src, canonical.href).href;
+    }
+    const script = document.createElement('script');
+    script.id = 'route-structured-data'; script.type = 'application/ld+json';
+    script.textContent = JSON.stringify(schema).replace(/</g, '\\u003c');
+    document.head.appendChild(script);
+  }
+}
 function render() {
   const r = current(), [page, id] = r.parts;
   const legacy = LEGACY.resolve(r.parts);
@@ -713,6 +875,7 @@ function render() {
   document.getElementById('search-input').value = r.params.get('q') || '';
   const heading = main.querySelector('h1');
   document.title = `${(heading ? (heading.innerText || heading.textContent) : 'Catalogue').replace(/\s+/g, ' ').trim()} | ${BUSINESS}`;
+  syncMetadata(r, main);
 
   const target = focusAfterRoute && document.getElementById(focusAfterRoute);
   if (target) {
@@ -756,23 +919,37 @@ function productURL(p) {
   const base = configured || location.href.split('#')[0];
   return base.replace(/#.*$/, '') + '#/product/' + p.id;
 }
-function priceLine(p) { return !hasPrice(p) ? 'Request Price' : `${money(p.price)}${isDemoPrice(p) ? ' (demonstration price shown on the website)' : ''}`; }
-function messageFor(p, q) {
+function priceLine(p) { return !hasPrice(p) ? 'Request Price' : `${money(p.price)} each${isDemoPrice(p) ? ' (demonstration price shown on the website)' : ''}`; }
+// One item format for every enquiry, so WhatsApp messages, the cart summary and the quotation form always agree.
+function itemLines(p, q) {
   const localNote = CONFIG.publicBaseUrl ? '' : (location.protocol === 'file:' ? ' (local file reference; configure publicBaseUrl for a public link)' : '');
-  return `Hello ${BUSINESS},
-I would like to enquire about the following item:
-Product: ${p.name}${p.model ? `\nModel: ${p.model}` : ''}${p.sku ? `\nSKU: ${p.sku}` : ''}
-Quantity: ${q}
-Displayed price: ${priceLine(p)}
-Product link${localNote}: ${productURL(p)}
+  return [`Product: ${p.name}`, p.model && `Model: ${p.model}`, p.sku && `SKU: ${p.sku}`, `Quantity: ${q}`, `Displayed price: ${priceLine(p)}`,
+    hasPrice(p) && `Line total: ${money(p.price * q)}`, `Product link${localNote}: ${productURL(p)}`].filter(Boolean).join('\n');
+}
+// Owner-approved product quotation template; SKU/model is omitted rather than invented when neither is known.
+function messageFor(p, q) {
+  const ref = [p.sku && `SKU ${p.sku}`, p.model && `Model ${p.model}`].filter(Boolean).join(', ');
+  return `Hello Nyce Solutions, I\u2019m interested in ${p.name}${ref ? ` (${ref})` : ''}.
+
 Please confirm:
-1. Current availability
-2. Delivery options and cost to my location: ________
-3. A final quotation including any applicable taxes
-This is an enquiry, not an order.`;
+- Current price and availability
+- Delivery options to [your location]
+- Installation and warranty options, where applicable
+Quantity required: ${q}
+Product link: ${productURL(p)}
+
+This is a quotation request, not a confirmed order.`;
+}
+const waLink = text => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}`;
+// Keeps the product-page WhatsApp link in step with the quantity field (covers long-press / open-in-new-tab).
+function syncQuoteLink() {
+  const a = document.querySelector('a[data-wa-quote]'), input = document.getElementById('detail-qty'); if (!a || !input) return;
+  const q = Number(input.value);
+  a.href = waLink(messageFor(product(a.dataset.waQuote), Number.isInteger(q) && q >= 1 && q <= MAX_QTY ? q : 1));
 }
 function cartSummary() {
-  return Object.entries(cart).map(([id, q]) => { const p = product(id); return `${p.name}${p.model ? ` · Model ${p.model}` : ''}${p.sku ? ` · SKU ${p.sku}` : ''}\nQuantity: ${q}\nDisplayed price: ${priceLine(p)}\nProduct link: ${productURL(p)}`; }).join('\n\n');
+  return Object.entries(cart).map(([id, q]) => itemLines(product(id), q)).join('\n\n')
+    + `\n\nTotal quantity: ${cartCount()}\nSubtotal shown on the website: ${money(cartTotal())}${DEMO_PRICES ? ' (demonstration prices)' : ''} (excluding delivery and taxes)`;
 }
 function cartMessage() {
   return `Hello ${BUSINESS},
@@ -780,7 +957,6 @@ I would like to enquire about the following items:
 
 ${cartSummary()}
 
-Subtotal shown on the website: ${money(cartTotal())}${PROD ? '' : ' (demonstration prices)'}
 Please confirm:
 1. Current availability of each item
 2. Delivery options and cost to my location: ________
@@ -829,11 +1005,11 @@ function validateForm(form) {
   setError('enq-name', v('enq-name') ? '' : 'Enter your full name.');
   setError('enq-email', !v('enq-email') ? 'Enter your email address.' : /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v('enq-email')) ? '' : 'Enter a valid email address, for example name@example.com.');
   setError('enq-location', v('enq-location') ? '' : 'Enter your town or county and country.');
+  const phone = v('enq-phone');
+  setError('enq-phone', !phone || (/^\+?[\d\s()-]+$/.test(phone) && phone.replace(/\D/g, '').length >= 9 && phone.replace(/\D/g, '').length <= 15) ? '' : 'Enter a phone number with its country code, for example +254 712 345 678, or leave it blank.');
   if (document.getElementById('enq-qty')) { const n = Number(v('enq-qty')); setError('enq-qty', Number.isInteger(n) && n >= 1 && n <= 9999 ? '' : 'Enter a whole number from 1 to 9999.'); }
   setError('enq-topic', v('enq-topic') ? '' : 'Select a topic.');
   setError('enq-message', !v('enq-message') ? 'Enter your message.' : v('enq-message').length < 10 ? 'Enter at least 10 characters.' : '');
-  const demo = document.getElementById('enq-demo');
-  if (demo) { const err = document.getElementById('enq-demo-error'); if (!demo.checked) { err.textContent = 'Tick the box to confirm you understand this is a demonstration.'; err.style.display = 'block'; demo.setAttribute('aria-invalid', 'true'); errors.push({ id: 'enq-demo', msg: err.textContent }); } else { err.textContent = ''; err.style.display = 'none'; demo.setAttribute('aria-invalid', 'false'); } }
   const box = document.getElementById('form-errors');
   box.innerHTML = errors.length ? `<div class="form-errors"><strong>Please correct ${errors.length} ${errors.length === 1 ? 'field' : 'fields'}:</strong><ul>${errors.map(e => `<li><a href="#${e.id}" data-focus-field="${e.id}">${esc(e.msg)}</a></li>`).join('')}</ul></div>` : '';
   return errors;
@@ -859,12 +1035,26 @@ document.addEventListener('click', e => {
     const input = document.getElementById(el.dataset.for); let q = Number(input.value) || 1;
     q = Math.max(1, Math.min(MAX_QTY, Math.round(q) + Number(el.dataset.qtyStep))); input.value = q; input.setCustomValidity('');
     if (input.dataset.qtyKind.startsWith('cart:')) { cart[input.dataset.qtyKind.slice(5)] = q; saveCart(); updateCartDisplay(); }
+    else syncQuoteLink();
     return;
   }
-  if (el.dataset.add) { const q = validQty(document.getElementById('detail-qty')); if (q !== null) addCart(el.dataset.add, q); return; }
-  if (el.dataset.remove) { delete cart[el.dataset.remove]; saveCart(); render(); notify('Item removed from the cart.'); return; }
-  if (el.hasAttribute('data-clear-cart')) { cart = {}; saveCart(); render(); notify('Cart cleared.'); return; }
+  if (el.dataset.waQuote) {
+    const q = validQty(document.getElementById('detail-qty'));
+    if (q === null) { e.preventDefault(); return; }
+    el.href = waLink(messageFor(product(el.dataset.waQuote), q));
+    return;
+  }
+  if (el.dataset.add) {
+    const q = validQty(document.getElementById('detail-qty')); if (q === null) return;
+    // Ignore an accidental second click on the same button within a second.
+    const key = `${el.dataset.add}:${q}`; if (lastAdd.key === key && Date.now() - lastAdd.t < 1000) return;
+    lastAdd = { key, t: Date.now() }; addCart(el.dataset.add, q); return;
+  }
+  if (el.dataset.remove) { undoCart = { ...cart }; delete cart[el.dataset.remove]; saveCart(); render(); notify('Item removed from the cart.', false, true); return; }
+  if (el.hasAttribute('data-clear-cart')) { undoCart = { ...cart }; cart = {}; saveCart(); render(); notify('Cart cleared.', false, true); return; }
+  if (el.hasAttribute('data-undo-cart')) { if (undoCart) { cart = undoCart; undoCart = null; saveCart(); if (current().parts[0] === 'cart' || current().parts[0] === 'checkout') render(); notify('Cart restored.'); } return; }
   if (el.dataset.wa) { const p = product(el.dataset.wa); let q = 1; if (el.dataset.detail) { q = validQty(document.getElementById('detail-qty')); if (q === null) return; } messageModal(messageFor(p, q)); return; }
+  if (el.dataset.policyWa && POLICY_CTA[el.dataset.policyWa]) { messageModal(policyMessage(el.dataset.policyWa)); return; }
   if (el.hasAttribute('data-general-wa')) { messageModal(generalMessage()); return; }
   if (el.hasAttribute('data-cart-wa')) { if (!cartCount()) { notify('Your cart is empty.'); return; } messageModal(cartMessage(), 'WhatsApp enquiry · cart list'); return; }
   if (el.dataset.quote) { let q = 1; const input = document.getElementById('detail-qty'); if (input) { q = validQty(input); if (q === null) return; } navigate(makeUrl('business', { product: el.dataset.quote, qty: q })); return; }
@@ -876,17 +1066,21 @@ document.addEventListener('click', e => {
     document.getElementById('gallery-main').setAttribute('aria-label', `Enlarge ${(p.gallery[galleryIndex] || {}).label || 'image'} for ${p.name}`);
     return;
   }
-  if (el.dataset.enlarge) { const p = product(el.dataset.enlarge); openModal(esc(p.name), galleryItem(p, galleryIndex) + (PROD ? '' : '<p style="margin-top:12px">Representative category image; exact product photography is pending.</p>'), 'lightbox'); return; }
+  if (el.dataset.enlarge) { const p = product(el.dataset.enlarge); openModal(esc(p.name), galleryItem(p, galleryIndex) + (!p.image?.src || p.image.src === ASSETS.placeholder ? '<p style="margin-top:12px">Product photograph pending.</p>' : ''), 'lightbox'); return; }
   if (el.hasAttribute('data-copy-message')) { copyMessage(); return; }
-  if (el.hasAttribute('data-form-preview')) { messageModal(formPreview, PROD ? 'Prepared enquiry' : 'Prepared enquiry · demonstration'); return; }
+  if (el.hasAttribute('data-form-preview')) { messageModal(formPreview, 'Prepared enquiry'); return; }
   if (el.classList.contains('close') || el.hasAttribute('data-close-modal')) { document.getElementById('modal').close(); return; }
 });
 document.addEventListener('change', e => {
   const el = e.target;
   if (el.dataset.filter) { setFilter(el.dataset.filter, el.value, el.id || (el.name ? `${el.name}-${el.value}` : null)); return; }
-  if (el.dataset.qtyKind && el.dataset.qtyKind.startsWith('cart:')) { const q = validQty(el); if (q !== null) { cart[el.dataset.qtyKind.slice(5)] = q; saveCart(); updateCartDisplay(); } }
+  if (el.dataset.qtyKind && el.dataset.qtyKind.startsWith('cart:')) {
+    const id = el.dataset.qtyKind.slice(5), q = validQty(el);
+    if (q !== null) { cart[id] = q; saveCart(); updateCartDisplay(); }
+    else { el.value = cart[id]; el.setCustomValidity(''); notify(`Enter a whole number from 1 to ${MAX_QTY}. The quantity was kept at ${cart[id]}.`); }
+  }
 });
-document.addEventListener('input', e => { if (e.target.setCustomValidity) e.target.setCustomValidity(''); });
+document.addEventListener('input', e => { if (e.target.setCustomValidity) e.target.setCustomValidity(''); if (e.target.id === 'detail-qty') syncQuoteLink(); });
 document.addEventListener('keydown', e => {
   if (e.target.matches && e.target.matches('[role=tab]')) {
     const names = ['description', 'specifications', 'delivery'], i = names.indexOf(e.target.dataset.tab);
@@ -920,7 +1114,7 @@ document.addEventListener('submit', e => {
   if (errors.length) { const first = document.getElementById(errors[0].id); if (first) first.focus(); return; }
   const d = Object.fromEntries(new FormData(form));
   formPreview = `Enquiry for ${BUSINESS}\nName: ${d.name.trim()}\nEmail: ${d.email.trim()}${d.company ? `\nOrganisation: ${d.company.trim()}` : ''}${d.phone ? `\nPhone: ${d.phone.trim()}` : ''}\nDestination: ${d.location.trim()}\nTopic: ${d.topic}${d.quantity ? `\nQuantity: ${d.quantity}` : ''}\n\n${d.message.trim()}\n\nThis is an enquiry, not an order.`;
-  document.getElementById('form-feedback').innerHTML = `<div class="form-success"><h3>Your enquiry is prepared${PROD ? '' : ' (demonstration)'}.</h3><p>Nothing has been sent or saved to a server. Review the text, then copy it${validNumber() ? ' or open WhatsApp' : ''} to send it to ${esc(BUSINESS)}.</p><button type="button" class="btn secondary sm" data-form-preview>Review &amp; ${validNumber() ? 'send' : 'copy'} enquiry</button></div>`;
+  document.getElementById('form-feedback').innerHTML = `<div class="form-success"><h3>Your ${form.dataset.type === 'business' ? 'quotation request' : 'enquiry'} is ready to send.</h3><p>Nothing has been sent yet and this is not an order. Review the text, then ${validNumber() ? 'open WhatsApp to send it, or copy it' : 'copy it'} to send to ${esc(BUSINESS)}. ${esc(BUSINESS)} replies with availability, delivery cost and a written quotation.</p><button type="button" class="btn secondary sm" data-form-preview>Review &amp; ${validNumber() ? 'send' : 'copy'}</button></div>`;
   document.getElementById('form-feedback').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 });
 document.getElementById('modal').addEventListener('click', e => {
@@ -932,6 +1126,13 @@ document.addEventListener('error', e => {
   if (img && img.tagName === 'IMG' && img.hasAttribute('data-photo-src') && img.parentElement) img.parentElement.outerHTML = photoPlaceholder(img.alt);
 }, true);
 window.addEventListener('hashchange', () => { const m = document.getElementById('modal'); if (m.open) m.close(); closeNav(); setDeptMenu(false); render(); });
+// Keep the cart consistent when it is changed in another tab of the same browser.
+window.addEventListener('storage', e => {
+  if (e.key !== CART_KEY) return;
+  const data = load(CART_KEY, {}); cart = {};
+  if (data && typeof data === 'object' && !Array.isArray(data)) Object.entries(data).forEach(([id, q]) => { const p = product(id); if (p && hasPrice(p) && Number.isInteger(q) && q > 0) cart[id] = Math.min(q, MAX_QTY); });
+  updateCount(); if (['cart', 'checkout'].includes(current().parts[0])) render();
+});
 window.addEventListener('resize', () => { if (innerWidth < 1050) setDeptMenu(false); else fitDeptMenu(); });
 function updateHeaderOnScroll() {
   const compact = window.scrollY > 80;
@@ -945,7 +1146,7 @@ window.addEventListener('scroll', updateHeaderOnScroll, { passive: true });
   // Mode indicators and footer text driven by config.
   buildShell();
   const year = document.getElementById('footer-year'); if (year) year.textContent = new Date().getFullYear();
-  const note = document.getElementById('footer-note'); if (note) note.textContent = PROD ? 'Prices and availability are confirmed by quotation. No online payment.' : 'Demonstration catalogue · indicative prices · no live checkout or payment.';
+  const note = document.getElementById('footer-note'); if (note) note.textContent = 'Prices and availability are confirmed by quotation. No online payment.';
 
   // Logo with wordmark fallback.
   for (const id of ['brand-logo', 'footer-logo']) {

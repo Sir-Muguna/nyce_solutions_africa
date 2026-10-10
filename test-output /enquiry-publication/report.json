@@ -1,0 +1,2259 @@
+{
+  "url": "http://127.0.0.1:8765/index.html",
+  "label": "enquiry-publication",
+  "passed": 450,
+  "failed": 0,
+  "console_errors": [],
+  "results": [
+    {
+      "check": "Nav: no \"Shop by Category\" tab",
+      "result": "PASS",
+      "detail": "['Home', 'About Us', 'Categories', 'Shop', 'Business & Bulk Order', 'Contact']"
+    },
+    {
+      "check": "Nav: Home, About Us, Categories, Shop, Business & Bulk Order, Contact",
+      "result": "PASS",
+      "detail": "['Home', 'About Us', 'Categories', 'Shop', 'Business & Bulk Order', 'Contact']"
+    },
+    {
+      "check": "Mobile nav follows the same six-item order",
+      "result": "PASS",
+      "detail": "['Home', 'About Us', 'Categories', 'Shop', 'Business & Bulk Order', 'Contact']"
+    },
+    {
+      "check": "Nav: Categories is a disclosure button controlling the category menu",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Nav: Business and Contact links use existing routes",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Header: no promotional banner or carousel",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Header: visible named search input",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Footer shows all four configured contact channels",
+      "result": "PASS",
+      "detail": "WhatsApp\n+254720384496\nEmail\nsales@nycesolutionsafrica.com\nPhone\n+254720384496\nFacebook\nnycesolutionsafrica\nWebsite\nwww.nycesolutionsafrica.com\nAddress\nSpewigo Shopping Complex, Basement 1, Shop 5, Price Road, Nairobi, Kenya\nHours\nMonday to Saturday, 8:00 a.m. \u2013 5:00 p.m."
+    },
+    {
+      "check": "Footer WhatsApp and email links use required destinations",
+      "result": "PASS",
+      "detail": "[['+254720384496', 'https://wa.me/254720384496', '', ''], ['sales@nycesolutionsafrica.com', 'mailto:sales@nycesolutionsafrica.com', '', ''], ['+254720384496', 'tel:+254720384496', '', ''], ['nycesolutionsafrica', 'https://www.facebook.com/nycesolutionsafrica', '_blank', 'noopener noreferrer'], ['www"
+    },
+    {
+      "check": "Footer Facebook link opens safely in a new tab",
+      "result": "PASS",
+      "detail": "['nycesolutionsafrica', 'https://www.facebook.com/nycesolutionsafrica', '_blank', 'noopener noreferrer']"
+    },
+    {
+      "check": "Footer website links to requested domain",
+      "result": "PASS",
+      "detail": "[['+254720384496', 'https://wa.me/254720384496', '', ''], ['sales@nycesolutionsafrica.com', 'mailto:sales@nycesolutionsafrica.com', '', ''], ['+254720384496', 'tel:+254720384496', '', ''], ['nycesolutionsafrica', 'https://www.facebook.com/nycesolutionsafrica', '_blank', 'noopener noreferrer'], ['www"
+    },
+    {
+      "check": "Footer: no category directory or guide links",
+      "result": "PASS",
+      "detail": "['#/', '#/shop', '#/business', '#/about', '#/cart', '#/shop?category=solar', '#/shop?category=agriculture', '#/shop?category=electrical', '#/shop?category=water', '#/shop?category=construction', '#/shop?category=generators', '#/policy/delivery', '#/policy/returns', '#/policy/privacy', '#/policy/term"
+    },
+    {
+      "check": "Footer: no \"Shop by Category\" text",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Footer Help & information contains only the original policy links",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Home: hero, categories, 1-4 product rows, customer segments, trust strip, CTA render in order",
+      "result": "PASS",
+      "detail": "['home-hero', 'home-categories', 'home-product-section', 'home-product-section', 'home-product-section', 'home-segments', 'home-trust-strip', 'home-cta-band']"
+    },
+    {
+      "check": "Home: cards use shared template and render available data only",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Home: no carousel or auto-playing slider",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Nav link works + active state: #/shop",
+      "result": "PASS",
+      "detail": "aria-current=page"
+    },
+    {
+      "check": "Nav link works + active state: #/",
+      "result": "PASS",
+      "detail": "aria-current=page"
+    },
+    {
+      "check": "Existing route still resolves: #/business",
+      "result": "PASS",
+      "detail": "Business & Bulk Orders"
+    },
+    {
+      "check": "Existing route still resolves: #/about",
+      "result": "PASS",
+      "detail": "About NYCE SOLUTIONS"
+    },
+    {
+      "check": "Existing route still resolves: #/contact",
+      "result": "PASS",
+      "detail": "Contact NYCE SOLUTIONS"
+    },
+    {
+      "check": "Existing route still resolves: #/cart",
+      "result": "PASS",
+      "detail": "Cart"
+    },
+    {
+      "check": "Contact page uses configured WhatsApp and email links",
+      "result": "PASS",
+      "detail": "[['+254720384496', 'https://wa.me/254720384496'], ['sales@nycesolutionsafrica.com', 'mailto:sales@nycesolutionsafrica.com'], ['nycesolutionsafrica', 'https://www.facebook.com/nycesolutionsafrica'], ['www.nycesolutionsafrica.com', 'https://www.nycesolutionsafrica.com']]"
+    },
+    {
+      "check": "Legacy #/categories \u2192 #/shop",
+      "result": "PASS",
+      "detail": "#/shop"
+    },
+    {
+      "check": "Legacy #/category/water \u2192 shop?category=water",
+      "result": "PASS",
+      "detail": "#/shop?category=water"
+    },
+    {
+      "check": "Legacy #/category/generators/generators-5 \u2192 both filters",
+      "result": "PASS",
+      "detail": "#/shop?category=generators&subcategory=generators-5"
+    },
+    {
+      "check": "Legacy unknown category \u2192 not found",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Not-found route renders",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Build Guide route not customer-facing",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Browser back/forward restore views",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Back after legacy redirect does not loop",
+      "result": "PASS",
+      "detail": "#/"
+    },
+    {
+      "check": "Product breadcrumbs use filtered Shop routes",
+      "result": "PASS",
+      "detail": "['#/', '#/shop', '#/shop?category=solar', '#/shop?category=solar&subcategory=solar-7']"
+    },
+    {
+      "check": "Breadcrumb resolves: #/shop?category=solar",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Breadcrumb resolves: #/shop?category=solar&subcategory=solar-7",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Catalogue: 6 categories",
+      "result": "PASS",
+      "detail": "{'cats': 6, 'subs': 58, 'products': 144, 'unique': 144, 'mode': 'demo'}"
+    },
+    {
+      "check": "Catalogue: 58 subcategories",
+      "result": "PASS",
+      "detail": "{'cats': 6, 'subs': 58, 'products': 144, 'unique': 144, 'mode': 'demo'}"
+    },
+    {
+      "check": "Taxonomy: subcategory names are unique and none repeats its category name",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "Catalogue validator: 0 schema errors",
+      "result": "PASS",
+      "detail": "RY\ncategories 6, subcategories 58, products 144\nschema errors: 0 in 0 product(s)\nempty subcategories: ['electrical-8']\nduplicates: 0; taxonomy notes: none\nno product photo: 48; unverified specs: 130; no brand: 130; no model: 135; no SKU: 144; no availability: 144\nprices: fixed 10, quote 134, demo 0\n"
+    },
+    {
+      "check": "Product template covers every live field and every subcategory",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "Owner-supplied records show their specifications and availability",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Draft import: no structural errors and every unverified draft lists its publication blockers",
+      "result": "PASS",
+      "detail": "275"
+    },
+    {
+      "check": "Draft import: drafts are not published and do not collide with live IDs",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "Draft import: draft products are not searchable on the site",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "A record marked verificationStatus \"draft\" is hidden from every page",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Retired subcategory link #/shop?category=water&subcategory=water-2 redirects to the merged Solar DC Borehole Pumps",
+      "result": "PASS",
+      "detail": "#/shop?category=solar&subcategory=solar-7"
+    },
+    {
+      "check": "Retired subcategory link #/category/water/water-2 redirects to the merged Solar DC Borehole Pumps",
+      "result": "PASS",
+      "detail": "#/shop?category=solar&subcategory=solar-7"
+    },
+    {
+      "check": "Catalogue: 144 unique product records",
+      "result": "PASS",
+      "detail": "{'cats': 6, 'subs': 58, 'products': 144, 'unique': 144, 'mode': 'demo'}"
+    },
+    {
+      "check": "Enquiry publication: exactly 96 approved records with no technical, price or stock claims",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Enquiry publication: every image is the neutral placeholder",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Enquiry publication: all 96 detail pages have placeholders, quote-only actions and product-specific WhatsApp messages",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "All 58 subcategory routes list their products (or the empty state) with the correct heading",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Shop filter panel and drawer toggle are removed",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Category navigation remains available in the shared header",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Category routes still filter the product grid without the panel",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Search \"hisaki\" finds hisaki-generator",
+      "result": "PASS",
+      "detail": "['hisaki-generator', 'macire-6b4e3c6f64c977e5']"
+    },
+    {
+      "check": "Search \"NYCE-TEST-001\" finds hisaki-generator",
+      "result": "PASS",
+      "detail": "['hisaki-generator']"
+    },
+    {
+      "check": "SKU search uses shared product-card template",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Search \"Hisaki 8.75 kVA diesel generator\" finds hisaki-generator",
+      "result": "PASS",
+      "detail": "['hisaki-generator']"
+    },
+    {
+      "check": "Category listing uses shared product-card template",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Card WhatsApp links carry that product's enquiry",
+      "result": "PASS",
+      "detail": "[['single-core', 'https://wa.me/254720384496?text=Hello Nyce Solutions, I\u2019m interested in Single-core cable \u00b7 2.5 mm\u00b2 example.\\n\\nPlease confirm:\\n- Current price and availability\\n- Delivery options to [your location]\\n- Installation and warranty options, where applicable\\nQuantity required: 1\\nPro"
+    },
+    {
+      "check": "Search matches brand / category / subcategory names: \"Doyin\"",
+      "result": "PASS",
+      "detail": "['doyin-solar-pump', 'hybrid-borehole', 'macire-08da9355b0ebddca', 'macire-a190ba2a8c3984c8']"
+    },
+    {
+      "check": "Search matches brand / category / subcategory names: \"generators\"",
+      "result": "PASS",
+      "detail": "['hisaki-generator', 'macire-fcc658b486ea6072', 'macire-df574ae6ecee0d83', 'macire-3d9cac0197f63239', 'macire-18eaf5e15fb64d12', 'macire-7fa45fb7c970bbd0']"
+    },
+    {
+      "check": "Search matches brand / category / subcategory names: \"Solar DC Borehole Pumps\"",
+      "result": "PASS",
+      "detail": "['macire-6980550400e3a1fd', 'doyin-solar-pump', 'macire-08da9355b0ebddca', 'macire-8c8f4fe27c352c2f', 'macire-b7b89b8d827fc1d0', 'macire-b239d146f89e4414']"
+    },
+    {
+      "check": "Filter bar offers only filters that split the current results",
+      "result": "PASS",
+      "detail": "['pricing', 'application', 'power', 'phase']"
+    },
+    {
+      "check": "Filter options show real counts",
+      "result": "PASS",
+      "detail": "['Diesel (3)', 'Gas (1)', 'Mechanical (1)', 'Petrol (1)']"
+    },
+    {
+      "check": "Choosing a filter updates the URL, chips and results, and keeps focus",
+      "result": "PASS",
+      "detail": "['Diesel', 'Diesel', 'Diesel']"
+    },
+    {
+      "check": "Choosing \"All\" clears the filter",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "No filter bar when nothing can be split",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Search excludes model-only terms",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Search empty state is factual and includes query/count",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Header search submits to #/shop?q= and displays query/count",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Existing category and phase filtering still applies from route state",
+      "result": "PASS",
+      "detail": "['pulsar-generator']"
+    },
+    {
+      "check": "Active filter chips shown",
+      "result": "PASS",
+      "detail": "['Petrol & Diesel Generators', 'Three phase']"
+    },
+    {
+      "check": "Individual chip removal",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Clear all filters \u2192 #/shop",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Changing category route resets pagination",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Empty results display factual query and count",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Sort A\u2013Z",
+      "result": "PASS",
+      "detail": "['0.32hp 0.25Kw Dayliff DDP 50A Automatic Mini Electric Booster Water Pump', '0.5hp 0.37Kw 35m Dayliff DDP 60 Electric Booster Water Pump High Quality', '0.5hp 28m 1.8m\u00b3 Electric Booster Peripheral Water Pump Premier QB60', '0.75kW 1.0HP TOTAL Sewage Submersible Pump Electric AC TWP87506 750w (Dirty"
+    },
+    {
+      "check": "Sort price low\u2192high",
+      "result": "PASS",
+      "detail": "[650, 850, 3200, 12500, 14900, 19500, 32995, 57999, 167990, 298000]"
+    },
+    {
+      "check": "Sort price high\u2192low (priced first)",
+      "result": "PASS",
+      "detail": "[298000, 167990, 57999, 32995, 19500, 14900, 12500, 3200, 850, 650, None]"
+    },
+    {
+      "check": "Sort: \"Newest\" omitted (no date data)",
+      "result": "PASS",
+      "detail": "['featured', 'az', 'za', 'price-asc', 'price-desc']"
+    },
+    {
+      "check": "No discount badges / old prices rendered",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Grid/list preference persists",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Pagination accessible (nav + buttons)",
+      "result": "PASS",
+      "detail": "['Previous', '1', '2', '3', '4', '12', 'Next']"
+    },
+    {
+      "check": "Pagination page 2 works",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Product: tabs present",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Product: tab switching",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Product: tab arrow-key navigation",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Product: gallery thumbnail switch",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Product: tap/click enlargement opens dialog",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Product: Escape closes dialog",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Product: quantity controls",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Product: related products link",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Product: related excludes self",
+      "result": "PASS",
+      "detail": "['macire-18eaf5e15fb64d12', 'macire-6b4e3c6f64c977e5', 'macire-03601a07a487a4c3', 'macire-af60226328579568']"
+    },
+    {
+      "check": "Product: no unverified claims",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Product: key facts show verified brand and To Be Confirmed availability",
+      "result": "PASS",
+      "detail": "[['Brand', 'Hisaki'], ['Model', 'HK7000SNA'], ['Availability', 'To Be Confirmed']]"
+    },
+    {
+      "check": "Product: verified record shows its specifications",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Cart: add priced product (qty 3)",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Product: unverified record shows To Be Confirmed instead of planning specs or evidence tags",
+      "result": "PASS",
+      "detail": "{'facts': ['To Be Confirmed', 'To Be Confirmed', 'To Be Confirmed'], 'preview': 0, 'table': 0, 'specText': '\\n    Key specificationsSpecifications: To Be Confirmed. Request the manufacturer datasheet with your quotation.\\n  ', 'tag': 0}"
+    },
+    {
+      "check": "Quote-only: no Add to Cart, Request a Quote shown",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Quote-only: cannot enter cart via storage",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Quote-only: rejected on cart restore",
+      "result": "PASS",
+      "detail": "{'hisaki-generator': 3}"
+    },
+    {
+      "check": "Request a Quote prefills business form",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Cart: subtotal correct",
+      "result": "PASS",
+      "detail": "KES 536,965"
+    },
+    {
+      "check": "Cart: quantity update recalculates",
+      "result": "PASS",
+      "detail": "KES 368,975"
+    },
+    {
+      "check": "Cart: persistence across reload",
+      "result": "PASS",
+      "detail": "{'hisaki-generator': 2, 'tolsen-hoist': 1}"
+    },
+    {
+      "check": "Cart: prototype statements present",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Checkout summary: honest statement + totals",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Checkout WhatsApp message lists items",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Cart: remove product",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Cart: clear cart \u2192 empty state",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Product page has exactly one WhatsApp CTA labelled \"Request a Quote on WhatsApp\"",
+      "result": "PASS",
+      "detail": "['Request a Quote on WhatsApp']"
+    },
+    {
+      "check": "WhatsApp quote message (product with SKU) contains every required field",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "WhatsApp quote uses the configured number",
+      "result": "PASS",
+      "detail": "https://wa.me/254720384496"
+    },
+    {
+      "check": "WhatsApp quote message is URL-encoded correctly",
+      "result": "PASS",
+      "detail": "Hello%20Nyce%20Solutions%2C%20I%E2%80%99m%20interested%20in%20Hisaki%208.75%20kV"
+    },
+    {
+      "check": "WhatsApp quote never claims a confirmed order or payment",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Quantity stepper keeps the WhatsApp link current (long-press / new-tab safe)",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "An invalid quantity blocks the WhatsApp quote and shows validation",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "WhatsApp quote message (no SKU, model only) shows the model",
+      "result": "PASS",
+      "detail": "Hello Nyce Solutions, I\u2019m interested in Lenhard MM-300 inverter welder (Model MM-300).\n\nPlease confirm:\n- Current price "
+    },
+    {
+      "check": "WhatsApp quote message (no SKU or model) omits the reference rather than inventing one",
+      "result": "PASS",
+      "detail": "Hello Nyce Solutions, I\u2019m interested in Starter lithium solar kit.\n\nPlease confirm:\n- Current price and availability\n- D"
+    },
+    {
+      "check": "Quote-only product keeps the online quote form as its second action",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "WhatsApp quote works by touch on mobile",
+      "result": "PASS",
+      "detail": "Hello Nyce Solutions, I\u2019m interested in Hisaki 8.75 kVA diesel generator (Model HK7000SNA).\n\nPlease "
+    },
+    {
+      "check": "Contact form: required validation with accessible errors",
+      "result": "PASS",
+      "detail": "5"
+    },
+    {
+      "check": "Contact form: email format validated",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Contact form: honest result, no transmission claim",
+      "result": "PASS",
+      "detail": "your enquiry is ready to send.\n\nnothing has been sent yet and this is not an order. review the text, then open whatsapp "
+    },
+    {
+      "check": "Business form: required validation",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Journey: search leads to the product page",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Journey: a double click adds the quantity once",
+      "result": "PASS",
+      "detail": "{'hisaki-generator': 2}"
+    },
+    {
+      "check": "Journey: an invalid quantity is rejected",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Journey: an out-of-range cart quantity is reverted with a message",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Journey: Undo restores a removed cart item",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Journey: cart state is shared with another tab via the existing storage",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Journey: checkout separates an enquiry from a confirmed order",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Journey: WhatsApp list matches the checkout quantities, line totals and subtotal",
+      "result": "PASS",
+      "detail": "l shown on the website: KES 368,975 (excluding delivery and taxes)\n\nPlease confirm:\n1. Current availability of each item\n2. Delivery options and cost to my location: ________\n3. A final quotation including any applicable taxes\nThis is an enquiry, not an order."
+    },
+    {
+      "check": "Journey: quotation request is prefilled with the same list, total quantity and subtotal",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Journey: an invalid phone number shows an inline error",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Journey: prepared request says it is not sent and not an order",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Journey: final WhatsApp action carries the full request",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Journey: Clear cart can be undone",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Journey: an already-open tab updates live when the cart changes",
+      "result": "PASS",
+      "detail": "['0', '3']"
+    },
+    {
+      "check": "Journey: no JavaScript errors",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "About: verified company summary",
+      "result": "PASS",
+      "detail": "NYCE SOLUTIONS is a Kenyan enterprise specialising in the procurement, retail and distribution of solar-energy infrastructure, power-backup systems, water solutions, industrial equipment, hardware and tools."
+    },
+    {
+      "check": "About: the five business sectors in order",
+      "result": "PASS",
+      "detail": "['Solar and renewable energy', 'Generators and backup systems', 'Water and irrigation solutions', 'Industrial and construction machinery', 'Hardware and hand tools']"
+    },
+    {
+      "check": "About: domestic, agricultural, commercial and industrial customers in Kenya and other African markets",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "About: confirmed address and hours shown; remaining unknown details marked To Be Confirmed",
+      "result": "PASS",
+      "detail": "{'Business name': 'NYCE SOLUTIONS', 'Based in': 'Kenya', 'Markets served': 'Kenya and other African markets', 'Physical address': 'Spewigo Shopping Complex, Basement 1, Shop 5, Price Road, Nairobi, Kenya', 'Operating hours': 'Monday to Saturday, 8:00 a.m. \u2013 5:00 p.m.', 'Company registration': 'To Be"
+    },
+    {
+      "check": "About: no invented history, certifications, partnerships or locations",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "About: all 9 sector links open catalogue pages with products",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "Contact: confirmed address and hours shown; Facebook and website listed",
+      "result": "PASS",
+      "detail": "WhatsApp\n+254720384496\nPhone\n+254720384496\nEmail\nsales@nycesolutionsafrica.com\nAddress\nSpewigo Shopping Complex, Basement 1, Shop 5, Price Road, Nairobi, Kenya\nOperating hours\nMonday to Saturday, 8:00 a.m. \u2013 5:00 p.m.\nFacebook\nnycesolutionsafrica\nWebsite\nwww.nycesolutionsafrica.com"
+    },
+    {
+      "check": "Policy delivery: page-specific CTA with contact line and correct heading order",
+      "result": "PASS",
+      "detail": "{'title': 'Need delivery to your location?', 'links': ['tel:+254720384496', '#/business?topic=Delivery+enquiry'], 'wa': 1, 'reach': 'Call +254720384496 \u00b7 Monday to Saturday, 8:00 a.m. \u2013 5:00 p.m.', 'headings': [1, 2]}"
+    },
+    {
+      "check": "Policy delivery: WhatsApp CTA opens a prefilled, honest enquiry",
+      "result": "PASS",
+      "detail": "Hello NYCE SOLUTIONS,\nI would like to ask about delivery.\nEquipment / product: ________\nQuantity: ________\nDelivery town"
+    },
+    {
+      "check": "Policy delivery: form CTA opens the form with the right topic",
+      "result": "PASS",
+      "detail": "('#/business?topic=Delivery+enquiry', 'Delivery enquiry')"
+    },
+    {
+      "check": "Policy returns: page-specific CTA with contact line and correct heading order",
+      "result": "PASS",
+      "detail": "{'title': 'Questions about returns or warranty?', 'links': ['tel:+254720384496', '#/contact?topic=Support+information'], 'wa': 1, 'reach': 'Call +254720384496 \u00b7 Monday to Saturday, 8:00 a.m. \u2013 5:00 p.m.', 'headings': [1, 2]}"
+    },
+    {
+      "check": "Policy returns: WhatsApp CTA opens a prefilled, honest enquiry",
+      "result": "PASS",
+      "detail": "Hello NYCE SOLUTIONS,\nI would like to ask about returns or warranty terms.\nProduct: ________\nQuotation or invoice refere"
+    },
+    {
+      "check": "Policy returns: form CTA opens the form with the right topic",
+      "result": "PASS",
+      "detail": "('#/contact?topic=Support+information', 'Support information')"
+    },
+    {
+      "check": "Policy privacy: page-specific CTA with contact line and correct heading order",
+      "result": "PASS",
+      "detail": "{'title': 'Questions about your information?', 'links': ['tel:+254720384496', '#/contact', 'mailto:sales@nycesolutionsafrica.com?subject=Privacy%20question'], 'wa': 0, 'reach': 'Call +254720384496 \u00b7 Monday to Saturday, 8:00 a.m. \u2013 5:00 p.m.', 'headings': [1, 2]}"
+    },
+    {
+      "check": "Policy privacy: email CTA uses the configured address",
+      "result": "PASS",
+      "detail": "['tel:+254720384496', '#/contact', 'mailto:sales@nycesolutionsafrica.com?subject=Privacy%20question']"
+    },
+    {
+      "check": "Policy privacy: form CTA opens the form with the right topic",
+      "result": "PASS",
+      "detail": "('#/contact', '')"
+    },
+    {
+      "check": "Policy terms: page-specific CTA with contact line and correct heading order",
+      "result": "PASS",
+      "detail": "{'title': 'Ready to buy?', 'links': ['tel:+254720384496', '#/business?topic=Quotation+request'], 'wa': 1, 'reach': 'Call +254720384496 \u00b7 Monday to Saturday, 8:00 a.m. \u2013 5:00 p.m.', 'headings': [1, 2]}"
+    },
+    {
+      "check": "Policy terms: WhatsApp CTA opens a prefilled, honest enquiry",
+      "result": "PASS",
+      "detail": "Hello NYCE SOLUTIONS,\nI would like a written quotation, including payment terms, for:\nEquipment / product: ________\nQuan"
+    },
+    {
+      "check": "Policy terms: form CTA opens the form with the right topic",
+      "result": "PASS",
+      "detail": "('#/business?topic=Quotation+request', 'Quotation request')"
+    },
+    {
+      "check": "Skip link present and first in DOM",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Landmarks: header/main/footer/nav",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Images have alt / aria-label",
+      "result": "PASS",
+      "detail": "0"
+    },
+    {
+      "check": "All buttons/links have accessible names",
+      "result": "PASS",
+      "detail": "0"
+    },
+    {
+      "check": "Heading structure: one h1, no level skipped",
+      "result": "PASS",
+      "detail": "[1, 2, 3, 3, 3, 3, 3, 3, 2, 3, 3, 3, 3, 2, 3, 3, 3, 3, 2, 3, 3, 3, 3, 2, 3, 3, 3, 3, 2]"
+    },
+    {
+      "check": "Keyboard: first Tab lands on skip link",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Keyboard: visible focus outline",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Skip link moves focus to main",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Keyboard: tabbing reaches catalogue controls",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "No horizontal overflow @375px #/",
+      "result": "PASS",
+      "detail": "[375, 375]"
+    },
+    {
+      "check": "No horizontal overflow @375px #/shop?category=generators",
+      "result": "PASS",
+      "detail": "[375, 375]"
+    },
+    {
+      "check": "No horizontal overflow @375px #/product/hisaki-generator",
+      "result": "PASS",
+      "detail": "[375, 375]"
+    },
+    {
+      "check": "No horizontal overflow @375px #/business",
+      "result": "PASS",
+      "detail": "[375, 375]"
+    },
+    {
+      "check": "No horizontal overflow @375px #/contact",
+      "result": "PASS",
+      "detail": "[375, 375]"
+    },
+    {
+      "check": "No horizontal overflow @375px #/cart",
+      "result": "PASS",
+      "detail": "[375, 375]"
+    },
+    {
+      "check": "Header search visible without interaction @375",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Homepage first product row starts within the first viewport @375",
+      "result": "PASS",
+      "detail": "{'x': 16, 'y': 727, 'width': 166.5, 'height': 404.484375}"
+    },
+    {
+      "check": "Homepage hero stays compact @375",
+      "result": "PASS",
+      "detail": "224.25"
+    },
+    {
+      "check": "Header search submits name/SKU query from the homepage @375",
+      "result": "PASS",
+      "detail": "#/shop?q=NYCE-TEST-001"
+    },
+    {
+      "check": "Header tap targets at least 44px @375",
+      "result": "PASS",
+      "detail": "[['BUTTON', 44, 44], ['INPUT', 293, 44], ['BUTTON', 48, 44], ['BUTTON', 44, 44], ['A', 54, 44]]"
+    },
+    {
+      "check": "Mobile search is a full-width row beneath logo",
+      "result": "PASS",
+      "detail": "[{'x': 68, 'y': 6, 'width': 112, 'height': 44}, {'x': 16, 'y': 54, 'width': 343, 'height': 46}]"
+    },
+    {
+      "check": "Scrolling compacts sticky header but keeps search and cart @375",
+      "result": "PASS",
+      "detail": "is-compact"
+    },
+    {
+      "check": "Compact header hides nav and WhatsApp action but keeps the menu button @375",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Scrolling up restores navigation (bar on desktop, menu button below 1050px) @375",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Header WhatsApp uses existing configured number @375",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Shop filter panel stays removed @375px",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Touch targets \u226532px tall @375",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "No overlapping floating widgets @375",
+      "result": "PASS",
+      "detail": "['skip']"
+    },
+    {
+      "check": "No horizontal overflow @768px #/",
+      "result": "PASS",
+      "detail": "[768, 768]"
+    },
+    {
+      "check": "No horizontal overflow @768px #/shop?category=generators",
+      "result": "PASS",
+      "detail": "[768, 768]"
+    },
+    {
+      "check": "No horizontal overflow @768px #/product/hisaki-generator",
+      "result": "PASS",
+      "detail": "[768, 768]"
+    },
+    {
+      "check": "No horizontal overflow @768px #/business",
+      "result": "PASS",
+      "detail": "[768, 768]"
+    },
+    {
+      "check": "No horizontal overflow @768px #/contact",
+      "result": "PASS",
+      "detail": "[768, 768]"
+    },
+    {
+      "check": "No horizontal overflow @768px #/cart",
+      "result": "PASS",
+      "detail": "[768, 768]"
+    },
+    {
+      "check": "Header search visible without interaction @768",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Homepage first product row starts within the first viewport @768",
+      "result": "PASS",
+      "detail": "{'x': 22, 'y': 691.21875, 'width': 172, 'height': 413.984375}"
+    },
+    {
+      "check": "Homepage hero stays compact @768",
+      "result": "PASS",
+      "detail": "245.84375"
+    },
+    {
+      "check": "Header search submits name/SKU query from the homepage @768",
+      "result": "PASS",
+      "detail": "#/shop?q=NYCE-TEST-001"
+    },
+    {
+      "check": "Header tap targets at least 44px @768",
+      "result": "PASS",
+      "detail": "[['BUTTON', 44, 44], ['INPUT', 223.09375, 44], ['BUTTON', 82, 44], ['BUTTON', 116.34375, 44], ['A', 88.5625, 44]]"
+    },
+    {
+      "check": "Scrolling compacts sticky header but keeps search and cart @768",
+      "result": "PASS",
+      "detail": "is-compact"
+    },
+    {
+      "check": "Compact header hides nav and WhatsApp action but keeps the menu button @768",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Scrolling up restores navigation (bar on desktop, menu button below 1050px) @768",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Header WhatsApp uses existing configured number @768",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Shop filter panel stays removed @768px",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Touch targets \u226532px tall @768",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "No overlapping floating widgets @768",
+      "result": "PASS",
+      "detail": "['skip']"
+    },
+    {
+      "check": "No horizontal overflow @1280px #/",
+      "result": "PASS",
+      "detail": "[1280, 1280]"
+    },
+    {
+      "check": "No horizontal overflow @1280px #/shop?category=generators",
+      "result": "PASS",
+      "detail": "[1280, 1280]"
+    },
+    {
+      "check": "No horizontal overflow @1280px #/product/hisaki-generator",
+      "result": "PASS",
+      "detail": "[1280, 1280]"
+    },
+    {
+      "check": "No horizontal overflow @1280px #/business",
+      "result": "PASS",
+      "detail": "[1280, 1280]"
+    },
+    {
+      "check": "No horizontal overflow @1280px #/contact",
+      "result": "PASS",
+      "detail": "[1280, 1280]"
+    },
+    {
+      "check": "No horizontal overflow @1280px #/cart",
+      "result": "PASS",
+      "detail": "[1280, 1280]"
+    },
+    {
+      "check": "Header search visible without interaction @1280",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Homepage first product row starts within the first viewport @1280",
+      "result": "PASS",
+      "detail": "{'x': 48, 'y': 661.375, 'width': 285.5, 'height': 527.484375}"
+    },
+    {
+      "check": "Homepage hero stays compact @1280",
+      "result": "PASS",
+      "detail": "217.375"
+    },
+    {
+      "check": "Header search submits name/SKU query from the homepage @1280",
+      "result": "PASS",
+      "detail": "#/shop?q=NYCE-TEST-001"
+    },
+    {
+      "check": "Header tap targets at least 44px @1280",
+      "result": "PASS",
+      "detail": "[['INPUT', 707.96875, 44], ['BUTTON', 87.125, 44], ['BUTTON', 116.34375, 44], ['A', 88.5625, 44], ['A', 66.5, 44], ['A', 87.15625, 44], ['BUTTON', 117.53125, 44], ['A', 60.578125, 44], ['A', 167.890625, 44], ['A', 77.234375, 44]]"
+    },
+    {
+      "check": "Desktop search is the widest header-row item",
+      "result": "PASS",
+      "detail": "{'#global-search': 797.09375, '.logo': 128, '.header-whatsapp': 116.34375, '.cart-link': 88.5625}"
+    },
+    {
+      "check": "Scrolling compacts sticky header but keeps search and cart @1280",
+      "result": "PASS",
+      "detail": "is-compact"
+    },
+    {
+      "check": "Compact header hides nav and WhatsApp action but keeps the menu button @1280",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Scrolling up restores navigation (bar on desktop, menu button below 1050px) @1280",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Header WhatsApp uses existing configured number @1280",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Shop filter panel stays removed @1280px",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Touch targets \u226532px tall @1280",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "No overlapping floating widgets @1280",
+      "result": "PASS",
+      "detail": "['skip']"
+    },
+    {
+      "check": "Shell @1440: logo links home and is named",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Shell @1440: search, WhatsApp, cart and nav bar visible; menu button hidden",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Shell @1440: category menu closed by default",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Shell @1440: focused nav control has a visible outline",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Category menu opens from the keyboard (Enter)",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Category menu groups 6 categories and 58 subcategories",
+      "result": "PASS",
+      "detail": "6"
+    },
+    {
+      "check": "Category menu links are exactly the existing shop filter routes",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "Category menu stays inside the viewport @1440",
+      "result": "PASS",
+      "detail": "{'left': 100, 'right': 1340, 'bottom': 623.34375, 'vw': 1440, 'vh': 900, 'groups': 6, 'subs': 58, 'hrefs': ['#/shop', '#/shop?category=agriculture', '#/shop?category=agriculture&subcategory=agriculture-1', '#/shop?category=agriculture&subcategory=agriculture-2', '#/shop?category=agriculture&subcateg"
+    },
+    {
+      "check": "Tab moves focus into the open menu with a visible outline",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Escape closes the category menu and returns focus to Categories",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Clicking outside closes the category menu",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Tabbing out of the category menu closes it",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Subcategory link navigates, closes the menu and marks Categories active",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Current subcategory is marked aria-current in the menu",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Nav #/business: navigates and is the active link",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Nav #/contact: navigates and is the active link",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Cart link navigates and shows an active state",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Compact header @1440 shows the menu button and opens the drawer",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Drawer opens on desktop from the compact header and Escape closes it",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Escape closes the drawer and focus returns to the menu button",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Shell @375: menu button, logo, search and cart visible; desktop bar hidden",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Shell @375: header (excluding the category strip) is at most 120px tall",
+      "result": "PASS",
+      "detail": "[168, 61]"
+    },
+    {
+      "check": "Shell @375: category strip is a single row of at most 64px",
+      "result": "PASS",
+      "detail": "61"
+    },
+    {
+      "check": "Drawer opens by touch @375, takes focus and is named",
+      "result": "PASS",
+      "detail": "{'open': True, 'left': 0, 'right': 330, 'top': 0, 'bottom': 812, 'vw': 375, 'vh': 812, 'details': 7, 'focus': True, 'overflow': False, 'expanded': 'true', 'name': 'Site menu'}"
+    },
+    {
+      "check": "Drawer fits the viewport @375",
+      "result": "PASS",
+      "detail": "{'open': True, 'left': 0, 'right': 330, 'top': 0, 'bottom': 812, 'vw': 375, 'vh': 812, 'details': 7, 'focus': True, 'overflow': False, 'expanded': 'true', 'name': 'Site menu'}"
+    },
+    {
+      "check": "Drawer lists six categories as accordions @375",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Category accordion expands to All + subcategories @375",
+      "result": "PASS",
+      "detail": "['#/shop?category=solar', '#/shop?category=solar&subcategory=solar-1']"
+    },
+    {
+      "check": "Accordion toggles from the keyboard @375",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Drawer controls are at least 44px tall @375",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "Focus stays out of the page behind the open drawer @375",
+      "result": "PASS",
+      "detail": "<a href=\"#/shop?category=solar&amp;subcategory=solar-1\" data-menu-category=\"sola"
+    },
+    {
+      "check": "Escape closes the drawer and focus returns to the menu button @375",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Tapping the backdrop closes the drawer @375",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Drawer link navigates and closes the drawer @375",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Drawer subcategory link applies the existing filter route @375",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Drawer opens on the current category with aria-current @375",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Drawer WhatsApp action closes the drawer and opens the enquiry preview @375",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Compact header keeps menu button and search reachable @375",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Shell @768: menu button, logo, search and cart visible; desktop bar hidden",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Drawer opens by touch @768, takes focus and is named",
+      "result": "PASS",
+      "detail": "{'open': True, 'left': 0, 'right': 360, 'top': 0, 'bottom': 1024, 'vw': 768, 'vh': 1024, 'details': 7, 'focus': True, 'overflow': False, 'expanded': 'true', 'name': 'Site menu'}"
+    },
+    {
+      "check": "Drawer fits the viewport @768",
+      "result": "PASS",
+      "detail": "{'open': True, 'left': 0, 'right': 360, 'top': 0, 'bottom': 1024, 'vw': 768, 'vh': 1024, 'details': 7, 'focus': True, 'overflow': False, 'expanded': 'true', 'name': 'Site menu'}"
+    },
+    {
+      "check": "Drawer lists six categories as accordions @768",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Category accordion expands to All + subcategories @768",
+      "result": "PASS",
+      "detail": "['#/shop?category=solar', '#/shop?category=solar&subcategory=solar-1']"
+    },
+    {
+      "check": "Accordion toggles from the keyboard @768",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Drawer controls are at least 44px tall @768",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "Focus stays out of the page behind the open drawer @768",
+      "result": "PASS",
+      "detail": "<a href=\"#/shop?category=solar&amp;subcategory=solar-1\" data-menu-category=\"sola"
+    },
+    {
+      "check": "Escape closes the drawer and focus returns to the menu button @768",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Tapping the backdrop closes the drawer @768",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Drawer link navigates and closes the drawer @768",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Drawer subcategory link applies the existing filter route @768",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Drawer opens on the current category with aria-current @768",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Drawer WhatsApp action closes the drawer and opens the enquiry preview @768",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Compact header keeps menu button and search reachable @768",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Footer @375: no repeated destinations",
+      "result": "PASS",
+      "detail": "['#/', '#/shop', '#/business', '#/about', '#/cart', '#/shop?category=solar', '#/shop?category=agriculture', '#/shop?category=electrical', '#/shop?category=water', '#/shop?category=construction', '#/shop?category=generators', '#/policy/delivery', '#/policy/returns', '#/policy/privacy', '#/policy/term"
+    },
+    {
+      "check": "Footer @375: every internal link resolves to a real page (16 links)",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "Footer @375: external links are https/mailto/tel, new-tab links use noopener",
+      "result": "PASS",
+      "detail": "[{'href': 'https://wa.me/254720384496', 'h': 44, 'target': '', 'rel': '', 'text': '+254720384496'}, {'href': 'mailto:sales@nycesolutionsafrica.com', 'h': 44, 'target': '', 'rel': '', 'text': 'sales@nycesolutionsafrica.com'}, {'href': 'tel:+254720384496', 'h': 44, 'target': '', 'rel': '', 'text': '+2"
+    },
+    {
+      "check": "Footer @375: shows only configured contact channels, no placeholders",
+      "result": "PASS",
+      "detail": "['WhatsApp+254720384496', 'Emailsales@nycesolutionsafrica.com', 'Phone+254720384496', 'Facebooknycesolutionsafrica', 'Websitewww.nycesolutionsafrica.com', 'AddressSpewigo Shopping Complex, Basement 1, Shop 5, Price Road, Nairobi, Kenya', 'HoursMonday to Saturday, 8:00 a.m. \u2013 5:00 p.m.']"
+    },
+    {
+      "check": "Footer @375: policy links carry no Draft labels",
+      "result": "PASS",
+      "detail": "0"
+    },
+    {
+      "check": "Footer @375: link groups are named navigation landmarks",
+      "result": "PASS",
+      "detail": "['Explore', 'Categories', 'Help & information']"
+    },
+    {
+      "check": "Footer @375: link targets at least 44px tall",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "Footer @375: no horizontal overflow",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Footer @768: no repeated destinations",
+      "result": "PASS",
+      "detail": "['#/', '#/shop', '#/business', '#/about', '#/cart', '#/shop?category=solar', '#/shop?category=agriculture', '#/shop?category=electrical', '#/shop?category=water', '#/shop?category=construction', '#/shop?category=generators', '#/policy/delivery', '#/policy/returns', '#/policy/privacy', '#/policy/term"
+    },
+    {
+      "check": "Footer @768: every internal link resolves to a real page (16 links)",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "Footer @768: external links are https/mailto/tel, new-tab links use noopener",
+      "result": "PASS",
+      "detail": "[{'href': 'https://wa.me/254720384496', 'h': 44, 'target': '', 'rel': '', 'text': '+254720384496'}, {'href': 'mailto:sales@nycesolutionsafrica.com', 'h': 44, 'target': '', 'rel': '', 'text': 'sales@nycesolutionsafrica.com'}, {'href': 'tel:+254720384496', 'h': 44, 'target': '', 'rel': '', 'text': '+2"
+    },
+    {
+      "check": "Footer @768: shows only configured contact channels, no placeholders",
+      "result": "PASS",
+      "detail": "['WhatsApp+254720384496', 'Emailsales@nycesolutionsafrica.com', 'Phone+254720384496', 'Facebooknycesolutionsafrica', 'Websitewww.nycesolutionsafrica.com', 'AddressSpewigo Shopping Complex, Basement 1, Shop 5, Price Road, Nairobi, Kenya', 'HoursMonday to Saturday, 8:00 a.m. \u2013 5:00 p.m.']"
+    },
+    {
+      "check": "Footer @768: policy links carry no Draft labels",
+      "result": "PASS",
+      "detail": "0"
+    },
+    {
+      "check": "Footer @768: link groups are named navigation landmarks",
+      "result": "PASS",
+      "detail": "['Explore', 'Categories', 'Help & information']"
+    },
+    {
+      "check": "Footer @768: link targets at least 44px tall",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "Footer @768: no horizontal overflow",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Footer @1440: no repeated destinations",
+      "result": "PASS",
+      "detail": "['#/', '#/shop', '#/business', '#/about', '#/cart', '#/shop?category=solar', '#/shop?category=agriculture', '#/shop?category=electrical', '#/shop?category=water', '#/shop?category=construction', '#/shop?category=generators', '#/policy/delivery', '#/policy/returns', '#/policy/privacy', '#/policy/term"
+    },
+    {
+      "check": "Footer @1440: every internal link resolves to a real page (16 links)",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "Footer @1440: external links are https/mailto/tel, new-tab links use noopener",
+      "result": "PASS",
+      "detail": "[{'href': 'https://wa.me/254720384496', 'h': 32, 'target': '', 'rel': '', 'text': '+254720384496'}, {'href': 'mailto:sales@nycesolutionsafrica.com', 'h': 32, 'target': '', 'rel': '', 'text': 'sales@nycesolutionsafrica.com'}, {'href': 'tel:+254720384496', 'h': 32, 'target': '', 'rel': '', 'text': '+2"
+    },
+    {
+      "check": "Footer @1440: shows only configured contact channels, no placeholders",
+      "result": "PASS",
+      "detail": "['WhatsApp+254720384496', 'Emailsales@nycesolutionsafrica.com', 'Phone+254720384496', 'Facebooknycesolutionsafrica', 'Websitewww.nycesolutionsafrica.com', 'AddressSpewigo Shopping Complex, Basement 1, Shop 5, Price Road, Nairobi, Kenya', 'HoursMonday to Saturday, 8:00 a.m. \u2013 5:00 p.m.']"
+    },
+    {
+      "check": "Footer @1440: policy links carry no Draft labels",
+      "result": "PASS",
+      "detail": "0"
+    },
+    {
+      "check": "Footer @1440: link groups are named navigation landmarks",
+      "result": "PASS",
+      "detail": "['Explore', 'Categories', 'Help & information']"
+    },
+    {
+      "check": "Footer @1440: link targets at least 32px tall",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "Footer @1440: no horizontal overflow",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Breadcrumbs: Home / Shop / Category / current subcategory",
+      "result": "PASS",
+      "detail": "['#/', '#/shop', '#/shop?category=solar']"
+    },
+    {
+      "check": "Breadcrumbs: search inside a category ends with the current Search results crumb",
+      "result": "PASS",
+      "detail": "['#/', '#/shop', '#/shop?category=solar']"
+    },
+    {
+      "check": "Subcategory URL filters results and updates the heading",
+      "result": "PASS",
+      "detail": "#/shop?category=water&subcategory=water-3"
+    },
+    {
+      "check": "Category route changes independently of the removed panel",
+      "result": "PASS",
+      "detail": "#/shop?category=solar"
+    },
+    {
+      "check": "All 58 catalogue subcategories have products, except those awaiting owner stock",
+      "result": "PASS",
+      "detail": "['electrical-8']"
+    },
+    {
+      "check": "Combined category + power + pricing + sort",
+      "result": "PASS",
+      "detail": "['Pulsar 41 kVA diesel generator', 'TLAC 220 A diesel welding generator']"
+    },
+    {
+      "check": "Combined state is shown as chips and the count",
+      "result": "PASS",
+      "detail": "2 products \u00b7 showing 1\u20132"
+    },
+    {
+      "check": "Category route filters the catalogue with the panel removed",
+      "result": "PASS",
+      "detail": "#/shop?category=agriculture"
+    },
+    {
+      "check": "Switching category keeps a filter that still applies",
+      "result": "PASS",
+      "detail": "#/shop?category=construction&power=Electric"
+    },
+    {
+      "check": "Pricing filter returns only priced products and shows a chip",
+      "result": "PASS",
+      "detail": "['priced', 'priced', 'priced']"
+    },
+    {
+      "check": "Legacy pricing=demo URL is corrected to pricing=priced",
+      "result": "PASS",
+      "detail": "#/shop?pricing=priced"
+    },
+    {
+      "check": "Search results default to \"Best match\"; the option exists only while searching",
+      "result": "PASS",
+      "detail": "[['relevance', 'Best match'], ['featured', 'Featured']]"
+    },
+    {
+      "check": "Best match is not offered without a search",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Invalid sort for the context is corrected in the URL",
+      "result": "PASS",
+      "detail": "#/shop"
+    },
+    {
+      "check": "Changing sort keeps the search",
+      "result": "PASS",
+      "detail": "#/shop?q=pump&sort=az"
+    },
+    {
+      "check": "Changing category keeps search and sort",
+      "result": "PASS",
+      "detail": "#/shop?q=pump&sort=az&category=water"
+    },
+    {
+      "check": "Search + category + sort results all match the search",
+      "result": "PASS",
+      "detail": "['0.32hp 0.25Kw Dayliff DDP 50A Automatic Mini Electric Booster Water Pump', '0.5hp 0.37Kw 35m Dayliff DDP 60 Electric Booster Water Pump High Quality', '0.5hp 28m 1.8m\u00b3 Electric Booster Peripheral Water Pump Premier QB60']"
+    },
+    {
+      "check": "Broad search paginates",
+      "result": "PASS",
+      "detail": "#/shop?q=a&page=2"
+    },
+    {
+      "check": "A new search resets pagination and replaces the query",
+      "result": "PASS",
+      "detail": "#/shop?q=kit"
+    },
+    {
+      "check": "Header search keeps the active filters and sort",
+      "result": "PASS",
+      "detail": "#/shop?category=solar&q=kit&power=Solar&sort=az"
+    },
+    {
+      "check": "Search results show query and result count",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Price low to high lists priced products ascending, then Request Price",
+      "result": "PASS",
+      "detail": "[650, 850, 3200, 12500, 14900, 19500, 32995, 57999, 167990, 298000, None, None]"
+    },
+    {
+      "check": "Price sort explains where Request Price products appear",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Sort Z to A",
+      "result": "PASS",
+      "detail": "['Workshop circular saw', 'Water filtration housing set', 'Water cooled diesel engine ZH-1110']"
+    },
+    {
+      "check": "Unknown sort values are removed from the URL",
+      "result": "PASS",
+      "detail": "#/shop?category=solar"
+    },
+    {
+      "check": "Out-of-range page is corrected to the last page",
+      "result": "PASS",
+      "detail": "#/shop?page=12"
+    },
+    {
+      "check": "Invalid page, category and subcategory values are removed from the URL",
+      "result": "PASS",
+      "detail": "#/shop"
+    },
+    {
+      "check": "A subcategory from another category corrects the category",
+      "result": "PASS",
+      "detail": "#/shop?category=solar&subcategory=solar-1"
+    },
+    {
+      "check": "Refresh restores category, filter, sort and results",
+      "result": "PASS",
+      "detail": "('#/shop?category=construction&power=Electric&sort=price-asc', '#/shop?category=construction&power=Electric&sort=price-asc')"
+    },
+    {
+      "check": "Back restores each earlier combination of filters and sort",
+      "result": "PASS",
+      "detail": "('#/shop?category=solar&sort=za', '#/shop?category=solar', '#/shop')"
+    },
+    {
+      "check": "Forward restores the latest state",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Cards mark priced and quote-only products with distinct states and wording",
+      "result": "PASS",
+      "detail": "[{'state': 'priced', 'text': 'KES 650', 'priced': True}, {'state': 'priced', 'text': 'KES 850', 'priced': True}, {'state': 'priced', 'text': 'KES 3,200', 'priced': True}]"
+    },
+    {
+      "check": "A record with no usable price is labelled \"Price not available\", not a price or a quote",
+      "result": "PASS",
+      "detail": "{'state': 'unavailable', 'text': 'Price not available', 'note': 'Contact us to confirm price and availability'}"
+    },
+    {
+      "check": "No-match state: factual message, count, search hint and next steps",
+      "result": "PASS",
+      "detail": "No matching products\n\nNo products match \u201czzzzqqq\u201d.\n\nSearch looks at product names, brands, SKUs and category names. Check the spelling or try a shorter term.\n\nC"
+    },
+    {
+      "check": "No-match state links to every category, a quote and WhatsApp",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "\"Clear search\" returns to the full catalogue",
+      "result": "PASS",
+      "detail": "#/shop"
+    },
+    {
+      "check": "Filter-only empty state names the filters, not a search",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "\"Clear filters\" resets filters",
+      "result": "PASS",
+      "detail": "#/shop"
+    },
+    {
+      "check": "Search + filter empty state offers both resets",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "\"Clear filters\" keeps the search term",
+      "result": "PASS",
+      "detail": "#/shop?q=pump"
+    },
+    {
+      "check": "Empty results show \"0 products\" and no pagination",
+      "result": "PASS",
+      "detail": "0 products"
+    },
+    {
+      "check": "Shop filter panel remains absent and sort stays labelled",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Keyboard changes the sort select",
+      "result": "PASS",
+      "detail": "#/shop?sort=az"
+    },
+    {
+      "check": "Active filter chips remain removable with the keyboard",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Shop grid @375: 2 columns, panel absent, full width, square images, no overflow",
+      "result": "PASS",
+      "detail": "{'cols': 2, 'overflow': False, 'sq': True, 'panelAbsent': True, 'fullWidth': True}"
+    },
+    {
+      "check": "URL filters remain active without a drawer @375",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Shop grid @768: 2 columns, panel absent, full width, square images, no overflow",
+      "result": "PASS",
+      "detail": "{'cols': 2, 'overflow': False, 'sq': True, 'panelAbsent': True, 'fullWidth': True}"
+    },
+    {
+      "check": "URL filters remain active without a drawer @768",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Shop grid @1440: 3 columns, panel absent, full width, square images, no overflow",
+      "result": "PASS",
+      "detail": "{'cols': 3, 'overflow': False, 'sq': True, 'panelAbsent': True, 'fullWidth': True}"
+    },
+    {
+      "check": "URL filters remain active without a drawer @1440",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Pagination is windowed with ellipses for many pages",
+      "result": "PASS",
+      "detail": "['Previous', '1', '\u2026', '8', '9', '10', '\u2026', '48', 'Next']"
+    },
+    {
+      "check": "Current page is marked and announced",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Next keeps filters and sort and moves one page",
+      "result": "PASS",
+      "detail": "#/shop?sort=az&page=10"
+    },
+    {
+      "check": "Out-of-range page is corrected with many pages",
+      "result": "PASS",
+      "detail": "#/shop?page=48"
+    },
+    {
+      "check": "Production mode with no published products shows a customer-facing empty catalogue, not owner instructions",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Homepage @375: one h1 (the hero) and a sensible heading outline",
+      "result": "PASS",
+      "detail": "[1, 2, 3, 3, 3, 3, 3, 3]"
+    },
+    {
+      "check": "Homepage @375: hero has exactly one primary and one secondary action",
+      "result": "PASS",
+      "detail": "[['Shop products', '#/shop'], ['Request a quote', '#/business']]"
+    },
+    {
+      "check": "Homepage @375: no empty or collapsed sections",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "Homepage @375: at most four product rows, each with 2-4 products",
+      "result": "PASS",
+      "detail": "[('Featured Products', 4), ('Solar & Renewable Energy', 4), ('Agriculture & Irrigation', 4)]"
+    },
+    {
+      "check": "Homepage @375: every product appears once on the page",
+      "result": "PASS",
+      "detail": "['alps-6kw', 'doyin-solar-pump', 'jiadi-tractor', 'tolsen-hoist', 'starter-solar', 'srne-home', 'commercial-solar', 'must-inverter', 'irrigation-kit', 'beehive', 'incubator', 'posho-mill']"
+    },
+    {
+      "check": "Homepage @375: product rows use real catalogue records, names and price states",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "Homepage @375: row \"view all\" links use existing shop routes",
+      "result": "PASS",
+      "detail": "['#/shop', '#/shop?category=solar', '#/shop?category=agriculture']"
+    },
+    {
+      "check": "Homepage @375: category cards match the catalogue and shop routes",
+      "result": "PASS",
+      "detail": "[{'href': '#/shop?category=solar', 'name': 'Solar & Renewable Energy', 'meta': '10 subcategories \u00b7 33 products'}, {'href': '#/shop?category=agriculture', 'name': 'Agriculture & Irrigation', 'meta': '9 subcategories \u00b7 26 products'}]"
+    },
+    {
+      "check": "Homepage @375: category counts come from the data",
+      "result": "PASS",
+      "detail": "['10 subcategories \u00b7 33 products', '9 subcategories \u00b7 26 products']"
+    },
+    {
+      "check": "Homepage @375: trust statements are limited to verified wording",
+      "result": "PASS",
+      "detail": "['Send product enquiries on WhatsApp', 'Prices, availability and taxes are confirmed by quotation', 'Delivery details are confirmed per enquiry']"
+    },
+    {
+      "check": "Homepage @375: no category/subcategory count statement",
+      "result": "PASS",
+      "detail": "['Send product enquiries on WhatsApp', 'Prices, availability and taxes are confirmed by quotation', 'Delivery details are confirmed per enquiry']"
+    },
+    {
+      "check": "Homepage @375: no discounts, urgency, stock, reviews, certification or delivery-coverage claims",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "Homepage @375: CTA offers quote, WhatsApp and contact",
+      "result": "PASS",
+      "detail": "[['Request a quote', '#/business', False], ['Enquire on WhatsApp', None, True], ['Contact us', '#/contact', False]]"
+    },
+    {
+      "check": "Homepage @375: product images are square and identical in size",
+      "result": "PASS",
+      "detail": "[(165, 165)]"
+    },
+    {
+      "check": "Homepage @375: images have text alternatives and none are broken",
+      "result": "PASS",
+      "detail": "{'rows': [{'title': 'Featured Products', 'ids': ['alps-6kw', 'doyin-solar-pump', 'jiadi-tractor', 'tolsen-hoist'], 'more': '#/shop', 'moreText': 'Browse all products', 'priceTops': [957, 957, 1371, 1371], 'actionTops': [1032, 1032, 1447, 1447], 'titleH': [42, 42, 42, 42], 'cols': 2}, {'title': 'Sola"
+    },
+    {
+      "check": "Homepage @375: price, title and action positions align across each visual row of cards",
+      "result": "PASS",
+      "detail": "[('Featured Products', [957, 957, 1371, 1371], [1032, 1032, 1447, 1447]), ('Solar & Renewable Energy', [1849, 1849, 2264, 2264], [1925, 1925, 2340, 2340])]"
+    },
+    {
+      "check": "Homepage @375: product grid uses 2 columns",
+      "result": "PASS",
+      "detail": "[2, 2, 2]"
+    },
+    {
+      "check": "Homepage @375: no horizontal overflow and nothing outside the viewport",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "Homepage @375: all 24 internal links resolve",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "Homepage @375: card WhatsApp links open safely in a new tab",
+      "result": "PASS",
+      "detail": "[['_blank', 'noopener noreferrer'], ['_blank', 'noopener noreferrer']]"
+    },
+    {
+      "check": "Homepage @375: hero primary action takes a visible focus outline",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Homepage @375: Tab moves from the primary to the secondary hero action",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Homepage @375: Tab then reaches the category cards",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Homepage @375: Enter on the hero primary action opens the shop",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Homepage @375: cart count survives visiting the homepage",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Homepage @375: \"View details\" opens the product page",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Homepage @375: CTA WhatsApp opens the enquiry preview",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Homepage @768: one h1 (the hero) and a sensible heading outline",
+      "result": "PASS",
+      "detail": "[1, 2, 3, 3, 3, 3, 3, 3]"
+    },
+    {
+      "check": "Homepage @768: hero has exactly one primary and one secondary action",
+      "result": "PASS",
+      "detail": "[['Shop products', '#/shop'], ['Request a quote', '#/business']]"
+    },
+    {
+      "check": "Homepage @768: no empty or collapsed sections",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "Homepage @768: at most four product rows, each with 2-4 products",
+      "result": "PASS",
+      "detail": "[('Featured Products', 4), ('Solar & Renewable Energy', 4), ('Agriculture & Irrigation', 4)]"
+    },
+    {
+      "check": "Homepage @768: every product appears once on the page",
+      "result": "PASS",
+      "detail": "['alps-6kw', 'doyin-solar-pump', 'jiadi-tractor', 'tolsen-hoist', 'starter-solar', 'srne-home', 'commercial-solar', 'must-inverter', 'irrigation-kit', 'beehive', 'incubator', 'posho-mill']"
+    },
+    {
+      "check": "Homepage @768: product rows use real catalogue records, names and price states",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "Homepage @768: row \"view all\" links use existing shop routes",
+      "result": "PASS",
+      "detail": "['#/shop', '#/shop?category=solar', '#/shop?category=agriculture']"
+    },
+    {
+      "check": "Homepage @768: category cards match the catalogue and shop routes",
+      "result": "PASS",
+      "detail": "[{'href': '#/shop?category=solar', 'name': 'Solar & Renewable Energy', 'meta': '10 subcategories \u00b7 33 products'}, {'href': '#/shop?category=agriculture', 'name': 'Agriculture & Irrigation', 'meta': '9 subcategories \u00b7 26 products'}]"
+    },
+    {
+      "check": "Homepage @768: category counts come from the data",
+      "result": "PASS",
+      "detail": "['10 subcategories \u00b7 33 products', '9 subcategories \u00b7 26 products']"
+    },
+    {
+      "check": "Homepage @768: trust statements are limited to verified wording",
+      "result": "PASS",
+      "detail": "['Send product enquiries on WhatsApp', 'Prices, availability and taxes are confirmed by quotation', 'Delivery details are confirmed per enquiry']"
+    },
+    {
+      "check": "Homepage @768: no category/subcategory count statement",
+      "result": "PASS",
+      "detail": "['Send product enquiries on WhatsApp', 'Prices, availability and taxes are confirmed by quotation', 'Delivery details are confirmed per enquiry']"
+    },
+    {
+      "check": "Homepage @768: no discounts, urgency, stock, reviews, certification or delivery-coverage claims",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "Homepage @768: CTA offers quote, WhatsApp and contact",
+      "result": "PASS",
+      "detail": "[['Request a quote', '#/business', False], ['Enquire on WhatsApp', None, True], ['Contact us', '#/contact', False]]"
+    },
+    {
+      "check": "Homepage @768: product images are square and identical in size",
+      "result": "PASS",
+      "detail": "[(170, 170)]"
+    },
+    {
+      "check": "Homepage @768: images have text alternatives and none are broken",
+      "result": "PASS",
+      "detail": "{'rows': [{'title': 'Featured Products', 'ids': ['alps-6kw', 'doyin-solar-pump', 'jiadi-tractor', 'tolsen-hoist'], 'more': '#/shop', 'moreText': 'Browse all products', 'priceTops': [928, 928, 928, 928], 'actionTops': [1004, 1004, 1004, 1004], 'titleH': [42, 42, 42, 42], 'cols': 4}, {'title': 'Solar "
+    },
+    {
+      "check": "Homepage @768: price, title and action positions align across each visual row of cards",
+      "result": "PASS",
+      "detail": "[('Featured Products', [928, 928, 928, 928], [1004, 1004, 1004, 1004]), ('Solar & Renewable Energy', [1416, 1416, 1416, 1416], [1492, 1492, 1492, 1492])]"
+    },
+    {
+      "check": "Homepage @768: product grid uses 4 columns",
+      "result": "PASS",
+      "detail": "[4, 4, 4]"
+    },
+    {
+      "check": "Homepage @768: no horizontal overflow and nothing outside the viewport",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "Homepage @768: all 24 internal links resolve",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "Homepage @768: card WhatsApp links open safely in a new tab",
+      "result": "PASS",
+      "detail": "[['_blank', 'noopener noreferrer'], ['_blank', 'noopener noreferrer']]"
+    },
+    {
+      "check": "Homepage @768: hero primary action takes a visible focus outline",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Homepage @768: Tab moves from the primary to the secondary hero action",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Homepage @768: Tab then reaches the category cards",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Homepage @768: Enter on the hero primary action opens the shop",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Homepage @768: cart count survives visiting the homepage",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Homepage @768: \"View details\" opens the product page",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Homepage @768: CTA WhatsApp opens the enquiry preview",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Homepage @1440: one h1 (the hero) and a sensible heading outline",
+      "result": "PASS",
+      "detail": "[1, 2, 3, 3, 3, 3, 3, 3]"
+    },
+    {
+      "check": "Homepage @1440: hero has exactly one primary and one secondary action",
+      "result": "PASS",
+      "detail": "[['Shop products', '#/shop'], ['Request a quote', '#/business']]"
+    },
+    {
+      "check": "Homepage @1440: no empty or collapsed sections",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "Homepage @1440: at most four product rows, each with 2-4 products",
+      "result": "PASS",
+      "detail": "[('Featured Products', 4), ('Solar & Renewable Energy', 4), ('Agriculture & Irrigation', 4)]"
+    },
+    {
+      "check": "Homepage @1440: every product appears once on the page",
+      "result": "PASS",
+      "detail": "['alps-6kw', 'doyin-solar-pump', 'jiadi-tractor', 'tolsen-hoist', 'starter-solar', 'srne-home', 'commercial-solar', 'must-inverter', 'irrigation-kit', 'beehive', 'incubator', 'posho-mill']"
+    },
+    {
+      "check": "Homepage @1440: product rows use real catalogue records, names and price states",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "Homepage @1440: row \"view all\" links use existing shop routes",
+      "result": "PASS",
+      "detail": "['#/shop', '#/shop?category=solar', '#/shop?category=agriculture']"
+    },
+    {
+      "check": "Homepage @1440: category cards match the catalogue and shop routes",
+      "result": "PASS",
+      "detail": "[{'href': '#/shop?category=solar', 'name': 'Solar & Renewable Energy', 'meta': '10 subcategories \u00b7 33 products'}, {'href': '#/shop?category=agriculture', 'name': 'Agriculture & Irrigation', 'meta': '9 subcategories \u00b7 26 products'}]"
+    },
+    {
+      "check": "Homepage @1440: category counts come from the data",
+      "result": "PASS",
+      "detail": "['10 subcategories \u00b7 33 products', '9 subcategories \u00b7 26 products']"
+    },
+    {
+      "check": "Homepage @1440: trust statements are limited to verified wording",
+      "result": "PASS",
+      "detail": "['Send product enquiries on WhatsApp', 'Prices, availability and taxes are confirmed by quotation', 'Delivery details are confirmed per enquiry']"
+    },
+    {
+      "check": "Homepage @1440: no category/subcategory count statement",
+      "result": "PASS",
+      "detail": "['Send product enquiries on WhatsApp', 'Prices, availability and taxes are confirmed by quotation', 'Delivery details are confirmed per enquiry']"
+    },
+    {
+      "check": "Homepage @1440: no discounts, urgency, stock, reviews, certification or delivery-coverage claims",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "Homepage @1440: CTA offers quote, WhatsApp and contact",
+      "result": "PASS",
+      "detail": "[['Request a quote', '#/business', False], ['Enquire on WhatsApp', None, True], ['Contact us', '#/contact', False]]"
+    },
+    {
+      "check": "Homepage @1440: product images are square and identical in size",
+      "result": "PASS",
+      "detail": "[(284, 284)]"
+    },
+    {
+      "check": "Homepage @1440: images have text alternatives and none are broken",
+      "result": "PASS",
+      "detail": "{'rows': [{'title': 'Featured Products', 'ids': ['alps-6kw', 'doyin-solar-pump', 'jiadi-tractor', 'tolsen-hoist'], 'more': '#/shop', 'moreText': 'Browse all products', 'priceTops': [1004, 1004, 1004, 1004], 'actionTops': [1080, 1080, 1080, 1080], 'titleH': [42, 42, 42, 42], 'cols': 4}, {'title': 'So"
+    },
+    {
+      "check": "Homepage @1440: price, title and action positions align across each visual row of cards",
+      "result": "PASS",
+      "detail": "[('Featured Products', [1004, 1004, 1004, 1004], [1080, 1080, 1080, 1080]), ('Solar & Renewable Energy', [1605, 1605, 1605, 1605], [1681, 1681, 1681, 1681])]"
+    },
+    {
+      "check": "Homepage @1440: product grid uses 4 columns",
+      "result": "PASS",
+      "detail": "[4, 4, 4]"
+    },
+    {
+      "check": "Homepage @1440: no horizontal overflow and nothing outside the viewport",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "Homepage @1440: all 24 internal links resolve",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "Homepage @1440: card WhatsApp links open safely in a new tab",
+      "result": "PASS",
+      "detail": "[['_blank', 'noopener noreferrer'], ['_blank', 'noopener noreferrer']]"
+    },
+    {
+      "check": "Homepage @1440: hero primary action takes a visible focus outline",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Homepage @1440: Tab moves from the primary to the secondary hero action",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Homepage @1440: Tab then reaches the category cards",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Homepage @1440: Enter on the hero primary action opens the shop",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Homepage @1440: cart count survives visiting the homepage",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Homepage @1440: \"View details\" opens the product page",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Homepage @1440: CTA WhatsApp opens the enquiry preview",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Incomplete data: no image / unusable tile / missing file all show the placeholder",
+      "result": "PASS",
+      "detail": "[{'fallback': True, 'img': None, 'price': 'Request Price', 'sq': True}, {'fallback': True, 'img': None, 'price': 'Request Price', 'sq': True}, {'fallback': True, 'img': None, 'price': 'KES 32,995Tax', 'sq': True}]"
+    },
+    {
+      "check": "Incomplete data: a record without a price shows Request Price",
+      "result": "PASS",
+      "detail": "{'fallback': False, 'img': None, 'price': 'Request Price', 'sq': True}"
+    },
+    {
+      "check": "Incomplete data: a record without categories does not break the homepage",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "Incomplete data: placeholder and photo cards stay square and the page does not overflow",
+      "result": "PASS",
+      "detail": "[{'fallback': False, 'img': {'loading': None, 'w': '600', 'h': '600', 'loaded': True}, 'price': 'KES 298,000Ta', 'sq': True}, {'fallback': True, 'img': None, 'price': 'Request Price', 'sq': True}, {'fallback': True, 'img': None, 'price': 'Request Price', 'sq': True}, {'fallback': True, 'img': None, "
+    },
+    {
+      "check": "Real photographs: first row loads eagerly, lower rows lazily, with intrinsic size",
+      "result": "PASS",
+      "detail": "[{'fallback': False, 'img': {'loading': None, 'w': '600', 'h': '600', 'loaded': True}, 'price': 'KES 298,000Ta', 'sq': True}, {'fallback': False, 'img': {'loading': 'lazy', 'w': '600', 'h': '600', 'loaded': True}, 'price': 'Request Price', 'sq': True}]"
+    },
+    {
+      "check": "Production mode with no approved products: no product rows, no empty sections, no demo wording",
+      "result": "PASS",
+      "detail": "{'rows': 0, 'depts': 6, 'metas': ['Solar & Renewable Energy10 subcategories', 'Agriculture & Irrigation9 subcategories', 'Electricals & Wiring10 subcategories', 'Borehole & Water Solutions9 subcategories', 'Construction & Tools10 subcategories', 'Petrol & Diesel Generators10 subcategories'], 'empty'"
+    },
+    {
+      "check": "Missing equipment image shows placeholder fallback",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Missing logo shows wordmark fallback",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Product card images share one aspect ratio",
+      "result": "PASS",
+      "detail": "{1}"
+    },
+    {
+      "check": "Repository subpath: all asset URLs resolve beneath site root",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "No root-absolute internal links",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "check": "No JavaScript console errors during tested workflows",
+      "result": "PASS",
+      "detail": "[]"
+    }
+  ]
+}

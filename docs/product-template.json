@@ -1,0 +1,661 @@
+{
+  "_how_to_use": [
+    "Copy \"product\" once per item and fill only facts you can confirm (supplier documents, packaging, invoices).",
+    "Leave unknown values as null. The website shows \"To Be Confirmed\" for brand, model and availability, and hides unverified specs.",
+    "price: number in KES with priceType \"fixed\" for a confirmed selling price; null with priceType \"quote\" for Request Price.",
+    "image.src: path under assets/images/ (or https URL) for a licensed product photo, at least 1200 x 1200 px. Without a photo, leave src null and set image.tile to the category imageTile (0-5).",
+    "gallery: keep at least one entry, e.g. [{\"type\": \"photo\", \"asset\": \"equipment\", \"tile\": <same tile>, \"label\": \"Product image\"}, {\"type\": \"spec\", \"label\": \"Specification overview\"}].",
+    "specs: use the attribute names listed for the product's first subcategory in \"requiredSpecsBySubcategory\".",
+    "Run: python tools/validate-catalogue.py  — it must report 0 schema errors before publishing."
+  ],
+  "fieldRules": {
+    "id": {
+      "type": "str",
+      "required": true,
+      "nullable": false
+    },
+    "name": {
+      "type": "str",
+      "required": true,
+      "nullable": false
+    },
+    "sku": {
+      "type": "str",
+      "required": true,
+      "nullable": true
+    },
+    "model": {
+      "type": "str",
+      "required": true,
+      "nullable": true
+    },
+    "brand": {
+      "type": "str",
+      "required": true,
+      "nullable": true
+    },
+    "brandStatus": {
+      "type": "str",
+      "required": false,
+      "nullable": true
+    },
+    "categories": {
+      "type": "list",
+      "required": true,
+      "nullable": false
+    },
+    "subcategories": {
+      "type": "list",
+      "required": true,
+      "nullable": false
+    },
+    "applications": {
+      "type": "list",
+      "required": true,
+      "nullable": false
+    },
+    "image": {
+      "type": "dict",
+      "required": true,
+      "nullable": false
+    },
+    "gallery": {
+      "type": "list",
+      "required": true,
+      "nullable": false
+    },
+    "alt": {
+      "type": "str",
+      "required": true,
+      "nullable": false
+    },
+    "photoStatus": {
+      "type": "str",
+      "required": false,
+      "nullable": true
+    },
+    "shortDescription": {
+      "type": "str",
+      "required": true,
+      "nullable": false
+    },
+    "description": {
+      "type": "str",
+      "required": true,
+      "nullable": false
+    },
+    "specs": {
+      "type": "dict",
+      "required": true,
+      "nullable": false
+    },
+    "power": {
+      "type": "str",
+      "required": true,
+      "nullable": true
+    },
+    "capacity": {
+      "type": "str",
+      "required": false,
+      "nullable": true
+    },
+    "phase": {
+      "type": "str",
+      "required": false,
+      "nullable": true
+    },
+    "price": {
+      "type": "int|float",
+      "required": true,
+      "nullable": true
+    },
+    "priceType": {
+      "type": "str",
+      "required": true,
+      "nullable": false
+    },
+    "currency": {
+      "type": "str",
+      "required": true,
+      "nullable": false
+    },
+    "quotationStatus": {
+      "type": "str",
+      "required": true,
+      "nullable": false
+    },
+    "stock": {
+      "type": "str",
+      "required": false,
+      "nullable": true
+    },
+    "priceDate": {
+      "type": "str",
+      "required": false,
+      "nullable": true
+    },
+    "imageSource": {
+      "type": "str",
+      "required": false,
+      "nullable": true
+    },
+    "verificationStatus": {
+      "type": "str",
+      "required": false,
+      "nullable": true
+    },
+    "evidenceStatus": {
+      "type": "str",
+      "required": true,
+      "nullable": false
+    },
+    "sourceReference": {
+      "type": "str",
+      "required": false,
+      "nullable": true
+    },
+    "sourceChecked": {
+      "type": "str",
+      "required": false,
+      "nullable": true
+    },
+    "sourceClassification": {
+      "type": "str",
+      "required": false,
+      "nullable": true
+    },
+    "featured": {
+      "type": "bool",
+      "required": true,
+      "nullable": false
+    },
+    "approved": {
+      "type": "bool",
+      "required": true,
+      "nullable": false
+    },
+    "dateAdded": {
+      "type": "str",
+      "required": true,
+      "nullable": true
+    },
+    "related": {
+      "type": "list",
+      "required": true,
+      "nullable": false
+    }
+  },
+  "allowedValues": {
+    "applications": [
+      "Construction & Workshop",
+      "Farm & Irrigation",
+      "Home Backup Power"
+    ],
+    "priceType": [
+      "demo",
+      "fixed",
+      "quote"
+    ],
+    "quotationStatus by priceType": {
+      "fixed": "priced",
+      "demo": "demo-price",
+      "quote": "quote-required"
+    },
+    "evidenceStatus": [
+      "illustrative",
+      "owner-supplied",
+      "sourced"
+    ],
+    "currency": [
+      "KES"
+    ],
+    "categories": [
+      "solar",
+      "agriculture",
+      "electrical",
+      "water",
+      "construction",
+      "generators"
+    ],
+    "subcategories": {
+      "solar-1": "Lithium Starter Solar Kits",
+      "solar-2": "Lithium Family & Home Solar Kits",
+      "solar-3": "Lithium Premium Home & Business Kits",
+      "solar-4": "Lithium Commercial & Industrial Solar",
+      "solar-5": "Hybrid Solar Inverters",
+      "solar-6": "Lithium Batteries",
+      "solar-7": "Solar DC Borehole Pumps",
+      "solar-8": "Solar Water Heaters",
+      "solar-9": "Solar Accessories",
+      "solar-10": "Solar Pumping Inverter",
+      "agriculture-1": "Irrigation Water Kits",
+      "agriculture-2": "Walking Tractor",
+      "agriculture-3": "Bee Keeping Equipment",
+      "agriculture-4": "Incubators",
+      "agriculture-5": "Posho Mill",
+      "agriculture-6": "Irrigation Pipes",
+      "agriculture-7": "Agricultural Diesel Engines",
+      "agriculture-8": "Knapsack Sprayers",
+      "agriculture-9": "Farm Irrigation Equipment",
+      "electrical-1": "Electrical Cables",
+      "electrical-2": "Switches & Sockets",
+      "electrical-3": "Changeover Switches",
+      "electrical-4": "Single Core Cables",
+      "electrical-5": "Extension Cords",
+      "electrical-6": "Voltage Stabilizers",
+      "electrical-7": "Panel Boxes",
+      "electrical-8": "Power Strips & Surge Protectors",
+      "electrical-9": "Twin & Earth Cables",
+      "electrical-10": "Distribution Boards",
+      "water-1": "Electric Borehole Pumps",
+      "water-3": "AC DC Borehole Pumps",
+      "water-4": "Borehole Cables & Accessories",
+      "water-5": "Automatic Pump Control Switch",
+      "water-6": "Borehole Pumps Systems",
+      "water-7": "Booster Centrifugal Water Pumps",
+      "water-8": "Swimming Pools Pumps & Accessories",
+      "water-9": "Water Treatment",
+      "water-10": "Water & Irrigation Equipment",
+      "construction-1": "Building Equipment",
+      "construction-2": "Construction Machinery",
+      "construction-3": "Welding Machines & Accessories",
+      "construction-4": "Wood Working & Carpentry",
+      "construction-5": "Power & Hand Tools",
+      "construction-6": "Plumbing & Sewage Pumps",
+      "construction-7": "Security",
+      "construction-8": "Ladders",
+      "construction-9": "Fire Safety Equipment",
+      "construction-10": "Gardening & Lawn Mowers",
+      "generators-1": "Petrol Generators",
+      "generators-2": "Diesel Generators",
+      "generators-3": "Single Phase Diesel Generators",
+      "generators-4": "Three Phase Diesel Generators",
+      "generators-5": "Silent Canopy Generators",
+      "generators-6": "Industrial Water Cooled Generators",
+      "generators-7": "Alternators",
+      "generators-8": "Biogas LPG Generators",
+      "generators-9": "Diesel Welding Generators",
+      "generators-10": "Home Backup Generators"
+    }
+  },
+  "requiredSpecsBySubcategory": {
+    "solar-1": [
+      "Inverter rating (kW)",
+      "Battery capacity (kWh)",
+      "Solar array (panel W x quantity)",
+      "System voltage (V)"
+    ],
+    "solar-2": [
+      "Inverter rating (kW)",
+      "Battery capacity (kWh)",
+      "Solar array (panel W x quantity)",
+      "System voltage (V)"
+    ],
+    "solar-3": [
+      "Inverter rating (kW)",
+      "Battery capacity (kWh)",
+      "Solar array (panel W x quantity)",
+      "System voltage (V)"
+    ],
+    "solar-4": [
+      "Inverter rating (kW)",
+      "Battery capacity (kWh)",
+      "Solar array (panel W x quantity)",
+      "System voltage (V)"
+    ],
+    "solar-5": [
+      "Rated power (kW)",
+      "Battery voltage (V)",
+      "MPPT / PV input",
+      "Phase"
+    ],
+    "solar-6": [
+      "Capacity (kWh)",
+      "Nominal voltage (V)",
+      "Chemistry",
+      "Cycle life"
+    ],
+    "solar-7": [
+      "Motor power (kW / HP)",
+      "Maximum head (m)",
+      "Maximum flow (m3/h)",
+      "Power supply (V / phase / DC)",
+      "Outlet size"
+    ],
+    "solar-8": [
+      "Tank capacity (L)",
+      "Collector type",
+      "Pressure type"
+    ],
+    "solar-9": [
+      "Accessory type",
+      "Rating / compatibility"
+    ],
+    "solar-10": [
+      "Rated power (kW)",
+      "Input voltage range (V)",
+      "Output phase"
+    ],
+    "agriculture-1": [
+      "Irrigation type",
+      "Coverage area",
+      "Pipe / emitter size",
+      "Water source / pressure"
+    ],
+    "agriculture-2": [
+      "Engine power (HP)",
+      "Fuel",
+      "Starting method",
+      "Cooling"
+    ],
+    "agriculture-3": [
+      "Hive type",
+      "Material",
+      "Frames"
+    ],
+    "agriculture-4": [
+      "Egg capacity",
+      "Turning",
+      "Power supply"
+    ],
+    "agriculture-5": [
+      "Throughput (kg/h)",
+      "Power source",
+      "Motor / engine power"
+    ],
+    "agriculture-6": [
+      "Diameter (mm)",
+      "Pressure class",
+      "Length (m)",
+      "Material"
+    ],
+    "agriculture-7": [
+      "Engine power (HP)",
+      "Fuel",
+      "Starting method",
+      "Cooling"
+    ],
+    "agriculture-8": [
+      "Tank capacity (L)",
+      "Operation"
+    ],
+    "agriculture-9": [
+      "Irrigation type",
+      "Coverage area",
+      "Pipe / emitter size",
+      "Water source / pressure"
+    ],
+    "electrical-1": [
+      "Cross-section (mm2)",
+      "Core count",
+      "Conductor material",
+      "Length / sale unit"
+    ],
+    "electrical-2": [
+      "Electrical rating (A)",
+      "Gangs / poles",
+      "Finish / mounting"
+    ],
+    "electrical-3": [
+      "Rating (A)",
+      "Poles",
+      "Operation (manual / automatic)"
+    ],
+    "electrical-4": [
+      "Cross-section (mm2)",
+      "Core count",
+      "Conductor material",
+      "Length / sale unit"
+    ],
+    "electrical-5": [
+      "Outlets",
+      "Rating (A)",
+      "Cable length (m)",
+      "Surge protection"
+    ],
+    "electrical-6": [
+      "Capacity (kVA)",
+      "Input voltage range (V)",
+      "Phase"
+    ],
+    "electrical-7": [
+      "Ways",
+      "Rating (A)",
+      "Mounting",
+      "Enclosure material"
+    ],
+    "electrical-8": [
+      "Outlets",
+      "Rating (A)",
+      "Cable length (m)",
+      "Surge protection"
+    ],
+    "electrical-9": [
+      "Cross-section (mm2)",
+      "Core count",
+      "Conductor material",
+      "Length / sale unit"
+    ],
+    "electrical-10": [
+      "Ways",
+      "Rating (A)",
+      "Mounting",
+      "Enclosure material"
+    ],
+    "water-1": [
+      "Motor power (kW / HP)",
+      "Maximum head (m)",
+      "Maximum flow (m3/h)",
+      "Power supply (V / phase / DC)",
+      "Outlet size"
+    ],
+    "water-3": [
+      "Motor power (kW / HP)",
+      "Maximum head (m)",
+      "Maximum flow (m3/h)",
+      "Power supply (V / phase / DC)",
+      "Outlet size"
+    ],
+    "water-4": [
+      "Cross-section (mm2)",
+      "Core count",
+      "Conductor material",
+      "Length / sale unit"
+    ],
+    "water-5": [
+      "Function",
+      "Rating",
+      "Supply"
+    ],
+    "water-6": [
+      "Motor power (kW / HP)",
+      "Maximum head (m)",
+      "Maximum flow (m3/h)",
+      "Power supply (V / phase / DC)",
+      "Outlet size"
+    ],
+    "water-7": [
+      "Motor power (kW / HP)",
+      "Maximum head (m)",
+      "Maximum flow (m3/h)",
+      "Power supply (V / phase / DC)",
+      "Outlet size"
+    ],
+    "water-8": [
+      "Motor power (kW / HP)",
+      "Maximum head (m)",
+      "Maximum flow (m3/h)",
+      "Power supply (V / phase / DC)",
+      "Outlet size"
+    ],
+    "water-9": [
+      "Treatment type",
+      "Flow rate",
+      "Connection size"
+    ],
+    "water-10": [
+      "Irrigation type",
+      "Coverage area",
+      "Pipe / emitter size",
+      "Water source / pressure"
+    ],
+    "construction-1": [
+      "Capacity / load",
+      "Power source",
+      "Motor / engine power"
+    ],
+    "construction-2": [
+      "Capacity / load",
+      "Power source",
+      "Motor / engine power"
+    ],
+    "construction-3": [
+      "Output current (A)",
+      "Input voltage (V)",
+      "Duty cycle"
+    ],
+    "construction-4": [
+      "Power (W) / battery (V)",
+      "Tool type",
+      "Chuck / blade size"
+    ],
+    "construction-5": [
+      "Power (W) / battery (V)",
+      "Tool type",
+      "Chuck / blade size"
+    ],
+    "construction-6": [
+      "Motor power (kW / HP)",
+      "Maximum head (m)",
+      "Maximum flow (m3/h)",
+      "Power supply (V / phase / DC)",
+      "Outlet size"
+    ],
+    "construction-7": [
+      "Resolution",
+      "Power supply",
+      "Connectivity"
+    ],
+    "construction-8": [
+      "Working height / steps",
+      "Material",
+      "Load rating (kg)"
+    ],
+    "construction-9": [
+      "Extinguishing agent",
+      "Capacity (kg / L)",
+      "Fire classes"
+    ],
+    "construction-10": [
+      "Engine power",
+      "Cutting width",
+      "Fuel"
+    ],
+    "generators-1": [
+      "Rated output (kVA / kW)",
+      "Fuel",
+      "Phase",
+      "Starting method",
+      "Fuel tank (L)"
+    ],
+    "generators-2": [
+      "Rated output (kVA / kW)",
+      "Fuel",
+      "Phase",
+      "Starting method",
+      "Fuel tank (L)"
+    ],
+    "generators-3": [
+      "Rated output (kVA / kW)",
+      "Fuel",
+      "Phase",
+      "Starting method",
+      "Fuel tank (L)"
+    ],
+    "generators-4": [
+      "Rated output (kVA / kW)",
+      "Fuel",
+      "Phase",
+      "Starting method",
+      "Fuel tank (L)"
+    ],
+    "generators-5": [
+      "Rated output (kVA / kW)",
+      "Fuel",
+      "Phase",
+      "Starting method",
+      "Fuel tank (L)"
+    ],
+    "generators-6": [
+      "Rated output (kVA / kW)",
+      "Fuel",
+      "Phase",
+      "Starting method",
+      "Fuel tank (L)"
+    ],
+    "generators-8": [
+      "Rated output (kVA / kW)",
+      "Fuel",
+      "Phase",
+      "Starting method",
+      "Fuel tank (L)"
+    ],
+    "generators-10": [
+      "Rated output (kVA / kW)",
+      "Fuel",
+      "Phase",
+      "Starting method",
+      "Fuel tank (L)"
+    ],
+    "generators-7": [
+      "Rated output (kVA)",
+      "Phase",
+      "Voltage (V)"
+    ],
+    "generators-9": [
+      "Rated output (kVA)",
+      "Welding current (A)",
+      "Fuel"
+    ]
+  },
+  "product": {
+    "id": "",
+    "name": "",
+    "sku": null,
+    "model": null,
+    "brand": null,
+    "brandStatus": null,
+    "categories": [],
+    "subcategories": [],
+    "applications": [],
+    "image": {
+      "src": null,
+      "tile": null
+    },
+    "gallery": [],
+    "alt": "",
+    "photoStatus": null,
+    "shortDescription": "",
+    "description": "",
+    "specs": {},
+    "power": null,
+    "capacity": null,
+    "phase": null,
+    "price": null,
+    "priceType": "quote",
+    "currency": "KES",
+    "quotationStatus": "quote-required",
+    "stock": null,
+    "priceDate": null,
+    "imageSource": null,
+    "verificationStatus": null,
+    "evidenceStatus": "owner-supplied",
+    "sourceReference": null,
+    "sourceChecked": null,
+    "sourceClassification": "owner-supplied",
+    "featured": false,
+    "approved": false,
+    "dateAdded": null,
+    "related": []
+  }
+}

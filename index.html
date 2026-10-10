@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="NYCE SOLUTIONS equipment catalogue — solar and backup power, borehole and water solutions, electricals, agricultural equipment, construction and workshop tools. WhatsApp-first enquiries for Kenya and Africa.">
-<meta name="robots" content="noindex,nofollow">
+<meta name="description" content="NYCE SOLUTIONS is a Kenyan enterprise supplying solar energy, generators and backup systems, water and irrigation solutions, industrial and construction machinery, hardware and tools to customers in Kenya and other African markets.">
+<meta name="robots" content="noindex,follow">
 <meta name="theme-color" content="#1D3D73">
 <title>NYCE SOLUTIONS | Power your home. Equip your business.</title>
 <link rel="icon" href="assets/images/logo.webp" type="image/webp">
@@ -17,15 +17,16 @@
   <div class="header-main wrap">
     <button type="button" class="menu-button" id="menu-button" aria-label="Open menu" aria-haspopup="dialog" aria-controls="nav-drawer" aria-expanded="false"><span data-icon="menu"></span></button>
     <a href="#/" class="logo" aria-label="NYCE SOLUTIONS home"><img id="brand-logo" alt="NYCE SOLUTIONS" width="178" height="71"></a>
-    <!-- Search query signature: submit sends q=<URL-encoded term> to #/shop; app.js matches product name and internal reference SKU. -->
+    <!-- Search query signature: submit sends q=<URL-encoded term> to #/shop; app.js matches product name, SKU, brand and category/subcategory names. -->
     <form class="search-form" id="global-search" role="search">
-      <label class="sr-only" for="search-input">Search products by name or SKU</label>
-      <input type="search" id="search-input" placeholder="Search by product name or SKU" autocomplete="off">
+      <label class="sr-only" for="search-input">Search products by name, brand, SKU or category</label>
+      <input type="search" id="search-input" placeholder="Search products, brands or categories" autocomplete="off">
       <button type="submit" aria-label="Search products" id="search-button"></button>
     </form>
     <button type="button" class="btn wa header-whatsapp" data-general-wa aria-label="Start a WhatsApp enquiry"><span data-icon="wa"></span><span class="header-whatsapp-label">WhatsApp</span></button>
     <a class="cart-link" href="#/cart" data-nav="cart" aria-label="Cart, 0 items"><span data-icon="cart"></span><span class="cart-label">Cart</span><span class="cart-number" id="cart-count">0</span></a>
   </div>
+  <nav class="category-strip" id="category-strip" aria-label="Product categories"></nav>
   <div class="header-nav">
     <div class="nav-wrap wrap">
       <nav class="navigation" id="primary-nav" aria-label="Main navigation">
@@ -39,6 +40,7 @@
         <a href="#/business" data-nav="business">Business &amp; Bulk Order</a>
         <a href="#/contact" data-nav="contact">Contact</a>
       </nav>
+      <a class="nav-phone" id="nav-phone" hidden></a>
     </div>
   </div>
 </header>
@@ -53,7 +55,7 @@
   <div class="footer-grid wrap">
     <div class="footer-brand">
       <a href="#/" aria-label="NYCE SOLUTIONS home"><img id="footer-logo" class="footer-logo" alt="NYCE SOLUTIONS" width="160" height="64"></a>
-      <p>Power, water and equipment for homes, farms, businesses and institutions. Explore the catalogue and send an enquiry on WhatsApp.</p>
+      <p>A Kenyan supplier of solar energy, power-backup, water and irrigation, industrial equipment, hardware and tools for customers in Kenya and other African markets.</p>
     </div>
     <nav class="footer-col" aria-labelledby="footer-explore">
       <h3 id="footer-explore">Explore</h3>
@@ -61,6 +63,10 @@
       <a href="#/business">Business &amp; Bulk Orders</a>
       <a href="#/about">About Us</a>
       <a href="#/cart">Cart</a>
+    </nav>
+    <nav class="footer-col" aria-labelledby="footer-categories">
+      <h3 id="footer-categories">Categories</h3>
+      <div id="footer-category-links"></div>
     </nav>
     <nav class="footer-col" aria-labelledby="footer-help">
       <h3 id="footer-help">Help &amp; information</h3>
@@ -86,8 +92,8 @@
 <script id="asset-map">
 window.NYCE_ASSETS = { logo: "assets/images/logo.webp", equipment: "assets/images/equipment.webp", placeholder: "assets/images/placeholder.svg" };
 </script>
-<script src="assets/js/config.js"></script>
-<script src="assets/js/catalogue.js"></script>
-<script src="assets/js/app.js"></script>
+<script defer src="assets/js/config.js"></script>
+<script defer src="assets/js/catalogue.js"></script>
+<script defer src="assets/js/app.js"></script>
 </body>
 </html>

@@ -1,0 +1,19 @@
+{
+  "before": {
+    "assets\\js\\catalogue.js": "905244a69d0b37a5ef825b213875c9f5a8db7951b98fd902ae54ec0008beefcd",
+    "assets\\js\\app.js": "1c3ca5361587d8f4a7d3728137c8c6f187b15fd1240bce1c26bd117c153d5e24",
+    "assets\\js\\config.js": "9ea919bf03b3accd14af70c1b86d345e3996b5878588324d5ad301d582db9eba",
+    "assets\\css\\styles.css": "667d81dfcb468b4859d6a978bee0ca3848d1c0c981e6cc68905322a01ea18193",
+    "index.html": "58f40c88dd32539d5fa9e3c3cce708a7011e5c29cbb6c9f56a7f62f905dd9517",
+    "404.html": "bc940d133af26cf1447bfe76e2f77e3535c158715496dd05672c18bb71f2eb40",
+    "data\\catalogue-drafts.json": "a6fb08b7fd5ea91d4a590e8a834cf7a4d3d23a098c5c82716d5b37df06cdccbe",
+    "data\\macire-source-register.csv": "1baa433ef37d33f98b44462cb6a898dfae8c86393220dd80e44500597065188a",
+    "docs\\macire-proposed-mapping.csv": "80dd57626fa7470cf7e01beb6bf8972e3f106d0863b025cbe3d056bab4d6f53c",
+    "tools\\import-macire.py": "8880cdb99a95d165f702993c3b0789b25fecad26b15a75bf2b5050797a60103a",
+    "tools\\map-research.py": "323688e1a15ef8ac409fb43e03dec128276399f1634703462fb6f5cbefcdf4f2",
+    "tools\\validate-catalogue.py": "949c134bbe2086eaef802ededbe178a1518e772da1297007eb258cd69f5373dd",
+    "data\\macire-catalogue-drafts.json": null
+  },
+  "stage_after": "efef99c83e5f09eae3092bbe34fd32ddcedf18969000e5b4e488f7791bdf689d",
+  "status": "applied"
+}

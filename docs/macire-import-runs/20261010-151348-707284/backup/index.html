@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="NYCE SOLUTIONS is a Kenyan enterprise supplying solar energy, generators and backup systems, water and irrigation solutions, industrial and construction machinery, hardware and tools to customers in Kenya and other African markets.">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#1D3D73">
+<title>NYCE SOLUTIONS | Power your home. Equip your business.</title>
+<link rel="icon" href="assets/images/logo.webp" type="image/webp">
+<link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+<a href="#main" class="skip">Skip to main content</a>
+
+<header id="site-header">
+  <div class="header-main wrap">
+    <button type="button" class="menu-button" id="menu-button" aria-label="Open menu" aria-haspopup="dialog" aria-controls="nav-drawer" aria-expanded="false"><span data-icon="menu"></span></button>
+    <a href="#/" class="logo" aria-label="NYCE SOLUTIONS home"><img id="brand-logo" alt="NYCE SOLUTIONS" width="178" height="71"></a>
+    <!-- Search query signature: submit sends q=<URL-encoded term> to #/shop; app.js matches product name, SKU, brand and category/subcategory names. -->
+    <form class="search-form" id="global-search" role="search">
+      <label class="sr-only" for="search-input">Search products by name, brand, SKU or category</label>
+      <input type="search" id="search-input" placeholder="Search products, brands or categories" autocomplete="off">
+      <button type="submit" aria-label="Search products" id="search-button"></button>
+    </form>
+    <button type="button" class="btn wa header-whatsapp" data-general-wa aria-label="Start a WhatsApp enquiry"><span data-icon="wa"></span><span class="header-whatsapp-label">WhatsApp</span></button>
+    <a class="cart-link" href="#/cart" data-nav="cart" aria-label="Cart, 0 items"><span data-icon="cart"></span><span class="cart-label">Cart</span><span class="cart-number" id="cart-count">0</span></a>
+  </div>
+  <nav class="category-strip" id="category-strip" aria-label="Product categories"></nav>
+  <div class="header-nav">
+    <div class="nav-wrap wrap">
+      <nav class="navigation" id="primary-nav" aria-label="Main navigation">
+        <a href="#/" data-nav="home">Home</a>
+        <a href="#/about" data-nav="about">About Us</a>
+        <div class="nav-menu" id="nav-menu">
+          <button type="button" class="nav-menu-toggle" id="categories-toggle" data-nav="categories" aria-expanded="false" aria-controls="category-menu">Categories <span data-icon="chevron"></span></button>
+          <div class="category-menu" id="category-menu" hidden></div>
+        </div>
+        <a href="#/shop" data-nav="shop">Shop</a>
+        <a href="#/business" data-nav="business">Business &amp; Bulk Order</a>
+        <a href="#/contact" data-nav="contact">Contact</a>
+      </nav>
+      <a class="nav-phone" id="nav-phone" hidden></a>
+    </div>
+  </div>
+</header>
+
+<dialog id="nav-drawer" class="nav-drawer" aria-label="Site menu"></dialog>
+
+<noscript><div class="noscript wrap">This catalogue needs JavaScript to display products, filters and enquiries. Enable JavaScript and reload the page.</div></noscript>
+
+<main id="main" class="wrap" tabindex="-1"></main>
+
+<footer>
+  <div class="footer-grid wrap">
+    <div class="footer-brand">
+      <a href="#/" aria-label="NYCE SOLUTIONS home"><img id="footer-logo" class="footer-logo" alt="NYCE SOLUTIONS" width="160" height="64"></a>
+      <p>A Kenyan supplier of solar energy, power-backup, water and irrigation, industrial equipment, hardware and tools for customers in Kenya and other African markets.</p>
+    </div>
+    <nav class="footer-col" aria-labelledby="footer-explore">
+      <h3 id="footer-explore">Explore</h3>
+      <a href="#/shop">Shop · View Full Catalogue</a>
+      <a href="#/business">Business &amp; Bulk Orders</a>
+      <a href="#/about">About Us</a>
+      <a href="#/cart">Cart</a>
+    </nav>
+    <nav class="footer-col" aria-labelledby="footer-categories">
+      <h3 id="footer-categories">Categories</h3>
+      <div id="footer-category-links"></div>
+    </nav>
+    <nav class="footer-col" aria-labelledby="footer-help">
+      <h3 id="footer-help">Help &amp; information</h3>
+      <a href="#/policy/delivery" data-policy-link>Delivery information</a>
+      <a href="#/policy/returns" data-policy-link>Returns &amp; warranty</a>
+      <a href="#/policy/privacy" data-policy-link>Privacy policy</a>
+      <a href="#/policy/terms" data-policy-link>Terms of sale</a>
+    </nav>
+    <div class="footer-col">
+      <h3 id="footer-contact-heading">Contact details</h3>
+      <ul class="footer-contact" id="footer-contact" aria-labelledby="footer-contact-heading"></ul>
+      <a href="#/contact">Send an enquiry</a>
+    </div>
+  </div>
+  <div class="footer-bottom wrap"><div>© <span id="footer-year"></span> NYCE SOLUTIONS</div><span id="footer-note"></span></div>
+</footer>
+
+<div class="toast" role="status" aria-live="polite" id="toast"></div>
+<dialog id="modal" aria-labelledby="modal-title"><button type="button" class="close" aria-label="Close dialog">×</button><div id="modal-content"></div></dialog>
+
+<!-- Asset paths are relative so the site works beneath a GitHub Pages repository subpath.
+     tools/build-standalone.py replaces this block with embedded data URIs. -->
+<script id="asset-map">
+window.NYCE_ASSETS = { logo: "assets/images/logo.webp", equipment: "assets/images/equipment.webp", placeholder: "assets/images/placeholder.svg" };
+</script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/catalogue.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>

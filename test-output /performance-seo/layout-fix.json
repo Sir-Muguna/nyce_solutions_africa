@@ -1,0 +1,196 @@
+{
+  "label": "layout-fix",
+  "browser": "153.0.8010.12",
+  "conditions": {
+    "viewport": [
+      375,
+      812
+    ],
+    "cache": "disabled; new context per sample",
+    "cpuSlowdown": 4,
+    "latencyMs": 40,
+    "downloadBytesPerSecond": 1250000,
+    "uploadBytesPerSecond": 625000,
+    "samplesPerRoute": 3,
+    "settleMs": 1000
+  },
+  "results": [
+    {
+      "route": "home",
+      "medians": {
+        "lcp": 1596,
+        "cls": 0,
+        "fcp": 804,
+        "domContentLoaded": 1728.8,
+        "load": 1810.1,
+        "transferBytes": 693395,
+        "requests": 7
+      },
+      "samples": [
+        {
+          "lcp": 964,
+          "cls": 0,
+          "fcp": 544,
+          "domContentLoaded": 960.8000000715256,
+          "load": 1233.1000000238419,
+          "transferBytes": 693395,
+          "requests": 7,
+          "title": "Power your home. Equip your business. | NYCE SOLUTIONS",
+          "description": "NYCE SOLUTIONS is a Kenyan enterprise supplying solar energy, generators and backup systems, water and irrigation solutions, industrial and construction machinery, hardware and tools to customers in Kenya and other African markets.",
+          "canonical": null,
+          "robots": "noindex,nofollow",
+          "structuredData": [],
+          "h1": 1
+        },
+        {
+          "lcp": 1596,
+          "cls": 0,
+          "fcp": 876,
+          "domContentLoaded": 1728.8000000715256,
+          "load": 1810.1000000238419,
+          "transferBytes": 693395,
+          "requests": 7,
+          "title": "Power your home. Equip your business. | NYCE SOLUTIONS",
+          "description": "NYCE SOLUTIONS is a Kenyan enterprise supplying solar energy, generators and backup systems, water and irrigation solutions, industrial and construction machinery, hardware and tools to customers in Kenya and other African markets.",
+          "canonical": null,
+          "robots": "noindex,nofollow",
+          "structuredData": [],
+          "h1": 1
+        },
+        {
+          "lcp": 1764,
+          "cls": 0,
+          "fcp": 804,
+          "domContentLoaded": 1973.2000000476837,
+          "load": 2020.3000000715256,
+          "transferBytes": 693395,
+          "requests": 7,
+          "title": "Power your home. Equip your business. | NYCE SOLUTIONS",
+          "description": "NYCE SOLUTIONS is a Kenyan enterprise supplying solar energy, generators and backup systems, water and irrigation solutions, industrial and construction machinery, hardware and tools to customers in Kenya and other African markets.",
+          "canonical": null,
+          "robots": "noindex,nofollow",
+          "structuredData": [],
+          "h1": 1
+        }
+      ]
+    },
+    {
+      "route": "#/shop?category=solar",
+      "medians": {
+        "lcp": 1708,
+        "cls": 0,
+        "fcp": 652,
+        "domContentLoaded": 1676.7,
+        "load": 1705.8,
+        "transferBytes": 693395,
+        "requests": 7
+      },
+      "samples": [
+        {
+          "lcp": 1708,
+          "cls": 0,
+          "fcp": 692,
+          "domContentLoaded": 1676.7000000476837,
+          "load": 1705.8000000715256,
+          "transferBytes": 693395,
+          "requests": 7,
+          "title": "Solar & Renewable Energy | NYCE SOLUTIONS",
+          "description": "NYCE SOLUTIONS is a Kenyan enterprise supplying solar energy, generators and backup systems, water and irrigation solutions, industrial and construction machinery, hardware and tools to customers in Kenya and other African markets.",
+          "canonical": null,
+          "robots": "noindex,nofollow",
+          "structuredData": [],
+          "h1": 1
+        },
+        {
+          "lcp": 2008,
+          "cls": 0,
+          "fcp": 652,
+          "domContentLoaded": 2019.6000000238419,
+          "load": 2019.7000000476837,
+          "transferBytes": 693395,
+          "requests": 7,
+          "title": "Solar & Renewable Energy | NYCE SOLUTIONS",
+          "description": "NYCE SOLUTIONS is a Kenyan enterprise supplying solar energy, generators and backup systems, water and irrigation solutions, industrial and construction machinery, hardware and tools to customers in Kenya and other African markets.",
+          "canonical": null,
+          "robots": "noindex,nofollow",
+          "structuredData": [],
+          "h1": 1
+        },
+        {
+          "lcp": 1584,
+          "cls": 0,
+          "fcp": 612,
+          "domContentLoaded": 1563.6000000238419,
+          "load": 1564.7000000476837,
+          "transferBytes": 693395,
+          "requests": 7,
+          "title": "Solar & Renewable Energy | NYCE SOLUTIONS",
+          "description": "NYCE SOLUTIONS is a Kenyan enterprise supplying solar energy, generators and backup systems, water and irrigation solutions, industrial and construction machinery, hardware and tools to customers in Kenya and other African markets.",
+          "canonical": null,
+          "robots": "noindex,nofollow",
+          "structuredData": [],
+          "h1": 1
+        }
+      ]
+    },
+    {
+      "route": "#/product/macire-5feb147d94b109c9",
+      "medians": {
+        "lcp": 1940,
+        "cls": 0,
+        "fcp": 712,
+        "domContentLoaded": 1944.2,
+        "load": 2026.1,
+        "transferBytes": 694296,
+        "requests": 8
+      },
+      "samples": [
+        {
+          "lcp": 1868,
+          "cls": 0,
+          "fcp": 712,
+          "domContentLoaded": 1890.5,
+          "load": 1939.5,
+          "transferBytes": 694296,
+          "requests": 8,
+          "title": "2kW Felicity Lithium Deluxe Family Solar Kit (24V) | NYCE SOLUTIONS",
+          "description": "NYCE SOLUTIONS is a Kenyan enterprise supplying solar energy, generators and backup systems, water and irrigation solutions, industrial and construction machinery, hardware and tools to customers in Kenya and other African markets.",
+          "canonical": null,
+          "robots": "noindex,nofollow",
+          "structuredData": [],
+          "h1": 1
+        },
+        {
+          "lcp": 2256,
+          "cls": 0,
+          "fcp": 800,
+          "domContentLoaded": 2259.2000000476837,
+          "load": 2260.5,
+          "transferBytes": 694296,
+          "requests": 8,
+          "title": "2kW Felicity Lithium Deluxe Family Solar Kit (24V) | NYCE SOLUTIONS",
+          "description": "NYCE SOLUTIONS is a Kenyan enterprise supplying solar energy, generators and backup systems, water and irrigation solutions, industrial and construction machinery, hardware and tools to customers in Kenya and other African markets.",
+          "canonical": null,
+          "robots": "noindex,nofollow",
+          "structuredData": [],
+          "h1": 1
+        },
+        {
+          "lcp": 1940,
+          "cls": 0,
+          "fcp": 708,
+          "domContentLoaded": 1944.2000000476837,
+          "load": 2026.1000000238419,
+          "transferBytes": 694296,
+          "requests": 8,
+          "title": "2kW Felicity Lithium Deluxe Family Solar Kit (24V) | NYCE SOLUTIONS",
+          "description": "NYCE SOLUTIONS is a Kenyan enterprise supplying solar energy, generators and backup systems, water and irrigation solutions, industrial and construction machinery, hardware and tools to customers in Kenya and other African markets.",
+          "canonical": null,
+          "robots": "noindex,nofollow",
+          "structuredData": [],
+          "h1": 1
+        }
+      ]
+    }
+  ]
+}
