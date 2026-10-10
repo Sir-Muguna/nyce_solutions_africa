@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /data/
+Disallow: /docs/
+Disallow: /tools/
+Disallow: /tests/
+Disallow: /test-output/
+Disallow: /standalone/

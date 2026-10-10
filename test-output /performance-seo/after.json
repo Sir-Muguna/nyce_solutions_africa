@@ -1,0 +1,259 @@
+{
+  "label": "after",
+  "browser": "153.0.8010.12",
+  "conditions": {
+    "viewport": [
+      375,
+      812
+    ],
+    "cache": "disabled; new context per sample",
+    "cpuSlowdown": 4,
+    "latencyMs": 40,
+    "downloadBytesPerSecond": 1250000,
+    "uploadBytesPerSecond": 625000,
+    "samplesPerRoute": 3,
+    "settleMs": 1000
+  },
+  "results": [
+    {
+      "route": "home",
+      "medians": {
+        "lcp": 1372,
+        "cls": 0,
+        "fcp": 628,
+        "domContentLoaded": 1344.3,
+        "load": 1697.4,
+        "transferBytes": 696766,
+        "requests": 7
+      },
+      "samples": [
+        {
+          "lcp": 1372,
+          "cls": 0,
+          "fcp": 576,
+          "domContentLoaded": 1344.2999999523163,
+          "load": 1697.3999999761581,
+          "transferBytes": 696766,
+          "requests": 7,
+          "title": "Power your home. Equip your business. | NYCE SOLUTIONS",
+          "description": "NYCE SOLUTIONS supplies solar energy, generators, water and irrigation equipment, construction machinery, hardware and tools in Kenya and other African markets.",
+          "canonical": "https://www.nycesolutionsafrica.com/",
+          "robots": "noindex,follow",
+          "structuredData": [
+            {
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "NYCE SOLUTIONS",
+              "url": "https://www.nycesolutionsafrica.com/"
+            }
+          ],
+          "h1": 1
+        },
+        {
+          "lcp": 1792,
+          "cls": 0,
+          "fcp": 924,
+          "domContentLoaded": 1767.8999999761581,
+          "load": 2106.899999976158,
+          "transferBytes": 696766,
+          "requests": 7,
+          "title": "Power your home. Equip your business. | NYCE SOLUTIONS",
+          "description": "NYCE SOLUTIONS supplies solar energy, generators, water and irrigation equipment, construction machinery, hardware and tools in Kenya and other African markets.",
+          "canonical": "https://www.nycesolutionsafrica.com/",
+          "robots": "noindex,follow",
+          "structuredData": [
+            {
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "NYCE SOLUTIONS",
+              "url": "https://www.nycesolutionsafrica.com/"
+            }
+          ],
+          "h1": 1
+        },
+        {
+          "lcp": 1296,
+          "cls": 0,
+          "fcp": 628,
+          "domContentLoaded": 1269.6000000238419,
+          "load": 1596.1000000238419,
+          "transferBytes": 696766,
+          "requests": 7,
+          "title": "Power your home. Equip your business. | NYCE SOLUTIONS",
+          "description": "NYCE SOLUTIONS supplies solar energy, generators, water and irrigation equipment, construction machinery, hardware and tools in Kenya and other African markets.",
+          "canonical": "https://www.nycesolutionsafrica.com/",
+          "robots": "noindex,follow",
+          "structuredData": [
+            {
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "NYCE SOLUTIONS",
+              "url": "https://www.nycesolutionsafrica.com/"
+            }
+          ],
+          "h1": 1
+        }
+      ]
+    },
+    {
+      "route": "#/shop?category=solar",
+      "medians": {
+        "lcp": 1396,
+        "cls": 0,
+        "fcp": 544,
+        "domContentLoaded": 1029.7,
+        "load": 1369.9,
+        "transferBytes": 696766,
+        "requests": 7
+      },
+      "samples": [
+        {
+          "lcp": 1216,
+          "cls": 0,
+          "fcp": 548,
+          "domContentLoaded": 878,
+          "load": 1185.8999999761581,
+          "transferBytes": 696766,
+          "requests": 7,
+          "title": "Solar & Renewable Energy | NYCE SOLUTIONS",
+          "description": "Browse Solar & Renewable Energy from NYCE SOLUTIONS. Request confirmed product details, pricing and availability.",
+          "canonical": "https://www.nycesolutionsafrica.com/",
+          "robots": "noindex,follow",
+          "structuredData": [
+            {
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "NYCE SOLUTIONS",
+              "url": "https://www.nycesolutionsafrica.com/"
+            }
+          ],
+          "h1": 1
+        },
+        {
+          "lcp": 1952,
+          "cls": 0,
+          "fcp": 400,
+          "domContentLoaded": 1599,
+          "load": 1940.2999999523163,
+          "transferBytes": 696766,
+          "requests": 7,
+          "title": "Solar & Renewable Energy | NYCE SOLUTIONS",
+          "description": "Browse Solar & Renewable Energy from NYCE SOLUTIONS. Request confirmed product details, pricing and availability.",
+          "canonical": "https://www.nycesolutionsafrica.com/",
+          "robots": "noindex,follow",
+          "structuredData": [
+            {
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "NYCE SOLUTIONS",
+              "url": "https://www.nycesolutionsafrica.com/"
+            }
+          ],
+          "h1": 1
+        },
+        {
+          "lcp": 1396,
+          "cls": 0,
+          "fcp": 544,
+          "domContentLoaded": 1029.6999999284744,
+          "load": 1369.8999999761581,
+          "transferBytes": 696766,
+          "requests": 7,
+          "title": "Solar & Renewable Energy | NYCE SOLUTIONS",
+          "description": "Browse Solar & Renewable Energy from NYCE SOLUTIONS. Request confirmed product details, pricing and availability.",
+          "canonical": "https://www.nycesolutionsafrica.com/",
+          "robots": "noindex,follow",
+          "structuredData": [
+            {
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "NYCE SOLUTIONS",
+              "url": "https://www.nycesolutionsafrica.com/"
+            }
+          ],
+          "h1": 1
+        }
+      ]
+    },
+    {
+      "route": "#/product/macire-5feb147d94b109c9",
+      "medians": {
+        "lcp": 1732,
+        "cls": 0,
+        "fcp": 556,
+        "domContentLoaded": 1388.7,
+        "load": 1760.2,
+        "transferBytes": 697667,
+        "requests": 8
+      },
+      "samples": [
+        {
+          "lcp": 1732,
+          "cls": 0,
+          "fcp": 556,
+          "domContentLoaded": 1388.7000000476837,
+          "load": 1760.2000000476837,
+          "transferBytes": 697667,
+          "requests": 8,
+          "title": "2kW Felicity Lithium Deluxe Family Solar Kit (24V) | NYCE SOLUTIONS",
+          "description": "Enquire about this item in Lithium Starter Solar Kits. Exact product details are To Be Confirmed.",
+          "canonical": "https://www.nycesolutionsafrica.com/",
+          "robots": "noindex,follow",
+          "structuredData": [
+            {
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "NYCE SOLUTIONS",
+              "url": "https://www.nycesolutionsafrica.com/"
+            }
+          ],
+          "h1": 1
+        },
+        {
+          "lcp": 1928,
+          "cls": 0,
+          "fcp": 616,
+          "domContentLoaded": 1624.8999999761581,
+          "load": 1947.5,
+          "transferBytes": 697667,
+          "requests": 8,
+          "title": "2kW Felicity Lithium Deluxe Family Solar Kit (24V) | NYCE SOLUTIONS",
+          "description": "Enquire about this item in Lithium Starter Solar Kits. Exact product details are To Be Confirmed.",
+          "canonical": "https://www.nycesolutionsafrica.com/",
+          "robots": "noindex,follow",
+          "structuredData": [
+            {
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "NYCE SOLUTIONS",
+              "url": "https://www.nycesolutionsafrica.com/"
+            }
+          ],
+          "h1": 1
+        },
+        {
+          "lcp": 1500,
+          "cls": 0,
+          "fcp": 440,
+          "domContentLoaded": 1085.0999999046326,
+          "load": 1500.5999999046326,
+          "transferBytes": 697667,
+          "requests": 8,
+          "title": "2kW Felicity Lithium Deluxe Family Solar Kit (24V) | NYCE SOLUTIONS",
+          "description": "Enquire about this item in Lithium Starter Solar Kits. Exact product details are To Be Confirmed.",
+          "canonical": "https://www.nycesolutionsafrica.com/",
+          "robots": "noindex,follow",
+          "structuredData": [
+            {
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "NYCE SOLUTIONS",
+              "url": "https://www.nycesolutionsafrica.com/"
+            }
+          ],
+          "h1": 1
+        }
+      ]
+    }
+  ]
+}
